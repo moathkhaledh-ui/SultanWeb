@@ -1,0 +1,1017 @@
+17:31:38.761
+System
+Build
+ Render Start 
+17:31:38.762
+System
+Log
+ Build successful and cleared previous logs 
+17:31:44.024
+Android
+Debug
+ 10-28 12:31:17.954 9475 D/EGL_emulation: app_time_stats: avg=523.31ms min=375.35ms max=671.27ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:18.034 9475 D/EGL_emulation: app_time_stats: avg=97.02ms min=56.59ms max=144.21ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:19.106 9475 D/EGL_emulation: app_time_stats: avg=64.81ms min=42.26ms max=109.03ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:19.183 9475 D/EGL_emulation: app_time_stats: avg=614.28ms min=610.29ms max=618.27ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:20.205 9475 D/EGL_emulation: app_time_stats: avg=89.41ms min=42.17ms max=140.37ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:20.581 9475 D/EGL_emulation: app_time_stats: avg=698.86ms min=665.54ms max=732.18ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:21.249 9475 D/EGL_emulation: app_time_stats: avg=77.80ms min=52.33ms max=117.52ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:21.681 9475 D/EGL_emulation: app_time_stats: avg=550.26ms min=547.28ms max=553.24ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:22.319 9475 D/EGL_emulation: app_time_stats: avg=77.56ms min=40.75ms max=139.69ms count=7 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:22.735 9475 D/EGL_emulation: app_time_stats: avg=526.75ms min=493.58ms max=559.92ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:23.326 9475 D/EGL_emulation: app_time_stats: avg=61.19ms min=3.84ms max=135.95ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:24.008 9475 D/EGL_emulation: app_time_stats: avg=636.37ms min=547.98ms max=724.76ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:24.383 9475 D/EGL_emulation: app_time_stats: avg=75.42ms min=39.49ms max=122.27ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:25.177 9475 D/EGL_emulation: app_time_stats: avg=584.77ms min=554.47ms max=615.07ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:25.532 9475 D/EGL_emulation: app_time_stats: avg=85.20ms min=41.33ms max=138.77ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:26.278 9475 D/EGL_emulation: app_time_stats: avg=550.16ms min=548.23ms max=552.09ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:26.629 9475 D/EGL_emulation: app_time_stats: avg=82.19ms min=40.95ms max=141.29ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:27.486 9475 D/EGL_emulation: app_time_stats: avg=604.08ms min=546.68ms max=661.47ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:27.664 9475 D/EGL_emulation: app_time_stats: avg=82.60ms min=51.33ms max=143.16ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:28.657 9475 D/EGL_emulation: app_time_stats: avg=585.65ms min=553.63ms max=617.67ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:28.720 9475 D/EGL_emulation: app_time_stats: avg=79.65ms min=45.90ms max=123.50ms count=7 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:29.840 9475 D/EGL_emulation: app_time_stats: avg=80.74ms min=56.01ms max=120.35ms count=9 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:30.313 9475 D/EGL_emulation: app_time_stats: avg=551.92ms min=430.99ms max=672.83ms count=3 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:30.890 9475 D/EGL_emulation: app_time_stats: avg=76.15ms min=43.31ms max=113.38ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:31.420 9475 D/EGL_emulation: app_time_stats: avg=553.16ms min=537.79ms max=568.53ms count=2 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:31.984 9475 D/EGL_emulation: app_time_stats: avg=97.69ms min=59.18ms max=126.33ms count=8 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:32.457 9475 D/EGL_emulation: app_time_stats: avg=518.87ms min=496.04ms max=541.70ms count=2 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:34.281 10411 I/cleanops.qmxrts: Late-enabling -Xcheck:jni 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:34.314 10411 I/cleanops.qmxrts: Using CollectorTypeCMC GC. 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:34.334 10411 D/nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok 
+17:31:44.025
+Android
+Warning
+ 10-28 12:31:34.534 10411 W/ziparchive: Unable to open '/data/app/~~Vt2GlgUB-DCXoUM3XVlhew==/com.aistudio.cleanops.qmxrts-1484LKzpr4mhhs6obxppNQ==/base.dm': No such file or directory 
+17:31:44.025
+Android
+Warning
+ 10-28 12:31:34.537 10411 W/ziparchive: Unable to open '/data/app/~~Vt2GlgUB-DCXoUM3XVlhew==/com.aistudio.cleanops.qmxrts-1484LKzpr4mhhs6obxppNQ==/base.dm': No such file or directory 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:35.321 10411 D/nativeloader: Configuring clns-7 for other apk /data/app/~~Vt2GlgUB-DCXoUM3XVlhew==/com.aistudio.cleanops.qmxrts-1484LKzpr4mhhs6obxppNQ==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~Vt2GlgUB-DCXoUM3XVlhew==/com.aistudio.cleanops.qmxrts-1484LKzpr4mhhs6obxppNQ==/lib/arm64:/data/app/~~Vt2GlgUB-DCXoUM3XVlhew==/com.aistudio.cleanops.qmxrts-1484LKzpr4mhhs6obxppNQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.aistudio.cleanops.qmxrts 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:35.329 10411 V/GraphicsEnvironment: Currently set values for:
+angle_gl_driver_selection_pkgs=[]
+angle_gl_driver_selection_values=[]
+Global.Settings values are invalid: number of packages: 0, number of values: 0
+Neither updatable production driver nor prerelease driver is supported. 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:35.353 10411 I/FirebaseApp: Device unlocked: initializing all Firebase APIs for app [DEFAULT] 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:35.356 10411 I/FirebaseInitProvider: FirebaseApp initialization successful 
+17:31:44.025
+Android
+Warning
+ 10-28 12:31:35.433 10411 W/HWUI    : Unknown dataspace 0 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:35.736 10411 I/cleanops.qmxrts: Compiler allocated 5250KB to compile void android.view.ViewRootImpl.performTraversals() 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:35.967 10411 I/EGL_emulation: Opening libGLESv1_CM_emulation.so 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:35.968 10411 I/EGL_emulation: Opening libGLESv2_emulation.so 
+17:31:44.025
+Android
+Warning
+ 10-28 12:31:35.973 10411 W/HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+Failed to initialize 101010-2 format, error = EGL_SUCCESS 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:36.049 10411 I/Gralloc4: mapper 4.x is not supported 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:36.169 10411 I/Choreographer: Skipped 39 frames!  The application may be doing too much work on its main thread. 
+17:31:44.025
+Android
+Log
+ 10-28 12:31:36.261 10411 I/HWUI    : Davey! duration=813ms; Flags=1, FrameTimelineVsyncId=147178, IntendedVsync=3373973510853, Vsync=3374023510851, InputEventId=0, HandleInputStart=3374038946898, AnimationStart=3374038949857, PerformTraversalsStart=3374039087857, DrawStart=3374649680982, FrameDeadline=3373990177519, FrameInterval=3374038856732, FrameStartTime=16666666, SyncQueued=3374664045440, SyncStart=3374665786065, IssueDrawCommandsStart=3374666424899, SwapBuffers=3374729993107, FrameCompleted=3374788659232, DequeueBufferDuration=1917, QueueBufferDuration=160541, GpuCompleted=3374788659232, SwapBuffersCompleted=3374732826024, DisplayPresentTime=72904454231359566, CommandSubmissionCompleted=3374729993107,  
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:37.438 10411 D/EGL_emulation: app_time_stats: avg=128.02ms min=36.56ms max=430.60ms count=9 
+17:31:44.025
+Android
+Debug
+ 10-28 12:31:40.869 10411 D/ProfileInstaller: Installing profile for com.aistudio.cleanops.qmxrts 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:30.713 10411 D/EGL_emulation: app_time_stats: avg=13260.79ms min=10.02ms max=52960.03ms count=4 
+17:32:37.587
+Android
+Log
+ 10-28 12:32:31.470 10411 I/cleanops.qmxrts: Compiler allocated 4834KB to compile kotlin.Unit com.example.ui.screens.DataCenterScreenKt.DataCenterScreen$lambda$50$lambda$49$lambda$48$lambda$22(androidx.compose.runtime.State, com.example.viewmodel.MainViewModel, androidx.compose.foundation.lazy.LazyItemScope, androidx.compose.runtime.Composer, int) 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:31.748 10411 D/EGL_emulation: app_time_stats: avg=47.46ms min=16.50ms max=104.21ms count=12 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.483 10411 D/EGL_emulation: app_time_stats: avg=174.51ms min=22.06ms max=1121.93ms count=8 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:33.882 10411 W/DynamiteModule: Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found. 
+17:32:37.587
+Android
+Log
+ 10-28 12:32:33.933 10411 I/DynamiteModule: Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:33.933 10411 W/ProviderInstaller: Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0. 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.953 10411 D/ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.983 10411 D/nativeloader: Configuring clns-8 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=37, uses_libraries=ALL, library_path=/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/lib/arm64:/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.986 10411 D/nativeloader: Configuring clns-9 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=37, uses_libraries=ALL, library_path=/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/lib/arm64:/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.987 10411 D/ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.988 10411 D/ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:33.990 10411 D/nativeloader: Configuring clns-10 for other apk /data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/base.apk. target_sdk_version=37, uses_libraries=, library_path=/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/lib/arm64:/data/app/~~pybqa_YMHNe9koY0hsyt-Q==/com.google.android.gms-iKaHWbEr11xvHhYtJ68ptw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.082 10411 W/cleanops.qmxrts: Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (unsupported, reflection, allowed) 
+17:32:37.587
+Android
+Log
+ 10-28 12:32:34.106 10411 I/gvuy    : Unable to retrieve flag snapshot for com.google.android.gms.providerinstaller#com.aistudio.cleanops.qmxrts, using defaults. 
+17:32:37.587
+Android
+Log
+ 10-28 12:32:34.117 10411 I/ProviderInstaller: Installed default security provider AndroidOpenSSL (via CompatProvider) 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.148 10411 W/GoogleApiManager: Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null} 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.150 10411 W/FlagRegistrar: Failed to register com.google.android.gms.providerinstaller#com.aistudio.cleanops.qmxrts
+gvvj: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+at gvvl.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):13)
+at hwtd.d(:com.google.android.gms@263234035@26.32.34 (260400-968093310):3)
+at hwtf.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):139)
+at hwvq.execute(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at hwtn.f(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at hwtn.m(:com.google.android.gms@263234035@26.32.34 (260400-968093310):101)
+at hwtn.q(:com.google.android.gms@263234035@26.32.34 (260400-968093310):16)
+at gpej.jd(:com.google.android.gms@263234035@26.32.34 (260400-968093310):35)
+at gbdp.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):12)
+at hwvq.execute(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at gbdq.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):18)
+at gbef.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):34)
+at gbeh.c(:com.google.android.gms@263234035@26.32.34 (260400-968093310):23)
+at blsh.e(:com.google.android.gms@263234035@26.32.34 (260400-968093310):9)
+at blux.r(:com.google.android.gms@263234035@26.32.34 (260400-968093310):48)
+at blux.d(:com.google.android.gms@263234035@26.32.34 (260400-968093310):10)
+at blux.g(:com.google.android.gms@263234035@26.32.34 (260400-968093310):191)
+at bluz.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):74)
+at android.os.Handler.handleCallback(Handler.java:959)
+at android.os.Handler.dispatchMessage(Handler.java:100)
+at dhsb.lJ(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at dhsb.dispatchMessage(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+at android.os.Looper.loopOnce(Looper.java:232)
+at android.os.Looper.loop(Looper.java:317)
+at android.os.HandlerThread.run(HandlerThread.java:85)
+Caused by: blqm: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+at bmoo.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):15)
+at blsk.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at blsh.e(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+... 11 more 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.150 10411 W/FlagStore: Unable to update local snapshot for com.google.android.gms.providerinstaller#com.aistudio.cleanops.qmxrts, may result in stale flags.
+java.util.concurrent.ExecutionException: gvvj: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+at hwtn.j(:com.google.android.gms@263234035@26.32.34 (260400-968093310):21)
+at hwtw.t(:com.google.android.gms@263234035@26.32.34 (260400-968093310):24)
+at hwtn.get(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at hwyf.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):2)
+at hwwv.s(:com.google.android.gms@263234035@26.32.34 (260400-968093310):10)
+at gwar.d(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at gvzv.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:307)
+at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+at java.lang.Thread.run(Thread.java:1012)
+Caused by: gvvj: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+at gvvl.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):13)
+at hwtd.d(:com.google.android.gms@263234035@26.32.34 (260400-968093310):3)
+at hwtf.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):139)
+at hwvq.execute(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at hwtn.f(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at hwtn.m(:com.google.android.gms@263234035@26.32.34 (260400-968093310):101)
+at hwtn.q(:com.google.android.gms@263234035@26.32.34 (260400-968093310):16)
+at gpej.jd(:com.google.android.gms@263234035@26.32.34 (260400-968093310):35)
+at gbdp.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):12)
+at hwvq.execute(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at gbdq.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):18)
+at gbef.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):34)
+at gbem.B(:com.google.android.gms@263234035@26.32.34 (260400-968093310):17)
+at gbdh.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):60)
+at hwvq.execute(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at gbdi.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):8)
+at gbef.b(:com.google.android.gms@263234035@26.32.34 (260400-968093310):34)
+at gbeh.c(:com.google.android.gms@263234035@26.32.34 (260400-968093310):23)
+at blsh.e(:com.google.android.gms@263234035@26.32.34 (260400-968093310):9)
+at blux.r(:com.google.android.gms@263234035@26.32.34 (260400-968093310):48)
+at blux.d(:com.google.android.gms@263234035@26.32.34 (260400-968093310):10)
+at blux.g(:com.google.android.gms@263234035@26.32.34 (260400-968093310):191)
+at bluz.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):74)
+at android.os.Handler.handleCallback(Handler.java:959)
+at android.os.Handler.dispatchMessage(Handler.java:100)
+at dhsb.lJ(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at dhsb.dispatchMessage(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+at android.os.Looper.loopOnce(Looper.java:232)
+at android.os.Looper.loop(Looper.java:317)
+at android.os.HandlerThread.run(HandlerThread.java:85)
+Caused by: blqm: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+at bmoo.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):15)
+at blsk.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+at blsh.e(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+... 11 more 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:34.270 10411 D/TrafficStats: tagSocket(126) with statsTag=0xffffffff, statsUid=-1 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:34.526 10411 D/EGL_emulation: app_time_stats: avg=47.66ms min=8.62ms max=87.80ms count=12 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.600 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:34.812 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:35.611 10411 D/EGL_emulation: app_time_stats: avg=35.76ms min=15.49ms max=66.08ms count=13 
+17:32:37.587
+Android
+Warning
+ 10-28 12:32:35.983 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:37.587
+Android
+Debug
+ 10-28 12:32:36.658 10411 D/EGL_emulation: app_time_stats: avg=39.27ms min=14.09ms max=72.18ms count=13 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:37.218 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:37.686 10411 D/EGL_emulation: app_time_stats: avg=41.32ms min=14.90ms max=82.05ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:38.748 10411 D/EGL_emulation: app_time_stats: avg=36.95ms min=9.41ms max=60.39ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:39.783 10411 D/EGL_emulation: app_time_stats: avg=41.54ms min=21.10ms max=59.76ms count=13 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:39.875 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:40.823 10411 D/EGL_emulation: app_time_stats: avg=38.52ms min=14.86ms max=61.77ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:41.894 10411 D/EGL_emulation: app_time_stats: avg=37.89ms min=20.56ms max=60.20ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:42.905 10411 D/EGL_emulation: app_time_stats: avg=35.20ms min=4.16ms max=59.92ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:43.932 10411 D/EGL_emulation: app_time_stats: avg=36.81ms min=14.39ms max=59.78ms count=13 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:44.111 10411 W/GoogleApiManager: Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null} 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:44.905 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:44.987 10411 D/EGL_emulation: app_time_stats: avg=34.10ms min=10.65ms max=61.97ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:46.056 10411 D/EGL_emulation: app_time_stats: avg=34.98ms min=5.47ms max=59.33ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:47.096 10411 D/EGL_emulation: app_time_stats: avg=34.70ms min=13.73ms max=64.72ms count=13 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:48.151 10411 D/EGL_emulation: app_time_stats: avg=32.67ms min=14.60ms max=62.26ms count=13 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:49.074 10411 W/WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+Set 'android:enableOnBackInvokedCallback="true"' in the application manifest. 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:49.229 10411 D/EGL_emulation: app_time_stats: avg=43.82ms min=21.53ms max=74.46ms count=13 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:49.471 10411 I/cleanops.qmxrts: Compiler allocated 7510KB to compile kotlin.Unit com.example.ui.components.AiChatDialogKt.AiChatDialog$lambda$29(long, kotlin.jvm.functions.Function1, androidx.compose.foundation.lazy.LazyListState, java.util.List, kotlin.jvm.functions.Function1, kotlin.jvm.functions.Function0, boolean, boolean, kotlin.jvm.functions.Function0, boolean, java.util.List, androidx.compose.runtime.MutableState, androidx.compose.runtime.Composer, int) 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:49.617 10411 I/cleanops.qmxrts: Compiler allocated 7475KB to compile kotlin.Unit com.example.ui.components.AiChatDialogKt.AiChatDialog$lambda$29(long, kotlin.jvm.functions.Function1, androidx.compose.foundation.lazy.LazyListState, java.util.List, kotlin.jvm.functions.Function1, kotlin.jvm.functions.Function0, boolean, boolean, kotlin.jvm.functions.Function0, boolean, java.util.List, androidx.compose.runtime.MutableState, androidx.compose.runtime.Composer, int) 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:49.821 10411 I/Choreographer: Skipped 45 frames!  The application may be doing too much work on its main thread. 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:49.901 10411 I/HWUI    : Davey! duration=868ms; Flags=1, FrameTimelineVsyncId=150530, IntendedVsync=3447506841245, Vsync=3447640174573, InputEventId=0, HandleInputStart=3447649749517, AnimationStart=3447649750809, PerformTraversalsStart=3447879294975, DrawStart=3448290783601, FrameDeadline=3447523507911, FrameInterval=3447646209059, FrameStartTime=16666666, SyncQueued=3448318708101, SyncStart=3448348732351, IssueDrawCommandsStart=3448348821059, SwapBuffers=3448361596684, FrameCompleted=3448405236892, DequeueBufferDuration=2208, QueueBufferDuration=222584, GpuCompleted=3448405236892, SwapBuffersCompleted=3448364522517, DisplayPresentTime=545252274072, CommandSubmissionCompleted=3448361596684,  
+17:32:57.549
+Android
+Log
+ 10-28 12:32:50.202 10411 I/HWUI    : Davey! duration=893ms; Flags=0, FrameTimelineVsyncId=150548, IntendedVsync=3447656841239, Vsync=3448406841209, InputEventId=0, HandleInputStart=3448429791517, AnimationStart=3448429793476, PerformTraversalsStart=3448450252684, DrawStart=3448463946642, FrameDeadline=3448423507875, FrameInterval=3448418244642, FrameStartTime=16666666, SyncQueued=3448467959934, SyncStart=3448605127934, IssueDrawCommandsStart=3448605231517, SwapBuffers=3448620417434, FrameCompleted=3448687828767, DequeueBufferDuration=2292, QueueBufferDuration=159958, GpuCompleted=3448687828767, SwapBuffersCompleted=3448653226059, DisplayPresentTime=545254559940, CommandSubmissionCompleted=3448620417434,  
+17:32:57.549
+Android
+Log
+ 10-28 12:32:50.306 10411 I/HWUI    : Davey! duration=1070ms; Flags=0, FrameTimelineVsyncId=150548, IntendedVsync=3447656841239, Vsync=3448406841209, InputEventId=0, HandleInputStart=3448429791517, AnimationStart=3448429793476, PerformTraversalsStart=3448450252684, DrawStart=3448605629059, FrameDeadline=3448606841201, FrameInterval=3448418244642, FrameStartTime=16666666, SyncQueued=3448606179434, SyncStart=3448676877017, IssueDrawCommandsStart=3448688377059, SwapBuffers=3448697549351, FrameCompleted=3448797604892, DequeueBufferDuration=2209, QueueBufferDuration=281375, GpuCompleted=3448797604892, SwapBuffersCompleted=3448723975642, DisplayPresentTime=0, CommandSubmissionCompleted=3448697549351,  
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:50.383 10411 D/EGL_emulation: app_time_stats: avg=74.78ms min=16.74ms max=149.20ms count=10 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:51.518 10411 D/EGL_emulation: app_time_stats: avg=60.29ms min=39.45ms max=118.42ms count=10 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:52.015 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:52.652 10411 D/EGL_emulation: app_time_stats: avg=49.35ms min=33.05ms max=60.70ms count=11 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:53.337 10411 D/InsetsController: show(ime(), fromIme=false) 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:53.337 10411 I/ImeTracker: com.aistudio.cleanops.qmxrts:3c94c0df: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT_BY_INSETS_API fromUser false 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:53.338 10411 D/InputMethodManager: showSoftInput() view=androidx.compose.ui.platform.AndroidComposeView{525c382 VFED..... .F....ID 0,0-1036,2207 aid=1073741825} flags=0 reason=SHOW_SOFT_INPUT_BY_INSETS_API 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:53.388 10411 D/EGL_emulation: app_time_stats: avg=905.12ms min=256.70ms max=2758.63ms count=4 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:53.576 10411 I/ImeTracker: com.aistudio.cleanops.qmxrts:f17ce059: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:53.576 10411 D/InputMethodManager: showSoftInput() view=androidx.compose.ui.platform.AndroidComposeView{525c382 VFED..... .F...... 0,0-1036,2207 aid=1073741825} flags=0 reason=SHOW_SOFT_INPUT 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:53.681 10411 D/EGL_emulation: app_time_stats: avg=82.58ms min=40.39ms max=188.37ms count=9 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:54.200 10411 D/InsetsController: show(ime(), fromIme=true) 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:54.243 10411 W/InteractionJankMonitor: Initializing without READ_DEVICE_CONFIG permission. enabled=true, interval=1, missedFrameThreshold=3, frameTimeThreshold=64, package=com.aistudio.cleanops.qmxrts 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:54.519 10411 D/EGL_emulation: app_time_stats: avg=218.73ms min=65.29ms max=338.53ms count=5 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:54.842 10411 D/EGL_emulation: app_time_stats: avg=192.04ms min=107.97ms max=345.98ms count=5 
+17:32:57.549
+Android
+Log
+ 10-28 12:32:55.046 10411 I/ImeTracker: com.aistudio.cleanops.qmxrts:f17ce059: onShown 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:55.871 10411 D/EGL_emulation: app_time_stats: avg=337.92ms min=180.61ms max=487.42ms count=4 
+17:32:57.549
+Android
+Debug
+ 10-28 12:32:56.025 10411 D/EGL_emulation: app_time_stats: avg=116.57ms min=55.93ms max=214.33ms count=7 
+17:32:57.549
+Android
+Warning
+ 10-28 12:32:56.156 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:33:16.154
+Backend
+Log
+ CONNECTED 
+17:33:17.552
+Android
+Debug
+ 10-28 12:32:57.196 10411 D/EGL_emulation: app_time_stats: avg=289.53ms min=18.65ms max=709.43ms count=4 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:57.219 10411 D/EGL_emulation: app_time_stats: avg=119.69ms min=58.45ms max=279.12ms count=7 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:57.720 10411 D/TrafficStats: tagSocket(124) with statsTag=0xffffffff, statsUid=-1 
+17:33:17.553
+Android
+Warning
+ 10-28 12:32:57.986 10411 W/AiAssistantService: Gemini API call failed, falling back to local smart engine: Gemini HTTP 404: {
+"error": {
+"code": 404,
+"message": "This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started).",
+"status": "NOT_FOUND"
+}
+} 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:58.335 10411 D/EGL_emulation: app_time_stats: avg=164.75ms min=18.94ms max=315.84ms count=6 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:58.401 10411 D/EGL_emulation: app_time_stats: avg=154.85ms min=63.60ms max=232.06ms count=6 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:58.981 10411 D/InsetsController: show(ime(), fromIme=true) 
+17:33:17.553
+Android
+Log
+ 10-28 12:32:58.998 10411 I/ImeTracker: com.aistudio.cleanops.qmxrts:8d0093b3: onCancelled at PHASE_CLIENT_APPLY_ANIMATION 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:59.417 10411 D/EGL_emulation: app_time_stats: avg=324.29ms min=133.73ms max=468.47ms count=3 
+17:33:17.553
+Android
+Debug
+ 10-28 12:32:59.432 10411 D/EGL_emulation: app_time_stats: avg=153.83ms min=37.95ms max=335.00ms count=6 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:00.551 10411 D/EGL_emulation: app_time_stats: avg=88.77ms min=51.70ms max=137.38ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:00.727 10411 D/EGL_emulation: app_time_stats: avg=431.49ms min=373.31ms max=541.13ms count=3 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:01.624 10411 D/EGL_emulation: app_time_stats: avg=72.18ms min=7.50ms max=140.89ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:01.818 10411 D/EGL_emulation: app_time_stats: avg=545.59ms min=490.80ms max=600.38ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:02.676 10411 D/EGL_emulation: app_time_stats: avg=83.28ms min=40.41ms max=148.56ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:03.188 10411 D/EGL_emulation: app_time_stats: avg=684.96ms min=650.53ms max=719.40ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:03.753 10411 D/EGL_emulation: app_time_stats: avg=66.58ms min=42.24ms max=138.53ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:04.367 10411 D/EGL_emulation: app_time_stats: avg=589.62ms min=552.12ms max=627.12ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:04.839 10411 D/EGL_emulation: app_time_stats: avg=89.49ms min=52.60ms max=146.62ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:05.512 10411 D/EGL_emulation: app_time_stats: avg=572.53ms min=550.95ms max=594.11ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:05.954 10411 D/EGL_emulation: app_time_stats: avg=69.66ms min=10.31ms max=124.21ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:06.636 10411 D/EGL_emulation: app_time_stats: avg=561.69ms min=560.38ms max=562.99ms count=2 
+17:33:17.553
+Android
+Warning
+ 10-28 12:33:06.994 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:06.997 10411 D/EGL_emulation: app_time_stats: avg=81.18ms min=42.85ms max=179.73ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:07.726 10411 D/EGL_emulation: app_time_stats: avg=544.22ms min=539.18ms max=549.27ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:08.041 10411 D/EGL_emulation: app_time_stats: avg=82.05ms min=58.92ms max=125.19ms count=7 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:08.835 10411 D/EGL_emulation: app_time_stats: avg=554.47ms min=552.51ms max=556.43ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:09.154 10411 D/EGL_emulation: app_time_stats: avg=75.43ms min=51.03ms max=116.86ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:09.948 10411 D/EGL_emulation: app_time_stats: avg=556.67ms min=556.04ms max=557.30ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:10.263 10411 D/EGL_emulation: app_time_stats: avg=84.78ms min=57.28ms max=127.86ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:10.989 10411 D/EGL_emulation: app_time_stats: avg=520.17ms min=489.92ms max=550.41ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:11.341 10411 D/EGL_emulation: app_time_stats: avg=77.20ms min=40.48ms max=136.55ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:12.082 10411 D/EGL_emulation: app_time_stats: avg=546.82ms min=489.19ms max=604.45ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:12.442 10411 D/EGL_emulation: app_time_stats: avg=80.60ms min=40.32ms max=140.10ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:13.461 10411 D/EGL_emulation: app_time_stats: avg=689.25ms min=664.72ms max=713.78ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:13.499 10411 D/EGL_emulation: app_time_stats: avg=67.26ms min=40.90ms max=116.61ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:14.562 10411 D/EGL_emulation: app_time_stats: avg=79.61ms min=42.82ms max=151.64ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:14.624 10411 D/EGL_emulation: app_time_stats: avg=581.31ms min=544.72ms max=617.90ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:15.648 10411 D/EGL_emulation: app_time_stats: avg=80.20ms min=36.26ms max=176.68ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:15.850 10411 D/EGL_emulation: app_time_stats: avg=613.20ms min=501.69ms max=724.71ms count=2 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:16.784 10411 D/EGL_emulation: app_time_stats: avg=78.08ms min=40.38ms max=140.89ms count=8 
+17:33:17.553
+Android
+Debug
+ 10-28 12:33:17.016 10411 D/EGL_emulation: app_time_stats: avg=582.81ms min=553.96ms max=611.66ms count=2 
+17:33:17.553
+Android
+Warning
+ 10-28 12:33:17.052 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:17.896 10411 D/EGL_emulation: app_time_stats: avg=73.24ms min=14.98ms max=149.29ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:18.124 10411 D/EGL_emulation: app_time_stats: avg=553.89ms min=540.89ms max=566.89ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:18.991 10411 D/EGL_emulation: app_time_stats: avg=76.93ms min=54.07ms max=113.14ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:19.230 10411 D/EGL_emulation: app_time_stats: avg=552.98ms min=550.44ms max=555.52ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:20.094 10411 D/EGL_emulation: app_time_stats: avg=75.67ms min=57.07ms max=112.25ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:20.314 10411 D/EGL_emulation: app_time_stats: avg=542.08ms min=530.71ms max=553.46ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:21.192 10411 D/EGL_emulation: app_time_stats: avg=86.90ms min=40.87ms max=158.21ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:21.487 10411 D/EGL_emulation: app_time_stats: avg=586.67ms min=511.10ms max=662.25ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:22.302 10411 D/EGL_emulation: app_time_stats: avg=80.41ms min=42.79ms max=141.51ms count=9 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:22.716 10411 D/EGL_emulation: app_time_stats: avg=614.40ms min=565.53ms max=663.28ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:23.394 10411 D/EGL_emulation: app_time_stats: avg=72.62ms min=21.38ms max=113.42ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:23.805 10411 D/EGL_emulation: app_time_stats: avg=544.31ms min=534.67ms max=553.96ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:24.433 10411 D/EGL_emulation: app_time_stats: avg=80.99ms min=15.05ms max=147.29ms count=7 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:24.903 10411 D/EGL_emulation: app_time_stats: avg=549.14ms min=545.80ms max=552.47ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:25.494 10411 D/EGL_emulation: app_time_stats: avg=79.00ms min=41.34ms max=157.69ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:25.990 10411 D/EGL_emulation: app_time_stats: avg=543.28ms min=504.70ms max=581.86ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:26.574 10411 D/EGL_emulation: app_time_stats: avg=78.58ms min=41.40ms max=178.27ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:27.108 10411 D/EGL_emulation: app_time_stats: avg=558.93ms min=551.11ms max=566.74ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:27.723 10411 D/EGL_emulation: app_time_stats: avg=87.17ms min=58.70ms max=125.07ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:28.197 10411 D/EGL_emulation: app_time_stats: avg=544.73ms min=536.06ms max=553.39ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:28.790 10411 D/EGL_emulation: app_time_stats: avg=57.57ms min=11.52ms max=102.39ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:29.380 10411 D/EGL_emulation: app_time_stats: avg=591.00ms min=555.03ms max=626.98ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:29.806 10411 D/EGL_emulation: app_time_stats: avg=90.44ms min=55.32ms max=175.51ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:30.598 10411 D/EGL_emulation: app_time_stats: avg=609.16ms min=553.03ms max=665.28ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:30.971 10411 D/EGL_emulation: app_time_stats: avg=90.23ms min=53.77ms max=162.45ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:31.809 10411 D/EGL_emulation: app_time_stats: avg=605.29ms min=536.73ms max=673.85ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:32.004 10411 D/EGL_emulation: app_time_stats: avg=90.60ms min=40.98ms max=144.31ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:33.146 10411 D/EGL_emulation: app_time_stats: avg=668.49ms min=665.27ms max=671.71ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:33.170 10411 D/EGL_emulation: app_time_stats: avg=67.60ms min=52.34ms max=123.12ms count=9 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:34.233 10411 D/EGL_emulation: app_time_stats: avg=543.83ms min=542.81ms max=544.85ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:34.258 10411 D/EGL_emulation: app_time_stats: avg=78.36ms min=55.88ms max=123.24ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:35.282 10411 D/EGL_emulation: app_time_stats: avg=524.37ms min=503.83ms max=544.91ms count=2 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:35.363 10411 D/EGL_emulation: app_time_stats: avg=92.02ms min=41.00ms max=179.12ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:36.368 10411 D/EGL_emulation: app_time_stats: avg=94.19ms min=54.88ms max=181.46ms count=8 
+17:33:37.557
+Android
+Debug
+ 10-28 12:33:36.638 10411 D/EGL_emulation: app_time_stats: avg=678.09ms min=664.13ms max=692.05ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:37.531 10411 D/EGL_emulation: app_time_stats: avg=69.67ms min=20.13ms max=114.58ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:37.781 10411 D/EGL_emulation: app_time_stats: avg=571.46ms min=568.93ms max=573.98ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:38.625 10411 D/EGL_emulation: app_time_stats: avg=81.89ms min=56.53ms max=113.39ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:38.800 10411 D/EGL_emulation: app_time_stats: avg=509.06ms min=486.45ms max=531.67ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:39.726 10411 D/EGL_emulation: app_time_stats: avg=91.05ms min=56.46ms max=141.38ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:39.973 10411 D/EGL_emulation: app_time_stats: avg=586.90ms min=562.37ms max=611.44ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:40.851 10411 D/EGL_emulation: app_time_stats: avg=83.07ms min=41.35ms max=140.26ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:41.576 10411 D/EGL_emulation: app_time_stats: avg=534.09ms min=393.50ms max=647.13ms count=3 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:41.924 10411 D/EGL_emulation: app_time_stats: avg=87.81ms min=40.13ms max=144.30ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:42.792 10411 D/EGL_emulation: app_time_stats: avg=607.80ms min=544.39ms max=671.21ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:42.988 10411 D/EGL_emulation: app_time_stats: avg=88.74ms min=41.58ms max=144.29ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:43.952 10411 D/EGL_emulation: app_time_stats: avg=580.21ms min=552.17ms max=608.25ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:44.095 10411 D/EGL_emulation: app_time_stats: avg=79.01ms min=3.70ms max=146.74ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:45.109 10411 D/EGL_emulation: app_time_stats: avg=578.45ms min=550.25ms max=606.66ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:45.184 10411 D/EGL_emulation: app_time_stats: avg=77.63ms min=56.77ms max=137.32ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:46.226 10411 D/EGL_emulation: app_time_stats: avg=70.68ms min=42.21ms max=113.57ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:46.370 10411 D/EGL_emulation: app_time_stats: avg=630.12ms min=551.53ms max=708.71ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:47.238 10411 D/EGL_emulation: app_time_stats: avg=84.17ms min=42.29ms max=143.06ms count=7 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:47.972 10411 D/EGL_emulation: app_time_stats: avg=534.23ms min=383.50ms max=633.37ms count=3 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:48.324 10411 D/EGL_emulation: app_time_stats: avg=93.16ms min=43.06ms max=144.06ms count=8 
+17:33:57.560
+Android
+Warning
+ 10-28 12:33:48.585 10411 W/Firestore: (26.5.0) [WriteStream]: (e8bb9f1) Stream closed with status: Status{code=NOT_FOUND, description=The database (default) does not exist for project gen-lang-client-0305755846 Please visit https://console.cloud.google.com/datastore/setup?project=gen-lang-client-0305755846 to add a Cloud Datastore or Cloud Firestore database. , cause=null}. 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:49.129 10411 D/EGL_emulation: app_time_stats: avg=578.20ms min=548.49ms max=607.90ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:49.483 10411 D/EGL_emulation: app_time_stats: avg=73.31ms min=40.73ms max=123.37ms count=9 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:50.345 10411 D/EGL_emulation: app_time_stats: avg=608.14ms min=607.03ms max=609.24ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:50.522 10411 D/EGL_emulation: app_time_stats: avg=91.10ms min=57.16ms max=141.89ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:51.614 10411 D/EGL_emulation: app_time_stats: avg=74.24ms min=52.96ms max=143.95ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:51.675 10411 D/EGL_emulation: app_time_stats: avg=664.70ms min=664.38ms max=665.03ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:52.695 10411 D/EGL_emulation: app_time_stats: avg=83.83ms min=41.32ms max=167.91ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:52.891 10411 D/EGL_emulation: app_time_stats: avg=608.10ms min=551.05ms max=665.14ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:53.822 10411 D/EGL_emulation: app_time_stats: avg=83.65ms min=41.68ms max=138.58ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:54.121 10411 D/EGL_emulation: app_time_stats: avg=614.95ms min=552.69ms max=677.20ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:54.876 10411 D/EGL_emulation: app_time_stats: avg=82.96ms min=40.71ms max=140.52ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:55.468 10411 D/EGL_emulation: app_time_stats: avg=673.32ms min=668.26ms max=678.39ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:55.967 10411 D/EGL_emulation: app_time_stats: avg=77.70ms min=36.52ms max=139.53ms count=8 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:56.569 10411 D/EGL_emulation: app_time_stats: avg=550.80ms min=549.30ms max=552.29ms count=2 
+17:33:57.560
+Android
+Debug
+ 10-28 12:33:57.065 10411 D/EGL_emulation: app_time_stats: avg=81.72ms min=20.92ms max=138.23ms count=8 
