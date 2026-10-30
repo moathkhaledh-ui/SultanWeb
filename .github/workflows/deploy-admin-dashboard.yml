@@ -1,0 +1,116 @@
+name: Deploy Web Admin Dashboard to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare Site & Apply Your Existing Secrets
+        run: |
+          mkdir -p _site
+
+          # 1. Detect where web files are located (Root or public directory)
+          if [ -f "web_admin_dashboard.html" ]; then
+            SRC_DIR="."
+            echo "Found web files in repository root directory."
+          elif [ -f "public/web_admin_dashboard.html" ]; then
+            SRC_DIR="public"
+            echo "Found web files in public/ directory."
+          else
+            echo "ERROR: web_admin_dashboard.html not found!"
+            ls -la
+            exit 1
+          fi
+
+          # 2. Copy all web assets into _site
+          cp $SRC_DIR/web_admin_dashboard.html _site/
+          
+          if [ -f "$SRC_DIR/index.html" ]; then
+            cp $SRC_DIR/index.html _site/
+          else
+            cp _site/web_admin_dashboard.html _site/index.html
+          fi
+
+          [ -f "$SRC_DIR/manifest.json" ] && cp "$SRC_DIR/manifest.json" _site/ || true
+          [ -f "$SRC_DIR/sw.js" ] && cp "$SRC_DIR/sw.js" _site/ || true
+          [ -f "$SRC_DIR/icon-192.png" ] && cp "$SRC_DIR/icon-192.png" _site/ || true
+          [ -f "$SRC_DIR/icon-512.png" ] && cp "$SRC_DIR/icon-512.png" _site/ || true
+          [ -f "$SRC_DIR/icon.svg" ] && cp "$SRC_DIR/icon.svg" _site/ || true
+          [ -f "$SRC_DIR/README_WEB_ADMIN.md" ] && cp "$SRC_DIR/README_WEB_ADMIN.md" _site/ || true
+
+          # Copy assets folder if present
+          if [ -d "$SRC_DIR/assets" ]; then
+            cp -r "$SRC_DIR/assets" _site/
+          elif [ -d "assets" ]; then
+            cp -r "assets" _site/
+          fi
+
+          # 3. Apply your existing secret: ADMIN_PASSWORD_HASH or ADMIN_DASHBOARD_PASSWORD (supports plaintext or SHA-256 hash)
+          ADMIN_HASH="${{ secrets.ADMIN_PASSWORD_HASH }}"
+          ADMIN_PWD="${{ secrets.ADMIN_DASHBOARD_PASSWORD }}"
+          
+          RAW_SECRET=""
+          if [ -n "$ADMIN_HASH" ]; then
+            RAW_SECRET=$(echo "$ADMIN_HASH" | tr -d '[:space:]')
+          elif [ -n "$ADMIN_PWD" ]; then
+            RAW_SECRET=$(echo "$ADMIN_PWD" | tr -d '[:space:]')
+          fi
+
+          if [ -n "$RAW_SECRET" ]; then
+            # Check if RAW_SECRET is already a 64-char hex SHA-256 hash
+            if echo "$RAW_SECRET" | grep -Eq '^[a-fA-F0-9]{64}$'; then
+              echo "Using provided SHA-256 hash directly..."
+              TARGET_HASH="$RAW_SECRET"
+            else
+              echo "Automatically hashing provided password secret with SHA-256..."
+              TARGET_HASH=$(echo -n "$RAW_SECRET" | sha256sum | awk '{print $1}')
+            fi
+          else
+            TARGET_HASH="__ADMIN_PASSWORD_HASH__"
+          fi
+
+          sed -i "s|__ADMIN_PASSWORD_HASH__|$TARGET_HASH|g" _site/web_admin_dashboard.html
+          sed -i "s|__ADMIN_PASSWORD_HASH__|$TARGET_HASH|g" _site/index.html
+
+          # 4. Apply your existing secret: GEMINI_API_KEY
+          API_KEY="${{ secrets.GEMINI_API_KEY || secrets.GEMINI_API_KEY1 || secrets.FIREBASE_API_KEY }}"
+          if [ -n "$API_KEY" ]; then
+            echo "Injecting your secret GEMINI_API_KEY into the web app..."
+            sed -i "s|__GEMINI_API_KEY__|$API_KEY|g" _site/web_admin_dashboard.html
+            sed -i "s|__GEMINI_API_KEY__|$API_KEY|g" _site/index.html
+          fi
+
+          echo "Deployment artifact prepared successfully:"
+          ls -la _site/
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
