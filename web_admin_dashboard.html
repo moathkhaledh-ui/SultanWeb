@@ -829,6 +829,90 @@
       line-height: 1.4;
     }
 
+    /* Unauthorized Domain Box (Fix for auth/unauthorized-domain) */
+    .unauthorized-domain-box {
+      display: none;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      margin-top: 1.25rem;
+      text-align: right;
+    }
+    .unauthorized-domain-box h4 {
+      color: #FBBF24;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .domain-badge-box {
+      background: rgba(10, 24, 32, 0.9);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin: 8px 0;
+    }
+    .domain-copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .domain-copy-row code {
+      color: var(--neon-teal);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .btn-copy-domain {
+      background: rgba(45, 212, 191, 0.15);
+      border: 1px solid var(--glass-border-highlight);
+      color: var(--neon-teal);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-copy-domain:hover {
+      background: var(--neon-teal);
+      color: #060E12;
+    }
+    .domain-steps {
+      font-size: 0.8rem;
+      color: #E2E8F0;
+      line-height: 1.6;
+      margin: 10px 0;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+    .domain-steps ol {
+      margin: 6px 0 0 1.2rem;
+      padding: 0;
+    }
+    .domain-steps li {
+      margin-bottom: 6px;
+    }
+    .firebase-console-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #60A5FA;
+      text-decoration: underline;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+    .firebase-console-link:hover {
+      color: #93C5FD;
+    }
+
     /* ═════════════════════════════════════════════════════════════════
        MODALS
        ═════════════════════════════════════════════════════════════════ */
@@ -992,9 +1076,44 @@
         </button>
       </div>
 
+      <!-- Unauthorized Domain Warning Box (Fix for auth/unauthorized-domain) -->
+      <div id="unauthorizedDomainBox" class="unauthorized-domain-box">
+        <h4>⚠️ خطوة لمرة واحدة: تفعيل نطاق الموقع في Firebase Console</h4>
+        <p style="font-size: 0.82rem; color: #FFF; margin-bottom: 8px;">
+          لحماية بياناتك، يتطلب Firebase السماح لنطاق موقعك بإجراء تسجيل الدخول بحساب Google.
+        </p>
+        
+        <div class="domain-badge-box">
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">النطاق المطلوب إضافته:</span>
+          <div class="domain-copy-row">
+            <code id="currentHostDomain" class="mono">moathkhaledh-ui.github.io</code>
+            <button type="button" class="btn-copy-domain" onclick="copyCurrentDomain()">
+              <span>📋</span> نسخ النطاق
+            </button>
+          </div>
+        </div>
+
+        <div class="domain-steps">
+          <b>خطوات الحل البسيطة:</b>
+          <ol>
+            <li>اضغط الرابط أدناه لفتح صفحة إعدادات Authentication في Firebase:
+              <br><a id="firebaseAuthSettingsLink" href="https://console.firebase.google.com/project/gen-lang-client-0305755846/authentication/settings" target="_blank" rel="noopener noreferrer" class="firebase-console-link">
+                <span>↗️</span> فتح إعدادات Firebase Authentication
+              </a>
+            </li>
+            <li>اختر تبويب <b>Settings (الإعدادات)</b> ثم انزل لقسم <b>Authorized domains (النطاقات المصرح بها)</b>.</li>
+            <li>اضغط <b>Add domain (إضافة نطاق)</b> والصق: <code class="mono" id="currentHostDomainInline">moathkhaledh-ui.github.io</code> ثم اضغط <b>Save</b>.</li>
+          </ol>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="retryGoogleLogin()">
+          🔄 لقد قمت بإضافة النطاق - إعادة المحاولة الآن
+        </button>
+      </div>
+
       <div class="auth-footer-notice">
         🔒 محمي بواسطة Google Identity و Firebase Security Rules.<br>
-        المدير العام المعتمد: <code>moath.khaled.h@gmail.com</code>
+        المدير العام المعتمد: <code>moath.khaled.h@gmail.com</code> / <code>moath.halid.h@gmail.com</code>
       </div>
     </div>
   </div>
@@ -2011,7 +2130,10 @@
       const btn = document.getElementById('btnGoogleSignIn');
       btn.disabled = true;
       btn.innerHTML = '⏳ جارٍ الاتصال بـ Google...';
-      document.getElementById('unauthorizedBox').style.display = 'none';
+      const unauthBox = document.getElementById('unauthorizedBox');
+      const domainBox = document.getElementById('unauthorizedDomainBox');
+      if (unauthBox) unauthBox.style.display = 'none';
+      if (domainBox) domainBox.style.display = 'none';
 
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -2030,8 +2152,36 @@
           </svg>
           تسجيل الدخول عبر حساب Google
         `;
-        showToast("فشل تسجيل الدخول: " + err.message, "error");
+
+        if (err.code === 'auth/unauthorized-domain') {
+          const host = window.location.hostname || 'moathkhaledh-ui.github.io';
+          const projectId = localStorage.getItem('fb_project_id') || 'gen-lang-client-0305755846';
+          
+          if (document.getElementById('currentHostDomain')) {
+            document.getElementById('currentHostDomain').innerText = host;
+          }
+          if (document.getElementById('currentHostDomainInline')) {
+            document.getElementById('currentHostDomainInline').innerText = host;
+          }
+          if (document.getElementById('firebaseAuthSettingsLink')) {
+            document.getElementById('firebaseAuthSettingsLink').href = `https://console.firebase.google.com/project/${projectId}/authentication/settings`;
+          }
+          
+          if (domainBox) domainBox.style.display = 'block';
+          showToast("⚠️ يجب إضافة نطاق الموقع (" + host + ") في إعدادات Firebase Console", "warning");
+        } else {
+          showToast("فشل تسجيل الدخول: " + err.message, "error");
+        }
       }
+    }
+
+    function copyCurrentDomain() {
+      const host = window.location.hostname || 'moathkhaledh-ui.github.io';
+      navigator.clipboard.writeText(host).then(() => {
+        showToast(`تم نسخ النطاق (${host}) بنجاح!`, "success");
+      }).catch(() => {
+        prompt("يرجى نسخ اسم النطاق:", host);
+      });
     }
 
     async function handleAuthStateChanged(user) {
