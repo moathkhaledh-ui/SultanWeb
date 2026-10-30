@@ -1,5 +1,5 @@
 // Service Worker for Clean Ops Web Admin Dashboard
-const CACHE_NAME = 'clean-ops-admin-v6';
+const CACHE_NAME = 'clean-ops-admin-v8';
 const ASSETS_TO_CACHE = [
   './',
   './web_admin_dashboard.html',
@@ -11,10 +11,11 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
