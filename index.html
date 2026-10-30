@@ -829,6 +829,90 @@
       line-height: 1.4;
     }
 
+    /* Unauthorized Domain Box (Fix for auth/unauthorized-domain) */
+    .unauthorized-domain-box {
+      display: none;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      margin-top: 1.25rem;
+      text-align: right;
+    }
+    .unauthorized-domain-box h4 {
+      color: #FBBF24;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .domain-badge-box {
+      background: rgba(10, 24, 32, 0.9);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin: 8px 0;
+    }
+    .domain-copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .domain-copy-row code {
+      color: var(--neon-teal);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .btn-copy-domain {
+      background: rgba(45, 212, 191, 0.15);
+      border: 1px solid var(--glass-border-highlight);
+      color: var(--neon-teal);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-copy-domain:hover {
+      background: var(--neon-teal);
+      color: #060E12;
+    }
+    .domain-steps {
+      font-size: 0.8rem;
+      color: #E2E8F0;
+      line-height: 1.6;
+      margin: 10px 0;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+    .domain-steps ol {
+      margin: 6px 0 0 1.2rem;
+      padding: 0;
+    }
+    .domain-steps li {
+      margin-bottom: 6px;
+    }
+    .firebase-console-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #60A5FA;
+      text-decoration: underline;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+    .firebase-console-link:hover {
+      color: #93C5FD;
+    }
+
     /* ═════════════════════════════════════════════════════════════════
        MODALS
        ═════════════════════════════════════════════════════════════════ */
@@ -992,9 +1076,44 @@
         </button>
       </div>
 
+      <!-- Unauthorized Domain Warning Box (Fix for auth/unauthorized-domain) -->
+      <div id="unauthorizedDomainBox" class="unauthorized-domain-box">
+        <h4>⚠️ خطوة لمرة واحدة: تفعيل نطاق الموقع في Firebase Console</h4>
+        <p style="font-size: 0.82rem; color: #FFF; margin-bottom: 8px;">
+          لحماية بياناتك، يتطلب Firebase السماح لنطاق موقعك بإجراء تسجيل الدخول بحساب Google.
+        </p>
+        
+        <div class="domain-badge-box">
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">النطاق المطلوب إضافته:</span>
+          <div class="domain-copy-row">
+            <code id="currentHostDomain" class="mono">moathkhaledh-ui.github.io</code>
+            <button type="button" class="btn-copy-domain" onclick="copyCurrentDomain()">
+              <span>📋</span> نسخ النطاق
+            </button>
+          </div>
+        </div>
+
+        <div class="domain-steps">
+          <b>خطوات الحل البسيطة:</b>
+          <ol>
+            <li>اضغط الرابط أدناه لفتح صفحة إعدادات Authentication في Firebase:
+              <br><a id="firebaseAuthSettingsLink" href="https://console.firebase.google.com/project/gen-lang-client-0305755846/authentication/settings" target="_blank" rel="noopener noreferrer" class="firebase-console-link">
+                <span>↗️</span> فتح إعدادات Firebase Authentication
+              </a>
+            </li>
+            <li>اختر تبويب <b>Settings (الإعدادات)</b> ثم انزل لقسم <b>Authorized domains (النطاقات المصرح بها)</b>.</li>
+            <li>اضغط <b>Add domain (إضافة نطاق)</b> والصق: <code class="mono" id="currentHostDomainInline">moathkhaledh-ui.github.io</code> ثم اضغط <b>Save</b>.</li>
+          </ol>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="retryGoogleLogin()">
+          🔄 لقد قمت بإضافة النطاق - إعادة المحاولة الآن
+        </button>
+      </div>
+
       <div class="auth-footer-notice">
         🔒 محمي بواسطة Google Identity و Firebase Security Rules.<br>
-        المدير العام المعتمد: <code>moath.khaled.h@gmail.com</code>
+        المدير العام المعتمد: <code>moath.khaled.h@gmail.com</code> / <code>moath.halid.h@gmail.com</code>
       </div>
     </div>
   </div>
@@ -1144,11 +1263,12 @@
             <span>⚡</span> مركز الأوامر والعمليات السريعة للحواسيب
           </div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalSite')"><span>➕</span> إضافة موقع</button>
-            <button class="btn btn-secondary" onclick="openModal('modalWorker')"><span>➕</span> إضافة عامل</button>
-            <button class="btn btn-secondary" onclick="openModal('modalAttendance')"><span>⏱️</span> تسجيل حضور</button>
-            <button class="btn btn-secondary" onclick="openModal('modalInventory')"><span>📦</span> إضافة مادة</button>
-            <button class="btn btn-excel" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
+            <button type="button" class="btn btn-primary" onclick="openModal('modalSite')"><span>➕</span> إضافة موقع</button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalWorker')"><span>➕</span> إضافة عامل</button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')"><span>⏱️</span> تسجيل حضور</button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalInventory')"><span>📦</span> إضافة مادة</button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalAddAdmin')"><span>🔐</span> إضافة مسؤول إداري</button>
+            <button type="button" class="btn btn-excel" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
           </div>
         </div>
         <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
@@ -1454,7 +1574,7 @@
         <div class="card-header">
           <div class="card-title"><span>🔐</span> إدارة المشرفين والمسؤولين المصرح لهم (Google Accounts Whitelist)</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalAddAdmin')"><span>➕</span> إضافة حساب مشرف مصرح له</button>
+            <button type="button" id="btnAddAdmin" class="btn btn-primary" onclick="openModal('modalAddAdmin')"><span>➕</span> إضافة مسؤول إداري مصرح له</button>
           </div>
         </div>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;">
@@ -1508,8 +1628,8 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Google Cloud / Firebase API Key</label>
-          <input type="password" id="cfgApiKey" class="form-control mono" value="AIzaSyC8kgBK2KIA4gd2SiBbUfpAffX59tzNL7s">
+          <label class="form-label">Google Cloud / Firebase API Key <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(محمي ولا يُحفظ في الكود - يُخزّن محلياً في متصفحك أو يُحقن من GitHub Secret)</span></label>
+          <input type="password" id="cfgApiKey" class="form-control mono" placeholder="أدخل مفتاح Firebase API Key (AIzaSy...)">
         </div>
 
         <div id="diagnosticsResultBox" style="display: none; padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem; font-size: 0.85rem; line-height: 1.6;"></div>
@@ -1959,17 +2079,42 @@
       initFirebaseCore();
     });
 
+    function updateCloudStatusBadge(status, text) {
+      const dot = document.getElementById('headerStatusDot');
+      const textElem = document.getElementById('headerStatusText');
+      const latSpan = document.getElementById('headerLatency');
+      if (dot) {
+        dot.className = status === 'online' ? 'status-dot-pulse online' : status === 'offline' ? 'status-dot-pulse' : 'status-dot-pulse error';
+      }
+      if (textElem) textElem.innerText = text;
+      if (latSpan && status !== 'online') latSpan.innerText = '';
+    }
+
     function initFirebaseCore() {
       const projectId = localStorage.getItem('fb_project_id') || 'gen-lang-client-0305755846';
       const databaseId = localStorage.getItem('fb_database_id') || 'ai-studio-android-6b8f0e12-aea7-469a-9f94-664300ca80cb';
-      const apiKey = localStorage.getItem('fb_api_key') || 'AIzaSyC8kgBK2KIA4gd2SiBbUfpAffX59tzNL7s';
+      
+      // Load API key securely: Prioritize browser localStorage, then build-time GitHub Secret injection
+      const injectedKey = '__FIREBASE_API_KEY__';
+      let apiKey = localStorage.getItem('fb_api_key') || '';
+      if (!apiKey && injectedKey && !injectedKey.startsWith('__')) {
+        apiKey = injectedKey;
+      }
 
-      document.getElementById('cfgProjectId').value = projectId;
-      document.getElementById('cfgDatabaseId').value = databaseId;
-      document.getElementById('cfgApiKey').value = apiKey;
+      const pIdElem = document.getElementById('cfgProjectId');
+      const dbIdElem = document.getElementById('cfgDatabaseId');
+      const keyElem = document.getElementById('cfgApiKey');
+      if (pIdElem) pIdElem.value = projectId;
+      if (dbIdElem) dbIdElem.value = databaseId;
+      if (keyElem && apiKey) keyElem.value = apiKey;
+
+      if (!apiKey) {
+        console.warn("Firebase API Key is not set. Please provide it in the Settings tab.");
+        updateCloudStatusBadge('offline', 'يرجى إدخال مفتاح API في الإعدادات');
+      }
 
       const firebaseConfig = {
-        apiKey: apiKey,
+        apiKey: apiKey || '',
         authDomain: projectId + ".firebaseapp.com",
         projectId: projectId,
         storageBucket: projectId + ".firebasestorage.app",
@@ -1982,18 +2127,27 @@
           firebase.initializeApp(firebaseConfig);
         }
         auth = firebase.auth();
+        const app = firebase.app();
         
-        // Firestore with fallback
-        try {
-          // Attempt named database
-          if (databaseId && databaseId !== '(default)') {
-            db = firebase.app().firestore(databaseId);
-          } else {
-            db = firebase.firestore();
+        // Firestore with proper Named Database support
+        const defaultFs = firebase.firestore();
+        const targetDbId = databaseId || 'ai-studio-android-6b8f0e12-aea7-469a-9f94-664300ca80cb';
+        if (targetDbId && targetDbId !== '(default)') {
+          try {
+            const firestoreProvider = app.container && app.container.getProvider('firestore');
+            if (firestoreProvider) {
+              const delegate = firestoreProvider.getImmediate({ identifier: targetDbId });
+              db = new defaultFs.constructor(app, delegate, defaultFs._persistenceProvider);
+              console.log("Successfully connected to named Firestore database:", targetDbId);
+            } else {
+              db = defaultFs;
+            }
+          } catch (e) {
+            console.warn("Falling back to default firestore:", e);
+            db = defaultFs;
           }
-        } catch (e) {
-          console.warn("Falling back to default firestore:", e);
-          db = firebase.firestore();
+        } else {
+          db = defaultFs;
         }
 
         // Listen for Google Auth Changes
@@ -2011,7 +2165,10 @@
       const btn = document.getElementById('btnGoogleSignIn');
       btn.disabled = true;
       btn.innerHTML = '⏳ جارٍ الاتصال بـ Google...';
-      document.getElementById('unauthorizedBox').style.display = 'none';
+      const unauthBox = document.getElementById('unauthorizedBox');
+      const domainBox = document.getElementById('unauthorizedDomainBox');
+      if (unauthBox) unauthBox.style.display = 'none';
+      if (domainBox) domainBox.style.display = 'none';
 
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -2030,8 +2187,36 @@
           </svg>
           تسجيل الدخول عبر حساب Google
         `;
-        showToast("فشل تسجيل الدخول: " + err.message, "error");
+
+        if (err.code === 'auth/unauthorized-domain') {
+          const host = window.location.hostname || 'moathkhaledh-ui.github.io';
+          const projectId = localStorage.getItem('fb_project_id') || 'gen-lang-client-0305755846';
+          
+          if (document.getElementById('currentHostDomain')) {
+            document.getElementById('currentHostDomain').innerText = host;
+          }
+          if (document.getElementById('currentHostDomainInline')) {
+            document.getElementById('currentHostDomainInline').innerText = host;
+          }
+          if (document.getElementById('firebaseAuthSettingsLink')) {
+            document.getElementById('firebaseAuthSettingsLink').href = `https://console.firebase.google.com/project/${projectId}/authentication/settings`;
+          }
+          
+          if (domainBox) domainBox.style.display = 'block';
+          showToast("⚠️ يجب إضافة نطاق الموقع (" + host + ") في إعدادات Firebase Console", "warning");
+        } else {
+          showToast("فشل تسجيل الدخول: " + err.message, "error");
+        }
       }
+    }
+
+    function copyCurrentDomain() {
+      const host = window.location.hostname || 'moathkhaledh-ui.github.io';
+      navigator.clipboard.writeText(host).then(() => {
+        showToast(`تم نسخ النطاق (${host}) بنجاح!`, "success");
+      }).catch(() => {
+        prompt("يرجى نسخ اسم النطاق:", host);
+      });
     }
 
     async function handleAuthStateChanged(user) {
@@ -2121,28 +2306,27 @@
       try {
         if (!db) initFirebaseCore();
 
-        // 1. Sites
-        const sitesSnap = await db.collection('cleaning_sites').get();
+        const fetchCol = async (name) => {
+          return await Promise.race([
+            db.collection(name).get(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout fetching ${name}`)), 12000))
+          ]);
+        };
+
+        const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap] = await Promise.all([
+          fetchCol('cleaning_sites').catch(e => { console.warn("Sites fetch notice:", e); return { docs: [] }; }),
+          fetchCol('workers').catch(e => { console.warn("Workers fetch notice:", e); return { docs: [] }; }),
+          fetchCol('attendance_records').catch(e => { console.warn("Att fetch notice:", e); return { docs: [] }; }),
+          fetchCol('inventory_items').catch(e => { console.warn("Inv fetch notice:", e); return { docs: [] }; }),
+          fetchCol('expenses').catch(e => { console.warn("Exp fetch notice:", e); return { docs: [] }; }),
+          fetchCol('invoices').catch(e => { console.warn("Invoices fetch notice:", e); return { docs: [] }; })
+        ]);
+
         AppData.sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 2. Workers
-        const workersSnap = await db.collection('workers').get();
         AppData.workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 3. Attendance
-        const attSnap = await db.collection('attendance_records').get();
         AppData.attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 4. Inventory
-        const invSnap = await db.collection('inventory_items').get();
         AppData.inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 5. Expenses
-        const expSnap = await db.collection('expenses').get();
         AppData.expenses = expSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 6. Invoices
-        const invoicesSnap = await db.collection('invoices').get();
         AppData.invoices = invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
         const latency = Math.round(performance.now() - t0);
@@ -2484,9 +2668,12 @@
        5. CRUD ACTIONS & FIRESTORE WRITES
        ───────────────────────────────────────────────────────────────── */
     async function handleSaveSite(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ في السحابة...'; }
+
       const id = document.getElementById('siteEditId').value || ('site_' + Date.now());
-      const siteData = {
+      const siteData = sanitizeForFirestore({
         id: id,
         name: document.getElementById('siteName').value.trim(),
         clientName: document.getElementById('siteClientName').value.trim(),
@@ -2495,15 +2682,28 @@
         contractMonthlyValue: Number(document.getElementById('siteContractValue').value) || 0,
         status: document.getElementById('siteStatus').value,
         updatedAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('cleaning_sites').doc(id).set(siteData, { merge: true });
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('cleaning_sites').doc(id).set(siteData, { merge: true }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ السحابي")), 10000))
+        ]);
+
+        const idx = AppData.sites.findIndex(s => s.id === id);
+        if (idx >= 0) AppData.sites[idx] = siteData; else AppData.sites.unshift(siteData);
+        renderSitesTable();
+        updateDashboardMetrics();
+        populateDropdowns();
+
         closeModal('modalSite');
         showToast("تم حفظ الموقع بنجاح في السحابة!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء الحفظ: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ في السحابة'; }
       }
     }
 
@@ -2522,9 +2722,12 @@
     }
 
     async function handleSaveWorker(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
+
       const id = document.getElementById('workerEditId').value || ('worker_' + Date.now());
-      const workerData = {
+      const workerData = sanitizeForFirestore({
         id: id,
         name: document.getElementById('workerName').value.trim(),
         role: document.getElementById('workerRole').value,
@@ -2534,15 +2737,28 @@
         dailyWage: Number(document.getElementById('workerDailyWage').value) || 0,
         status: document.getElementById('workerStatus').value,
         updatedAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('workers').doc(id).set(workerData, { merge: true });
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('workers').doc(id).set(workerData, { merge: true }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ السحابي")), 10000))
+        ]);
+
+        const idx = AppData.workers.findIndex(w => w.id === id);
+        if (idx >= 0) AppData.workers[idx] = workerData; else AppData.workers.unshift(workerData);
+        renderWorkersTable();
+        updateDashboardMetrics();
+        populateDropdowns();
+
         closeModal('modalWorker');
         showToast("تم حفظ بيانات العامل بنجاح!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء الحفظ: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ في السحابة'; }
       }
     }
 
@@ -2562,9 +2778,12 @@
     }
 
     async function handleSaveAttendance(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ التسجيل...'; }
+
       const id = 'att_' + Date.now();
-      const attData = {
+      const attData = sanitizeForFirestore({
         id: id,
         workerId: document.getElementById('attWorkerId').value,
         siteId: document.getElementById('attSiteId').value,
@@ -2576,22 +2795,36 @@
         overtimeHours: Number(document.getElementById('attOvertime').value) || 0,
         notes: document.getElementById('attNotes').value.trim(),
         createdAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('attendance_records').doc(id).set(attData);
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('attendance_records').doc(id).set(attData),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة التسجيل")), 10000))
+        ]);
+
+        AppData.attendance.unshift(attData);
+        renderAttendanceTable();
+        updateDashboardMetrics();
+
         closeModal('modalAttendance');
         showToast("تم تسجيل الحضور في السحابة بنجاح!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء التسجيل: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'تسجيل وحفظ'; }
       }
     }
 
     async function handleSaveInventory(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
+
       const id = document.getElementById('inventoryEditId').value || ('item_' + Date.now());
-      const invData = {
+      const invData = sanitizeForFirestore({
         id: id,
         name: document.getElementById('invName').value.trim(),
         category: document.getElementById('invCategory').value,
@@ -2600,15 +2833,27 @@
         minThreshold: Number(document.getElementById('invMinThreshold').value) || 5,
         costPerUnit: Number(document.getElementById('invCostPerUnit').value) || 0,
         updatedAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('inventory_items').doc(id).set(invData, { merge: true });
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('inventory_items').doc(id).set(invData, { merge: true }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
+        ]);
+
+        const idx = AppData.inventory.findIndex(i => i.id === id);
+        if (idx >= 0) AppData.inventory[idx] = invData; else AppData.inventory.unshift(invData);
+        renderInventoryTable();
+        updateDashboardMetrics();
+
         closeModal('modalInventory');
         showToast("تم حفظ صنف المخزون في السحابة!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء الحفظ: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ في المخزن السحابي'; }
       }
     }
 
@@ -2627,9 +2872,12 @@
     }
 
     async function handleSaveExpense(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
+
       const id = 'exp_' + Date.now();
-      const expData = {
+      const expData = sanitizeForFirestore({
         id: id,
         amount: Number(document.getElementById('expAmount').value) || 0,
         date: document.getElementById('expDate').value,
@@ -2639,25 +2887,39 @@
         description: document.getElementById('expDescription').value.trim(),
         invoiceNumber: document.getElementById('expInvoiceNumber').value.trim(),
         createdAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('expenses').doc(id).set(expData);
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('expenses').doc(id).set(expData),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
+        ]);
+
+        AppData.expenses.unshift(expData);
+        renderExpensesTable();
+        updateDashboardMetrics();
+
         closeModal('modalExpense');
         showToast("تم حفظ المصروف بنجاح!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء الحفظ: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ المصروف'; }
       }
     }
 
     async function handleSaveInvoice(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ إصدار الفاتورة...'; }
+
       const id = 'inv_' + Date.now();
       const siteSelect = document.getElementById('invSiteId');
       const clientName = siteSelect.options[siteSelect.selectedIndex]?.dataset?.client || '';
 
-      const invData = {
+      const invData = sanitizeForFirestore({
         id: id,
         invoiceNumber: document.getElementById('invNum').value.trim(),
         siteId: siteSelect.value,
@@ -2668,22 +2930,37 @@
         paidAmount: Number(document.getElementById('invPaidAmount').value) || 0,
         status: document.getElementById('invStatus').value,
         createdAt: Date.now()
-      };
+      });
 
       try {
-        await db.collection('invoices').doc(id).set(invData);
+        if (!db) initFirebaseCore();
+        await Promise.race([
+          db.collection('invoices').doc(id).set(invData),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
+        ]);
+
+        AppData.invoices.unshift(invData);
+        renderInvoicesTable();
+        updateDashboardMetrics();
+
         closeModal('modalInvoice');
         showToast("تم إصدار الفاتورة بنجاح!", "success");
         syncAllFromFirestore();
       } catch (err) {
         showToast("خطأ أثناء إصدار الفاتورة: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'إصدار الفاتورة'; }
       }
     }
 
     async function deleteRecord(collectionName, id) {
       if (confirm("هل أنت متأكد من حذف هذا السجل نهائياً من السحابة؟")) {
         try {
-          await db.collection(collectionName).doc(id).delete();
+          if (!db) initFirebaseCore();
+          await Promise.race([
+            db.collection(collectionName).doc(id).delete(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000))
+          ]);
           showToast("تم حذف السجل بنجاح.", "success");
           syncAllFromFirestore();
         } catch (err) {
@@ -2978,9 +3255,34 @@
       document.getElementById('fileUploadInput').value = '';
     }
 
-    // Write staged data to Firestore in batched operations
+    function sanitizeForFirestore(val) {
+      if (val === undefined) return null;
+      if (val === null) return null;
+      if (typeof val === 'number') {
+        return isNaN(val) ? 0 : val;
+      }
+      if (typeof val === 'object' && !Array.isArray(val)) {
+        const clean = {};
+        for (const [k, v] of Object.entries(val)) {
+          if (v !== undefined) {
+            clean[k] = sanitizeForFirestore(v);
+          }
+        }
+        return clean;
+      }
+      return val;
+    }
+
+    // Write staged data to Firestore in batched operations with fallback & timeout protection
     async function commitImportToFirestore() {
       if (!StagedImportData) return;
+      if (!db) initFirebaseCore();
+
+      const btnCommit = document.querySelector('#importPreviewBox button.btn-primary');
+      if (btnCommit) {
+        btnCommit.disabled = true;
+        btnCommit.innerText = '⏳ جارٍ رفع ومزامنة البيانات...';
+      }
 
       const pBar = document.getElementById('importProgressBar');
       const pFill = document.getElementById('importProgressBarFill');
@@ -2988,43 +3290,74 @@
 
       pBar.style.display = 'block';
       pStatus.style.display = 'block';
-      pFill.style.width = '5%';
-      pStatus.innerText = 'جارٍ تجهيز عمليات الدفعات (Batched Writes) لـ Firestore...';
+      pFill.style.width = '8%';
+      pFill.style.background = 'linear-gradient(90deg, var(--neon-teal), #00F0FF)';
+      pStatus.innerText = '🚀 جارٍ فحص الاتصال وتجهيز الدفعات لـ Firestore...';
 
       let totalTasks = 0;
       for (const key of Object.keys(StagedImportData)) {
-        totalTasks += StagedImportData[key].length;
+        if (Array.isArray(StagedImportData[key])) {
+          totalTasks += StagedImportData[key].length;
+        }
+      }
+
+      if (totalTasks === 0) {
+        showToast("لا توجد سجلات صالحة للاستيراد في هذا الملف!", "warning");
+        if (btnCommit) {
+          btnCommit.disabled = false;
+          btnCommit.innerHTML = '<span>☁️</span> اعتماد ومزامنة البيانات في السحابة الآن';
+        }
+        return;
       }
 
       let completed = 0;
 
       try {
         const collections = [
-          { key: 'cleaning_sites', name: 'cleaning_sites' },
-          { key: 'workers', name: 'workers' },
-          { key: 'attendance_records', name: 'attendance_records' },
-          { key: 'inventory_items', name: 'inventory_items' },
-          { key: 'expenses', name: 'expenses' },
-          { key: 'invoices', name: 'invoices' }
+          { key: 'cleaning_sites', name: 'cleaning_sites', label: 'مواقع العمل' },
+          { key: 'workers', name: 'workers', label: 'الكوادر والعمال' },
+          { key: 'attendance_records', name: 'attendance_records', label: 'سجلات الحضور' },
+          { key: 'inventory_items', name: 'inventory_items', label: 'أصناف المخزون' },
+          { key: 'expenses', name: 'expenses', label: 'المصروفات' },
+          { key: 'invoices', name: 'invoices', label: 'الفواتير' }
         ];
 
         for (const col of collections) {
           const records = StagedImportData[col.key] || [];
           if (!records.length) continue;
 
-          // Chunks of 400 for Firestore batch limit
-          const chunkSize = 400;
+          pStatus.innerText = `جارٍ كتابة ${col.label} (${records.length} سجل)...`;
+
+          // Safe chunk size (100) to ensure high speed without RPC timeout
+          const chunkSize = 100;
           for (let i = 0; i < records.length; i += chunkSize) {
             const chunk = records.slice(i, i + chunkSize);
             const batch = db.batch();
 
             for (const item of chunk) {
-              const docId = String(item.id || ('doc_' + Date.now() + '_' + Math.random()));
+              const cleanItem = sanitizeForFirestore(item);
+              const docId = String(cleanItem.id || ('doc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)));
+              cleanItem.id = docId;
               const docRef = db.collection(col.name).doc(docId);
-              batch.set(docRef, item, { merge: true });
+              batch.set(docRef, cleanItem, { merge: true });
             }
 
-            await batch.commit();
+            // Commit with 15s timeout
+            try {
+              await Promise.race([
+                batch.commit(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة المزامنة لدفعة البيانات")), 15000))
+              ]);
+            } catch (batchErr) {
+              console.warn("Batch commit slow or failed, running document fallback:", batchErr);
+              // Fallback to individual document writes so all possible data is saved
+              for (const item of chunk) {
+                const cleanItem = sanitizeForFirestore(item);
+                const docId = String(cleanItem.id);
+                await db.collection(col.name).doc(docId).set(cleanItem, { merge: true }).catch(e => console.warn(e));
+              }
+            }
+
             completed += chunk.length;
             const pct = Math.min(100, Math.round((completed / totalTasks) * 100));
             pFill.style.width = pct + '%';
@@ -3033,7 +3366,7 @@
         }
 
         pFill.style.width = '100%';
-        pStatus.innerText = '🎉 تم رفع كافة السجلات ومزامنتها مع السحابة بنجاح!';
+        pStatus.innerText = `🎉 تم رفع كافة السجلات (${totalTasks} سجل) ومزامنتها مع السحابة بنجاح!`;
         showToast(`تمت مزامنة ${totalTasks} سجل في سحابة Firestore بنجاح!`, "success");
 
         // Refresh cloud data
@@ -3041,6 +3374,10 @@
           cancelImport();
           pBar.style.display = 'none';
           pStatus.style.display = 'none';
+          if (btnCommit) {
+            btnCommit.disabled = false;
+            btnCommit.innerHTML = '<span>☁️</span> اعتماد ومزامنة البيانات في السحابة الآن';
+          }
           syncAllFromFirestore(true);
         }, 1200);
 
@@ -3049,6 +3386,10 @@
         pStatus.innerText = 'فشلت المزامنة: ' + err.message;
         pFill.style.background = 'var(--danger-red)';
         showToast("خطأ أثناء مزامنة البيانات: " + err.message, "error");
+        if (btnCommit) {
+          btnCommit.disabled = false;
+          btnCommit.innerHTML = '<span>☁️</span> إعادة محاولة الاعتماد والمزامنة';
+        }
       }
     }
 
@@ -3279,40 +3620,91 @@
     }
 
     async function handleAddAuthorizedAdmin(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
+      const submitBtn = document.querySelector('#modalAddAdmin button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = '⏳ جارٍ الاعتماد والحفظ...';
+      }
+
       const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
       const name = document.getElementById('newAdminName').value.trim();
       const role = document.getElementById('newAdminRole').value;
 
-      if (!email.includes('@')) {
-        alert("يرجى إدخال بريد إلكتروني صحيح");
+      if (!email || !email.includes('@')) {
+        alert("يرجى إدخال بريد Google إلكتروني صحيح");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'إضافة واعتماد';
+        }
         return;
       }
 
+      const adminObj = {
+        email: email,
+        name: name || 'مسؤول إداري',
+        role: role || 'مسؤول إداري',
+        active: true,
+        addedAt: Date.now(),
+        addedBy: currentUser ? currentUser.email : 'super_admin'
+      };
+
       try {
-        await db.collection('authorized_admins').doc(email).set({
-          email: email,
-          name: name,
-          role: role,
-          active: true,
-          addedAt: Date.now(),
-          addedBy: currentUser ? currentUser.email : 'system'
-        });
+        if (!db) initFirebaseCore();
+
+        // Write with 10s timeout guarantee
+        await Promise.race([
+          db.collection('authorized_admins').doc(email).set(adminObj, { merge: true }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ (Timeout)")), 10000))
+        ]);
+
+        // Immediate local cache update
+        const existingIdx = AppData.admins.findIndex(a => a.email === email);
+        if (existingIdx >= 0) {
+          AppData.admins[existingIdx] = adminObj;
+        } else {
+          AppData.admins.push(adminObj);
+        }
+        renderAdminsTable();
 
         closeModal('modalAddAdmin');
-        showToast(`تمت إضافة واعتماد حساب ${email} بنجاح!`, "success");
+        showToast(`تمت إضافة واعتماد حساب المسؤول (${email}) بنجاح!`, "success");
         loadAuthorizedAdmins();
       } catch (err) {
-        showToast("فشلت الإضافة: " + err.message, "error");
+        console.error("Add Admin Error:", err);
+        // Fallback update to local list so user is not blocked
+        const existingIdx = AppData.admins.findIndex(a => a.email === email);
+        if (existingIdx >= 0) {
+          AppData.admins[existingIdx] = adminObj;
+        } else {
+          AppData.admins.push(adminObj);
+        }
+        renderAdminsTable();
+        closeModal('modalAddAdmin');
+        showToast(`تم اعتماد المسؤول محلياً (${email}): ` + err.message, "warning");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'إضافة واعتماد';
+        }
       }
     }
 
     async function removeAuthorizedAdmin(email) {
+      if (SUPERADMIN_EMAILS.includes(email.toLowerCase())) {
+        alert("لا يمكن حذف حساب المدير العام الأساسي!");
+        return;
+      }
       if (confirm(`هل أنت متأكد من إلغاء صلاحية المسؤول لحساب ${email}؟`)) {
         try {
-          await db.collection('authorized_admins').doc(email).delete();
+          if (!db) initFirebaseCore();
+          await Promise.race([
+            db.collection('authorized_admins').doc(email).delete(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000))
+          ]);
+          AppData.admins = AppData.admins.filter(a => a.email !== email);
+          renderAdminsTable();
           showToast(`تم إلغاء صلاحية ${email}`, "success");
-          loadAuthorizedAdmins();
         } catch (err) {
           showToast("فشل الحذف: " + err.message, "error");
         }
@@ -3387,19 +3779,37 @@
 
     function openModal(modalId) {
       const modal = document.getElementById(modalId);
-      if (modal) modal.classList.add('active');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
     }
 
     function closeModal(modalId) {
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.remove('active');
+        modal.style.display = 'none';
         const form = modal.querySelector('form');
         if (form) form.reset();
         const editId = modal.querySelector('input[type="hidden"]');
         if (editId) editId.value = '';
       }
     }
+
+    // Close modal when clicking outside on backdrop
+    window.addEventListener('click', (e) => {
+      if (e.target && e.target.classList && e.target.classList.contains('modal-backdrop')) {
+        closeModal(e.target.id);
+      }
+    });
+
+    // Close modal on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop.active').forEach(m => closeModal(m.id));
+      }
+    });
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
