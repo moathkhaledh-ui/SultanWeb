@@ -68,39 +68,14 @@ jobs:
             cp -r "assets" _site/
           fi
 
-          # 3. Apply your existing secret: ADMIN_PASSWORD_HASH or ADMIN_DASHBOARD_PASSWORD (supports plaintext or SHA-256 hash)
-          ADMIN_HASH="${{ secrets.ADMIN_PASSWORD_HASH }}"
-          ADMIN_PWD="${{ secrets.ADMIN_DASHBOARD_PASSWORD }}"
-          
-          RAW_SECRET=""
-          if [ -n "$ADMIN_HASH" ]; then
-            RAW_SECRET=$(echo "$ADMIN_HASH" | tr -d '[:space:]')
-          elif [ -n "$ADMIN_PWD" ]; then
-            RAW_SECRET=$(echo "$ADMIN_PWD" | tr -d '[:space:]')
-          fi
-
-          if [ -n "$RAW_SECRET" ]; then
-            # Check if RAW_SECRET is already a 64-char hex SHA-256 hash
-            if echo "$RAW_SECRET" | grep -Eq '^[a-fA-F0-9]{64}$'; then
-              echo "Using provided SHA-256 hash directly..."
-              TARGET_HASH="$RAW_SECRET"
-            else
-              echo "Automatically hashing provided password secret with SHA-256..."
-              TARGET_HASH=$(echo -n "$RAW_SECRET" | sha256sum | awk '{print $1}')
-            fi
-          else
-            TARGET_HASH="__ADMIN_PASSWORD_HASH__"
-          fi
-
-          sed -i "s|__ADMIN_PASSWORD_HASH__|$TARGET_HASH|g" _site/web_admin_dashboard.html
-          sed -i "s|__ADMIN_PASSWORD_HASH__|$TARGET_HASH|g" _site/index.html
-
-          # 4. Apply your existing secret: GEMINI_API_KEY
-          API_KEY="${{ secrets.GEMINI_API_KEY || secrets.GEMINI_API_KEY1 || secrets.FIREBASE_API_KEY }}"
-          if [ -n "$API_KEY" ]; then
-            echo "Injecting your secret GEMINI_API_KEY into the web app..."
-            sed -i "s|__GEMINI_API_KEY__|$API_KEY|g" _site/web_admin_dashboard.html
-            sed -i "s|__GEMINI_API_KEY__|$API_KEY|g" _site/index.html
+          # 3. Apply your secrets securely without committing keys to git
+          SECRET_KEY="${{ secrets.FIREBASE_API_KEY || secrets.GEMINI_API_KEY || secrets.GEMINI_API_KEY1 }}"
+          if [ -n "$SECRET_KEY" ]; then
+            echo "Injecting secret API key into web app deployment artifact..."
+            sed -i "s|__FIREBASE_API_KEY__|$SECRET_KEY|g" _site/web_admin_dashboard.html
+            sed -i "s|__FIREBASE_API_KEY__|$SECRET_KEY|g" _site/index.html
+            sed -i "s|__GEMINI_API_KEY__|$SECRET_KEY|g" _site/web_admin_dashboard.html
+            sed -i "s|__GEMINI_API_KEY__|$SECRET_KEY|g" _site/index.html
           fi
 
           echo "Deployment artifact prepared successfully:"
