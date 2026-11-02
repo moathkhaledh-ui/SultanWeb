@@ -1188,6 +1188,12 @@
     <button class="tab-btn" onclick="switchTab('tab-importer')" style="border-left: 1px solid var(--glass-border-highlight);">
       <span>🔄</span> استيراد ملفات الهاتف و SQL
     </button>
+    <button class="tab-btn" onclick="switchTab('tab-trash')">
+      <span>🗑️</span> سلة المحذوفات <span id="badgeTrashCount" class="tab-badge" style="background: rgba(239, 68, 68, 0.25); color: #F87171;">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab-audit')">
+      <span>📜</span> سجل التعديلات والعمليات <span id="badgeAuditCount" class="tab-badge">0</span>
+    </button>
     <button class="tab-btn" onclick="switchTab('tab-settings')">
       <span>⚙️</span> المسؤولين والربط
     </button>
@@ -1254,6 +1260,24 @@
             <div class="metric-subtitle" style="color: var(--text-secondary);">مسجلة بالسحابة</div>
           </div>
         </div>
+
+        <div class="metric-card" onclick="switchTab('tab-trash')" style="cursor: pointer;">
+          <div class="metric-icon" style="color: #F87171; background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3);">🗑️</div>
+          <div class="metric-body">
+            <div class="metric-label">سلة المحذوفات</div>
+            <div id="statTotalTrashOverview" class="metric-value">0</div>
+            <div class="metric-subtitle" style="color: #F87171;">قابلة للاستعادة الفورية ♻️</div>
+          </div>
+        </div>
+
+        <div class="metric-card" onclick="switchTab('tab-audit')" style="cursor: pointer;">
+          <div class="metric-icon">📜</div>
+          <div class="metric-body">
+            <div class="metric-label">سجل العمليات والتدقيق</div>
+            <div id="statTotalAuditOverview" class="metric-value">0</div>
+            <div class="metric-subtitle" style="color: var(--neon-teal);">تتبع كامل للتعديلات</div>
+          </div>
+        </div>
       </div>
 
       <!-- Quick Action Cards & Live Sync Banner -->
@@ -1268,6 +1292,8 @@
             <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')"><span>⏱️</span> تسجيل حضور</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalInventory')"><span>📦</span> إضافة مادة</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalAddAdmin')"><span>🔐</span> إضافة مسؤول إداري</button>
+            <button type="button" class="btn btn-secondary" onclick="switchTab('tab-trash')"><span>🗑️</span> سلة المحذوفات</button>
+            <button type="button" class="btn btn-secondary" onclick="switchTab('tab-audit')"><span>📜</span> سجل العمليات</button>
             <button type="button" class="btn btn-excel" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
           </div>
         </div>
@@ -1565,9 +1591,185 @@
           </div>
         </div>
       </div>
+    <!-- 8. RECYCLE BIN (سلة وسجل المحذوفات السحابية وإمكانية الاستعادة) -->
+    <section id="tab-trash" class="section-view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🗑️</span> سلة وسجل المحذوفات السحابية (Cloud Recycle Bin)
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-secondary" onclick="syncAllFromFirestore(true)"><span>🔄</span> تحديث السلة</button>
+            <button type="button" class="btn btn-excel" onclick="exportTrashToExcel()"><span>📊</span> تصدير المحذوفات Excel</button>
+            <button type="button" class="btn btn-danger" onclick="emptyRecycleBin()"><span>🔥</span> إفراغ سلة المحذوفات بالكامل</button>
+          </div>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.6;">
+          لحماية بياناتك من الحذف غير المقصود، يتم حفظ نسخة كاملة من أي موقع أو عامل أو سجل حضور أو مادة مخزون أو فاتورة أو مصروف يتم حذفه من النظام هنا. يمكنك <b>معاينة البيانات السابقة واستعادتها بنقرة واحدة ♻️</b> لتعود فوراً إلى مكانها في قاعدة البيانات السحابية والتطبيق!
+        </p>
+
+        <!-- Trash Toolbar & Filters -->
+        <div class="table-toolbar">
+          <div class="search-input-box">
+            <input type="text" id="searchTrash" placeholder="البحث في المحذوفات بالاسم، الكود، أو بريد الحاذف..." oninput="filterTrashTable()">
+            <span class="icon">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="filterTrashCollection" class="form-control" style="width: auto; min-width: 170px;" onchange="filterTrashTable()">
+              <option value="">جميع الأقسام المحذوفة</option>
+              <option value="cleaning_sites">🏢 مواقع العمل</option>
+              <option value="workers">👥 الكوادر والعمال</option>
+              <option value="attendance_records">⏱️ الحضور والانصراف</option>
+              <option value="inventory_items">📦 أصناف المخزون</option>
+              <option value="invoices">🧾 الفواتير</option>
+              <option value="expenses">💸 المصروفات</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Trash Table -->
+        <div class="table-responsive">
+          <table class="data-table" id="trashTable">
+            <thead>
+              <tr>
+                <th>القسم الأصلي</th>
+                <th>عنوان السجل المحذوف</th>
+                <th>المعرف الأصلي (ID)</th>
+                <th>حُذف بواسطة</th>
+                <th>تاريخ ووقت الحذف</th>
+                <th>معاينة السجل</th>
+                <th>إجراءات الاستعادة</th>
+              </tr>
+            </thead>
+            <tbody id="trashTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                  سلة المحذوفات فارغة حالياً. لا توجد أي بيانات محذوفة.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
-    <!-- 8. SETTINGS & AUTHORIZED ADMINS VIEW -->
+    <!-- 9. AUDIT TRAIL & ACTIVITY LOGS (سجل العمليات والتعديلات الكامل والنسخ السابقة) -->
+    <section id="tab-audit" class="section-view">
+      <!-- Audit Metrics Banner -->
+      <div class="metrics-grid" style="margin-bottom: 1.25rem;">
+        <div class="metric-card">
+          <div class="metric-icon">📜</div>
+          <div class="metric-body">
+            <div class="metric-label">إجمالي العمليات المسجلة</div>
+            <div id="statAuditTotal" class="metric-value">0</div>
+            <div class="metric-subtitle">سجل تدقيق سحابي كامل</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">➕</div>
+          <div class="metric-body">
+            <div class="metric-label">عمليات الإضافة والإنشاء</div>
+            <div id="statAuditCreates" class="metric-value" style="color: var(--success-green);">0</div>
+            <div class="metric-subtitle">سجلات تم إنشاؤها</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">✏️</div>
+          <div class="metric-body">
+            <div class="metric-label">عمليات التعديل والتحديث</div>
+            <div id="statAuditUpdates" class="metric-value" style="color: var(--warning-amber);">0</div>
+            <div class="metric-subtitle">تعديلات مع حفظ النسخ السابقة</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">♻️</div>
+          <div class="metric-body">
+            <div class="metric-label">عمليات الاستعادة السحابية</div>
+            <div id="statAuditRestores" class="metric-value" style="color: var(--neon-teal);">0</div>
+            <div class="metric-subtitle">بيانات تم استرجاعها بنجاح</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📜</span> سجل التعديلات والعمليات السحابية الكامل (Audit & Activity Trail)
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-secondary" onclick="syncAllFromFirestore(true)"><span>🔄</span> تحديث السجل</button>
+            <button type="button" class="btn btn-excel" onclick="exportAuditToExcel()"><span>📊</span> تصدير سجل التدقيق Excel</button>
+          </div>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.6;">
+          يوثق هذا السجل كل عملية تتم في النظام بدقة تامة: الإضافات، التعديلات (مع حفظ نسخة طبق الأصل قبل التعديل)، الحذف، الاستعادة، واستيراد ملفات الهاتف و SQL. يمكنك فحص أي عملية و<b>استعادة أي نسخة سابقة للبيانات مباشرة</b>!
+        </p>
+
+        <!-- Audit Toolbar & Filters -->
+        <div class="table-toolbar">
+          <div class="search-input-box">
+            <input type="text" id="searchAudit" placeholder="البحث في السجل بالعنوان، المنفذ، الكود، أو التفاصيل..." oninput="filterAuditTable()">
+            <span class="icon">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterAuditAction" class="form-control" style="width: auto; min-width: 150px;" onchange="filterAuditTable()">
+              <option value="">جميع أنواع العمليات</option>
+              <option value="CREATE">➕ عمليات الإضافة (CREATE)</option>
+              <option value="UPDATE">✏️ عمليات التعديل (UPDATE)</option>
+              <option value="DELETE">🗑️ النقل للمحذوفات (DELETE)</option>
+              <option value="RESTORE">♻️ عمليات الاستعادة (RESTORE)</option>
+              <option value="IMPORT">📱 استيراد الهاتف و SQL (IMPORT)</option>
+              <option value="ADMIN">🔐 إدارة المسؤولين (ADMIN)</option>
+              <option value="PERMANENT_DELETE">🔥 الحذف النهائي</option>
+            </select>
+
+            <select id="filterAuditCollection" class="form-control" style="width: auto; min-width: 150px;" onchange="filterAuditTable()">
+              <option value="">جميع الأقسام</option>
+              <option value="cleaning_sites">🏢 مواقع العمل</option>
+              <option value="workers">👥 الكوادر والعمال</option>
+              <option value="attendance_records">⏱️ الحضور والانصراف</option>
+              <option value="inventory_items">📦 المخزون والمواد</option>
+              <option value="invoices">🧾 الفواتير</option>
+              <option value="expenses">💸 المصروفات</option>
+              <option value="authorized_admins">🔐 المسؤولين</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Audit Table -->
+        <div class="table-responsive">
+          <table class="data-table" id="auditTable">
+            <thead>
+              <tr>
+                <th>التاريخ والوقت</th>
+                <th>نوع العملية</th>
+                <th>القسم / الجدول</th>
+                <th>عنوان العملية / السجل</th>
+                <th>المستخدم المنفذ</th>
+                <th>تفاصيل العملية</th>
+                <th>النسخة السابقة / الاستعادة</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                  جارٍ تحميل سجل العمليات والتدقيق...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. SETTINGS & AUTHORIZED ADMINS VIEW -->
     <section id="tab-settings" class="section-view">
       <!-- Authorized Admins Management -->
       <div class="card">
@@ -2015,6 +2217,38 @@
         </div>
       </form>
     </div>
+  <!-- Modal: Trash Record Details -->
+  <div id="modalTrashDetail" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-title">
+        <span>🗑️ تفاصيل السجل في سلة المحذوفات</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalTrashDetail')">✕</button>
+      </div>
+      <div id="trashDetailBody" style="font-size: 0.9rem; line-height: 1.6;">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalTrashDetail')">إغلاق</button>
+        <button type="button" id="btnRestoreFromModal" class="btn btn-primary"><span>♻️</span> استعادة هذا السجل الآن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Audit Log Details & Snapshot Restore -->
+  <div id="modalAuditDetail" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 720px;">
+      <div class="modal-title">
+        <span>📜 تفاصيل العملية وسجل التدقيق والنسخة المحفوظة</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalAuditDetail')">✕</button>
+      </div>
+      <div id="auditDetailBody" style="font-size: 0.88rem; line-height: 1.6;">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAuditDetail')">إغلاق</button>
+        <button type="button" id="btnRestoreAuditSnapshot" class="btn btn-primary" style="display: none;"><span>♻️</span> استعادة هذه النسخة إلى قاعدة البيانات الآن</button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Notification Container -->
@@ -2039,7 +2273,9 @@
       inventory: [],
       expenses: [],
       invoices: [],
-      admins: []
+      admins: [],
+      trash: [],
+      auditLogs: []
     };
 
     // Staged Import Data
@@ -2313,13 +2549,15 @@
           ]);
         };
 
-        const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap] = await Promise.all([
+        const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap, trashSnap, auditSnap] = await Promise.all([
           fetchCol('cleaning_sites').catch(e => { console.warn("Sites fetch notice:", e); return { docs: [] }; }),
           fetchCol('workers').catch(e => { console.warn("Workers fetch notice:", e); return { docs: [] }; }),
           fetchCol('attendance_records').catch(e => { console.warn("Att fetch notice:", e); return { docs: [] }; }),
           fetchCol('inventory_items').catch(e => { console.warn("Inv fetch notice:", e); return { docs: [] }; }),
           fetchCol('expenses').catch(e => { console.warn("Exp fetch notice:", e); return { docs: [] }; }),
-          fetchCol('invoices').catch(e => { console.warn("Invoices fetch notice:", e); return { docs: [] }; })
+          fetchCol('invoices').catch(e => { console.warn("Invoices fetch notice:", e); return { docs: [] }; }),
+          fetchCol('recycle_bin').catch(e => { console.warn("Trash fetch notice:", e); return { docs: [] }; }),
+          fetchCol('audit_logs').catch(e => { console.warn("Audit fetch notice:", e); return { docs: [] }; })
         ]);
 
         AppData.sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2328,6 +2566,8 @@
         AppData.inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.expenses = expSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.invoices = invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        AppData.trash = trashSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.deletedAt||0) - (a.deletedAt||0));
+        AppData.auditLogs = auditSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
 
         const latency = Math.round(performance.now() - t0);
 
@@ -2392,6 +2632,13 @@
 
       const totalExpVal = AppData.expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
       document.getElementById('statTotalExpenses').innerText = totalExpVal.toLocaleString('ar-SA');
+
+      // Trash & Audit Counters
+      const trashElem = document.getElementById('statTotalTrashOverview');
+      if (trashElem) trashElem.innerText = AppData.trash.length;
+
+      const auditElem = document.getElementById('statTotalAuditOverview');
+      if (auditElem) auditElem.innerText = AppData.auditLogs.length;
     }
 
     function renderAllTables() {
@@ -2401,6 +2648,10 @@
       renderInventoryTable();
       renderInvoicesTable();
       renderExpensesTable();
+      renderTrashTable();
+      renderAuditLogsTable();
+      updateTrashBadge();
+      updateAuditBadge();
     }
 
     // 1. Sites Table
@@ -2672,6 +2923,7 @@
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ في السحابة...'; }
 
+      const isEdit = !!document.getElementById('siteEditId').value;
       const id = document.getElementById('siteEditId').value || ('site_' + Date.now());
       const siteData = sanitizeForFirestore({
         id: id,
@@ -2690,6 +2942,16 @@
           db.collection('cleaning_sites').doc(id).set(siteData, { merge: true }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ السحابي")), 10000))
         ]);
+
+        await logAuditEvent(
+          isEdit ? 'UPDATE' : 'CREATE',
+          isEdit ? `تعديل موقع: ${siteData.name}` : `إضافة موقع: ${siteData.name}`,
+          'cleaning_sites',
+          id,
+          siteData.name,
+          isEdit ? `تعديل بيانات موقع عمل (القيمة الشهرية: ${siteData.contractMonthlyValue} ر.س، الحالة: ${siteData.status})` : `إضافة موقع عمل جديد للعميل ${siteData.clientName} بقيمة ${siteData.contractMonthlyValue} ر.س شهرياً`,
+          siteData
+        );
 
         const idx = AppData.sites.findIndex(s => s.id === id);
         if (idx >= 0) AppData.sites[idx] = siteData; else AppData.sites.unshift(siteData);
@@ -2726,6 +2988,7 @@
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
+      const isEdit = !!document.getElementById('workerEditId').value;
       const id = document.getElementById('workerEditId').value || ('worker_' + Date.now());
       const workerData = sanitizeForFirestore({
         id: id,
@@ -2745,6 +3008,16 @@
           db.collection('workers').doc(id).set(workerData, { merge: true }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ السحابي")), 10000))
         ]);
+
+        await logAuditEvent(
+          isEdit ? 'UPDATE' : 'CREATE',
+          isEdit ? `تعديل عامل: ${workerData.name}` : `تسجيل عامل: ${workerData.name}`,
+          'workers',
+          id,
+          workerData.name,
+          isEdit ? `تعديل بيانات العامل [${workerData.name}] (المسمى: ${workerData.role}، الأجر: ${workerData.dailyWage} ر.س)` : `تسجيل عامل جديد [${workerData.name}] بمسمى [${workerData.role}] وأجر ${workerData.dailyWage} ر.س`,
+          workerData
+        );
 
         const idx = AppData.workers.findIndex(w => w.id === id);
         if (idx >= 0) AppData.workers[idx] = workerData; else AppData.workers.unshift(workerData);
@@ -2804,6 +3077,18 @@
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة التسجيل")), 10000))
         ]);
 
+        const worker = AppData.workers.find(w => w.id === attData.workerId);
+        const wName = worker ? worker.name : 'عامل';
+        await logAuditEvent(
+          'CREATE',
+          `تسجيل حضور: ${wName}`,
+          'attendance_records',
+          id,
+          `${wName} (${attData.date})`,
+          `تسجيل حضور العامل [${wName}] بتاريخ ${attData.date} بحالة [${attData.status}] و ${attData.hoursWorked} ساعات عمل`,
+          attData
+        );
+
         AppData.attendance.unshift(attData);
         renderAttendanceTable();
         updateDashboardMetrics();
@@ -2823,6 +3108,7 @@
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
+      const isEdit = !!document.getElementById('inventoryEditId').value;
       const id = document.getElementById('inventoryEditId').value || ('item_' + Date.now());
       const invData = sanitizeForFirestore({
         id: id,
@@ -2841,6 +3127,16 @@
           db.collection('inventory_items').doc(id).set(invData, { merge: true }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
         ]);
+
+        await logAuditEvent(
+          isEdit ? 'UPDATE' : 'CREATE',
+          isEdit ? `تعديل مادة: ${invData.name}` : `إضافة مادة: ${invData.name}`,
+          'inventory_items',
+          id,
+          invData.name,
+          isEdit ? `تعديل صنف المخزون [${invData.name}] (الرصيد: ${invData.currentStock} ${invData.unit}، التكلفة: ${invData.costPerUnit} ر.س)` : `إضافة صنف جديد بالمستودع [${invData.name}] برصيد ${invData.currentStock} ${invData.unit}`,
+          invData
+        );
 
         const idx = AppData.inventory.findIndex(i => i.id === id);
         if (idx >= 0) AppData.inventory[idx] = invData; else AppData.inventory.unshift(invData);
@@ -2896,6 +3192,16 @@
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
         ]);
 
+        await logAuditEvent(
+          'CREATE',
+          `تسجيل مصروف: ${expData.amount} ر.س`,
+          'expenses',
+          id,
+          expData.description || expData.category,
+          `تسجيل مصروف بقيمة ${expData.amount} ر.س بند [${expData.category}] طريقة الدفع [${expData.paymentMethod}]`,
+          expData
+        );
+
         AppData.expenses.unshift(expData);
         renderExpensesTable();
         updateDashboardMetrics();
@@ -2939,6 +3245,16 @@
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
         ]);
 
+        await logAuditEvent(
+          'CREATE',
+          `إصدار فاتورة: ${invData.invoiceNumber}`,
+          'invoices',
+          id,
+          invData.invoiceNumber,
+          `إصدار فاتورة للعميل [${invData.clientName}] بقيمة ${invData.totalAmount} ر.س`,
+          invData
+        );
+
         AppData.invoices.unshift(invData);
         renderInvoicesTable();
         updateDashboardMetrics();
@@ -2953,20 +3269,606 @@
       }
     }
 
+    /* ─────────────────────────────────────────────────────────────────
+       5.1 AUDIT LOGGING SYSTEM (CHANGE TRAIL & SYSTEM RESTORE)
+       ───────────────────────────────────────────────────────────────── */
+    async function logAuditEvent(action, title, collectionName, recordId, recordTitle, details, snapshot = null) {
+      try {
+        if (!db) initFirebaseCore();
+        const logId = 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+        const logEntry = sanitizeForFirestore({
+          id: logId,
+          action: action, // 'CREATE' | 'UPDATE' | 'DELETE' | 'RESTORE' | 'PERMANENT_DELETE' | 'IMPORT' | 'ADMIN'
+          title: title,
+          collectionName: collectionName,
+          recordId: String(recordId || ''),
+          recordTitle: String(recordTitle || ''),
+          details: typeof details === 'string' ? details : JSON.stringify(details),
+          snapshot: snapshot,
+          userEmail: currentUser?.email || 'admin@cleanops.system',
+          userName: currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : 'المسؤول الإداري'),
+          timestamp: Date.now()
+        });
+
+        // Fire-and-forget to Firestore so UI is instant
+        db.collection('audit_logs').doc(logId).set(logEntry).catch(e => console.warn("Log write notice:", e));
+
+        AppData.auditLogs.unshift(logEntry);
+        if (AppData.auditLogs.length > 500) AppData.auditLogs.pop();
+        renderAuditLogsTable();
+        updateAuditBadge();
+      } catch (err) {
+        console.warn("Could not log audit event:", err);
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       5.2 RECYCLE BIN (SAFE DELETE & INSTANT RESTORATION)
+       ───────────────────────────────────────────────────────────────── */
     async function deleteRecord(collectionName, id) {
-      if (confirm("هل أنت متأكد من حذف هذا السجل نهائياً من السحابة؟")) {
-        try {
-          if (!db) initFirebaseCore();
-          await Promise.race([
-            db.collection(collectionName).doc(id).delete(),
-            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000))
-          ]);
-          showToast("تم حذف السجل بنجاح.", "success");
-          syncAllFromFirestore();
-        } catch (err) {
-          showToast("فشل الحذف: " + err.message, "error");
+      let record = null;
+      let collectionLabel = 'سجل';
+      let recordTitle = id;
+
+      if (collectionName === 'cleaning_sites') {
+        record = AppData.sites.find(s => s.id === id);
+        collectionLabel = 'مواقع العمل';
+        recordTitle = record?.name || id;
+      } else if (collectionName === 'workers') {
+        record = AppData.workers.find(w => w.id === id);
+        collectionLabel = 'الكوادر والعمال';
+        recordTitle = record?.name || id;
+      } else if (collectionName === 'attendance_records') {
+        record = AppData.attendance.find(a => a.id === id);
+        collectionLabel = 'الحضور والانصراف';
+        const worker = AppData.workers.find(w => w.id === record?.workerId);
+        recordTitle = (worker ? worker.name : 'عامل') + ' (' + (record?.date || '') + ')';
+      } else if (collectionName === 'inventory_items') {
+        record = AppData.inventory.find(i => i.id === id);
+        collectionLabel = 'المخزون والمواد';
+        recordTitle = record?.name || id;
+      } else if (collectionName === 'expenses') {
+        record = AppData.expenses.find(e => e.id === id);
+        collectionLabel = 'المصروفات';
+        recordTitle = (record?.description || record?.category || 'مصروف') + ' (' + (record?.amount || 0) + ' ر.س)';
+      } else if (collectionName === 'invoices') {
+        record = AppData.invoices.find(inv => inv.id === id);
+        collectionLabel = 'الفواتير';
+        recordTitle = (record?.invoiceNumber || id) + ' - ' + (record?.clientName || '');
+      }
+
+      if (!confirm(`هل أنت متأكد من حذف "${recordTitle}"؟\nسيتم نقله فوراً إلى سلة المحذوفات حيث يمكنك استعادته في أي وقت.`)) {
+        return;
+      }
+
+      try {
+        if (!db) initFirebaseCore();
+
+        // If not found in cache, fetch fresh snapshot
+        if (!record) {
+          const snap = await db.collection(collectionName).doc(id).get();
+          if (snap.exists) record = snap.data();
+        }
+
+        const trashId = 'trash_' + Date.now() + '_' + id;
+        const trashItem = sanitizeForFirestore({
+          id: trashId,
+          originalCollection: collectionName,
+          originalId: id,
+          title: recordTitle,
+          collectionLabel: collectionLabel,
+          data: record || { id: id },
+          deletedByEmail: currentUser?.email || 'admin@cleanops.system',
+          deletedByName: currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : 'المسؤول الإداري'),
+          deletedAt: Date.now()
+        });
+
+        // 1. Save to recycle_bin
+        await db.collection('recycle_bin').doc(trashId).set(trashItem);
+
+        // 2. Delete from original collection
+        await db.collection(collectionName).doc(id).delete();
+
+        // 3. Log audit event
+        await logAuditEvent(
+          'DELETE',
+          `نقل إلى سلة المحذوفات: ${recordTitle}`,
+          collectionName,
+          id,
+          recordTitle,
+          `تم حذف السجل ونقله إلى سلة المحذوفات من قسم [${collectionLabel}]`,
+          record
+        );
+
+        // 4. Update in-memory collections
+        AppData.trash.unshift(trashItem);
+        if (collectionName === 'cleaning_sites') AppData.sites = AppData.sites.filter(s => s.id !== id);
+        else if (collectionName === 'workers') AppData.workers = AppData.workers.filter(w => w.id !== id);
+        else if (collectionName === 'attendance_records') AppData.attendance = AppData.attendance.filter(a => a.id !== id);
+        else if (collectionName === 'inventory_items') AppData.inventory = AppData.inventory.filter(i => i.id !== id);
+        else if (collectionName === 'expenses') AppData.expenses = AppData.expenses.filter(e => e.id !== id);
+        else if (collectionName === 'invoices') AppData.invoices = AppData.invoices.filter(inv => inv.id !== id);
+
+        renderAllTables();
+        updateDashboardMetrics();
+        showToast(`تم نقل "${recordTitle}" إلى سلة المحذوفات بنجاح. يمكنك استعادته من تبويب سلة المحذوفات.`, "success");
+      } catch (err) {
+        console.error("Delete / Move to Trash error:", err);
+        showToast("فشل الحذف: " + err.message, "error");
+      }
+    }
+
+    function renderTrashTable(filtered = null) {
+      const list = filtered || AppData.trash;
+      const tbody = document.getElementById('trashTableBody');
+      if (!tbody) return;
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">سلة المحذوفات فارغة حالياً. لا توجد أي بيانات محذوفة.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(t => {
+        const dateStr = t.deletedAt ? new Date(t.deletedAt).toLocaleString('ar-SA') : '-';
+        let badgeClass = 'badge-teal';
+        if (t.originalCollection === 'cleaning_sites') badgeClass = 'badge-info';
+        else if (t.originalCollection === 'workers') badgeClass = 'badge-success';
+        else if (t.originalCollection === 'invoices') badgeClass = 'badge-warning';
+        else if (t.originalCollection === 'expenses') badgeClass = 'badge-danger';
+
+        return `
+          <tr>
+            <td><span class="badge ${badgeClass}">${escapeHtml(t.collectionLabel || t.originalCollection)}</span></td>
+            <td><b>${escapeHtml(t.title || t.originalId)}</b></td>
+            <td><code class="mono" style="color:var(--neon-teal);">${escapeHtml(t.originalId)}</code></td>
+            <td>
+              <div style="font-size:0.85rem; font-weight:700;">${escapeHtml(t.deletedByName || 'مسؤول')}</div>
+              <div class="mono" style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(t.deletedByEmail || '-')}</div>
+            </td>
+            <td class="mono" style="font-size:0.82rem;">${escapeHtml(dateStr)}</td>
+            <td>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="viewTrashDetail('${t.id}')">
+                <span>🔍</span> معاينة
+              </button>
+            </td>
+            <td>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.8rem;" onclick="restoreFromTrash('${t.id}')" title="استعادة السجل إلى موقعه الأصلي">
+                  <span>♻️</span> استعادة
+                </button>
+                <button type="button" class="btn-action-icon danger" onclick="permanentDeleteTrashItem('${t.id}')" title="حذف نهائي لا رجعة فيه">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTrashTable() {
+      const q = (document.getElementById('searchTrash')?.value || '').toLowerCase().trim();
+      const col = document.getElementById('filterTrashCollection')?.value || '';
+
+      let list = AppData.trash;
+      if (col) {
+        list = list.filter(t => t.originalCollection === col);
+      }
+      if (q) {
+        list = list.filter(t => 
+          (t.title || '').toLowerCase().includes(q) ||
+          (t.originalId || '').toLowerCase().includes(q) ||
+          (t.deletedByEmail || '').toLowerCase().includes(q) ||
+          (t.deletedByName || '').toLowerCase().includes(q) ||
+          (t.collectionLabel || '').toLowerCase().includes(q)
+        );
+      }
+      renderTrashTable(list);
+    }
+
+    function updateTrashBadge() {
+      const badge = document.getElementById('badgeTrashCount');
+      if (badge) {
+        badge.innerText = AppData.trash.length;
+      }
+    }
+
+    function viewTrashDetail(trashId) {
+      const item = AppData.trash.find(t => t.id === trashId);
+      if (!item) return;
+
+      const body = document.getElementById('trashDetailBody');
+      const restoreBtn = document.getElementById('btnRestoreFromModal');
+      const dateStr = item.deletedAt ? new Date(item.deletedAt).toLocaleString('ar-SA') : '-';
+
+      body.innerHTML = `
+        <div style="background: rgba(14, 30, 39, 0.7); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-teal">${escapeHtml(item.collectionLabel || item.originalCollection)}</span>
+            <span class="mono" style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(dateStr)}</span>
+          </div>
+          <h3 style="color:#FFF; font-size:1.15rem; margin-bottom:4px;">${escapeHtml(item.title)}</h3>
+          <p style="font-size:0.82rem; color:var(--text-secondary);">
+            المعرف الأصلي: <code class="mono" style="color:var(--neon-teal);">${escapeHtml(item.originalId)}</code> | الحاذف: <b>${escapeHtml(item.deletedByName || '')}</b> (${escapeHtml(item.deletedByEmail || '')})
+          </p>
+        </div>
+
+        <div style="margin-bottom:8px; font-weight:700; color:var(--neon-teal); font-size:0.85rem;">📋 البيانات المحفوظة للسجل (Data Snapshot):</div>
+        <pre class="mono" style="background:#04090D; border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:12px; max-height:260px; overflow-y:auto; font-size:0.8rem; color:#A7F3D0; text-align:left; direction:ltr;">${escapeHtml(JSON.stringify(item.data, null, 2))}</pre>
+      `;
+
+      if (restoreBtn) {
+        restoreBtn.onclick = () => {
+          closeModal('modalTrashDetail');
+          restoreFromTrash(item.id);
+        };
+      }
+
+      openModal('modalTrashDetail');
+    }
+
+    async function restoreFromTrash(trashId) {
+      const item = AppData.trash.find(t => t.id === trashId);
+      if (!item) {
+        showToast("العنصر غير موجود في سلة المحذوفات!", "error");
+        return;
+      }
+
+      if (!confirm(`هل تريد بالتأكيد استعادة "${item.title}" وإعادته إلى ${item.collectionLabel}؟`)) {
+        return;
+      }
+
+      try {
+        if (!db) initFirebaseCore();
+
+        const targetCol = item.originalCollection;
+        const targetId = item.originalId;
+        const restoredData = sanitizeForFirestore(item.data);
+        restoredData.updatedAt = Date.now();
+        restoredData.restoredAt = Date.now();
+        restoredData.restoredBy = currentUser?.email || 'admin';
+
+        // 1. Write back to original collection
+        await db.collection(targetCol).doc(targetId).set(restoredData, { merge: true });
+
+        // 2. Remove from recycle_bin
+        await db.collection('recycle_bin').doc(trashId).delete();
+
+        // 3. Log audit event
+        await logAuditEvent(
+          'RESTORE',
+          `استعادة من سلة المحذوفات: ${item.title}`,
+          targetCol,
+          targetId,
+          item.title,
+          `تمت استعادة السجل وإعادته لقسم [${item.collectionLabel}] بكافة بياناته وتحديثه في السحابة`,
+          restoredData
+        );
+
+        // 4. Update in-memory collections
+        AppData.trash = AppData.trash.filter(t => t.id !== trashId);
+        showToast(`تمت استعادة "${item.title}" بنجاح إلى ${item.collectionLabel}!`, "success");
+
+        // Refresh all tables
+        syncAllFromFirestore();
+      } catch (err) {
+        console.error("Restore error:", err);
+        showToast("فشلت الاستعادة: " + err.message, "error");
+      }
+    }
+
+    async function permanentDeleteTrashItem(trashId) {
+      const item = AppData.trash.find(t => t.id === trashId);
+      const title = item ? item.title : trashId;
+
+      if (!confirm(`تحذير نهائي: هل أنت متأكد من الحذف النهائي لـ "${title}"؟\nلن يمكن استعادة هذا السجل بعد الآن نهائياً!`)) {
+        return;
+      }
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('recycle_bin').doc(trashId).delete();
+
+        await logAuditEvent(
+          'PERMANENT_DELETE',
+          `حذف نهائي: ${title}`,
+          item?.originalCollection || 'recycle_bin',
+          item?.originalId || trashId,
+          title,
+          `تم حذف السجل نهائياً من سلة المحذوفات بواسطة ${currentUser?.email || 'المسؤول'}`
+        );
+
+        AppData.trash = AppData.trash.filter(t => t.id !== trashId);
+        renderTrashTable();
+        updateTrashBadge();
+        showToast(`تم الحذف النهائي لـ "${title}".`, "info");
+      } catch (err) {
+        showToast("فشل الحذف النهائي: " + err.message, "error");
+      }
+    }
+
+    async function emptyRecycleBin() {
+      if (!AppData.trash.length) {
+        showToast("سلة المحذوفات فارغة بالفعل!", "info");
+        return;
+      }
+
+      const count = AppData.trash.length;
+      if (!confirm(`تحذير شديد الخطورة: هل تريد إفراغ سلة المحذوفات بالكامل وحذف كافة الـ (${count}) سجلات نهائياً؟`)) {
+        return;
+      }
+
+      try {
+        if (!db) initFirebaseCore();
+        const batch = db.batch();
+        AppData.trash.forEach(t => {
+          const docRef = db.collection('recycle_bin').doc(t.id);
+          batch.delete(docRef);
+        });
+        await batch.commit();
+
+        await logAuditEvent(
+          'PERMANENT_DELETE',
+          `إفراغ سلة المحذوفات بالكامل (${count} سجل)`,
+          'recycle_bin',
+          'all',
+          'إفراغ السلة',
+          `تم إفراغ سلة المحذوفات وحذف ${count} سجل نهائياً بواسطة ${currentUser?.email || 'المسؤول'}`
+        );
+
+        AppData.trash = [];
+        renderTrashTable();
+        updateTrashBadge();
+        showToast(`تم إفراغ سلة المحذوفات بنجاح (${count} سجل).`, "success");
+      } catch (err) {
+        showToast("خطأ أثناء إفراغ سلة المحذوفات: " + err.message, "error");
+      }
+    }
+
+    function exportTrashToExcel() {
+      if (!AppData.trash.length) {
+        showToast("لا توجد سجلات في سلة المحذوفات لتصديرها!", "warning");
+        return;
+      }
+
+      const rows = AppData.trash.map(t => ({
+        'القسم الأصلي': t.collectionLabel || t.originalCollection,
+        'عنوان السجل المحذوف': t.title,
+        'المعرف الأصلي': t.originalId,
+        'حُذف بواسطة': `${t.deletedByName || ''} (${t.deletedByEmail || ''})`,
+        'تاريخ ووقت الحذف': t.deletedAt ? new Date(t.deletedAt).toLocaleString('ar-SA') : '',
+        'بيانات السجل': JSON.stringify(t.data)
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "المحذوفات");
+      XLSX.writeFile(wb, `CleanOps_Recycle_Bin_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showToast("تم تصدير سجل المحذوفات إلى Excel بنجاح!", "success");
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       5.3 AUDIT LOGS DISPLAY & POINT-IN-TIME RESTORE
+       ───────────────────────────────────────────────────────────────── */
+    function renderAuditLogsTable(filtered = null) {
+      const list = filtered || AppData.auditLogs;
+      const tbody = document.getElementById('auditTableBody');
+      if (!tbody) return;
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">لا توجد أي عمليات مسجلة في سجل التدقيق حالياً.</td></tr>';
+        return;
+      }
+
+      // Summary metrics
+      const total = AppData.auditLogs.length;
+      const creates = AppData.auditLogs.filter(l => l.action === 'CREATE').length;
+      const updates = AppData.auditLogs.filter(l => l.action === 'UPDATE').length;
+      const restores = AppData.auditLogs.filter(l => l.action === 'RESTORE').length;
+
+      if (document.getElementById('statAuditTotal')) document.getElementById('statAuditTotal').innerText = total;
+      if (document.getElementById('statAuditCreates')) document.getElementById('statAuditCreates').innerText = creates;
+      if (document.getElementById('statAuditUpdates')) document.getElementById('statAuditUpdates').innerText = updates;
+      if (document.getElementById('statAuditRestores')) document.getElementById('statAuditRestores').innerText = restores;
+
+      tbody.innerHTML = list.map(l => {
+        const dateStr = l.timestamp ? new Date(l.timestamp).toLocaleString('ar-SA') : '-';
+        let actionBadge = 'badge-teal';
+        let actionIcon = 'ℹ️';
+
+        if (l.action === 'CREATE') { actionBadge = 'badge-success'; actionIcon = '➕ إضافة'; }
+        else if (l.action === 'UPDATE') { actionBadge = 'badge-warning'; actionIcon = '✏️ تعديل'; }
+        else if (l.action === 'DELETE') { actionBadge = 'badge-danger'; actionIcon = '🗑️ حذف'; }
+        else if (l.action === 'RESTORE') { actionBadge = 'badge-teal'; actionIcon = '♻️ استعادة'; }
+        else if (l.action === 'IMPORT') { actionBadge = 'badge-info'; actionIcon = '📱 استيراد'; }
+        else if (l.action === 'ADMIN') { actionBadge = 'badge-teal'; actionIcon = '🔐 مسؤولين'; }
+        else if (l.action === 'PERMANENT_DELETE') { actionBadge = 'badge-danger'; actionIcon = '🔥 حذف نهائي'; }
+
+        const hasSnapshot = l.snapshot && typeof l.snapshot === 'object' && Object.keys(l.snapshot).length > 0;
+
+        return `
+          <tr>
+            <td class="mono" style="font-size:0.8rem; white-space:nowrap;">${escapeHtml(dateStr)}</td>
+            <td><span class="badge ${actionBadge}">${actionIcon}</span></td>
+            <td><span class="badge badge-teal">${escapeHtml(getCollectionArabicName(l.collectionName))}</span></td>
+            <td><b>${escapeHtml(l.title || l.recordTitle || '-')}</b></td>
+            <td>
+              <div style="font-size:0.85rem; font-weight:700;">${escapeHtml(l.userName || 'مسؤول')}</div>
+              <div class="mono" style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(l.userEmail || '-')}</div>
+            </td>
+            <td style="max-width:280px; overflow:hidden; text-overflow:ellipsis; font-size:0.82rem; color:var(--text-secondary);">
+              ${escapeHtml(l.details || '-')}
+            </td>
+            <td>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="viewAuditDetail('${l.id}')">
+                <span>🔍</span> ${hasSnapshot ? 'فحص واستعادة' : 'التفاصيل'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getCollectionArabicName(col) {
+      if (col === 'cleaning_sites') return 'مواقع العمل';
+      if (col === 'workers') return 'الكوادر والعمال';
+      if (col === 'attendance_records') return 'الحضور والانصراف';
+      if (col === 'inventory_items') return 'المخزون والمواد';
+      if (col === 'invoices') return 'الفواتير';
+      if (col === 'expenses') return 'المصروفات';
+      if (col === 'authorized_admins') return 'إدارة المسؤولين';
+      if (col === 'recycle_bin') return 'سلة المحذوفات';
+      return col || 'عام';
+    }
+
+    function filterAuditTable() {
+      const q = (document.getElementById('searchAudit')?.value || '').toLowerCase().trim();
+      const action = document.getElementById('filterAuditAction')?.value || '';
+      const col = document.getElementById('filterAuditCollection')?.value || '';
+
+      let list = AppData.auditLogs;
+      if (action) {
+        list = list.filter(l => l.action === action);
+      }
+      if (col) {
+        list = list.filter(l => l.collectionName === col);
+      }
+      if (q) {
+        list = list.filter(l => 
+          (l.title || '').toLowerCase().includes(q) ||
+          (l.recordTitle || '').toLowerCase().includes(q) ||
+          (l.recordId || '').toLowerCase().includes(q) ||
+          (l.userEmail || '').toLowerCase().includes(q) ||
+          (l.userName || '').toLowerCase().includes(q) ||
+          (l.details || '').toLowerCase().includes(q)
+        );
+      }
+      renderAuditLogsTable(list);
+    }
+
+    function updateAuditBadge() {
+      const badge = document.getElementById('badgeAuditCount');
+      if (badge) {
+        badge.innerText = AppData.auditLogs.length;
+      }
+    }
+
+    function viewAuditDetail(logId) {
+      const log = AppData.auditLogs.find(l => l.id === logId);
+      if (!log) return;
+
+      const body = document.getElementById('auditDetailBody');
+      const restoreBtn = document.getElementById('btnRestoreAuditSnapshot');
+      const dateStr = log.timestamp ? new Date(log.timestamp).toLocaleString('ar-SA') : '-';
+
+      const hasSnapshot = log.snapshot && typeof log.snapshot === 'object' && Object.keys(log.snapshot).length > 0;
+      const canRestore = hasSnapshot && ['cleaning_sites', 'workers', 'attendance_records', 'inventory_items', 'expenses', 'invoices'].includes(log.collectionName);
+
+      body.innerHTML = `
+        <div style="background: rgba(14, 30, 39, 0.7); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-teal">${escapeHtml(getCollectionArabicName(log.collectionName))}</span>
+            <span class="mono" style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(dateStr)}</span>
+          </div>
+          <h3 style="color:#FFF; font-size:1.15rem; margin-bottom:4px;">${escapeHtml(log.title || 'عملية')}</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:6px;">${escapeHtml(log.details || '')}</p>
+          <div style="font-size:0.8rem; color:var(--text-muted);">
+            المستخدم: <b>${escapeHtml(log.userName || '')}</b> (${escapeHtml(log.userEmail || '')}) | معرف السجل: <code class="mono" style="color:var(--neon-teal);">${escapeHtml(log.recordId || '-')}</code>
+          </div>
+        </div>
+
+        ${hasSnapshot ? `
+          <div style="margin-bottom:8px; font-weight:700; color:var(--neon-teal); font-size:0.85rem;">📋 نسخة السجل المحفوظة في هذه العملية (Data Snapshot):</div>
+          <pre class="mono" style="background:#04090D; border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:12px; max-height:260px; overflow-y:auto; font-size:0.8rem; color:#A7F3D0; text-align:left; direction:ltr;">${escapeHtml(JSON.stringify(log.snapshot, null, 2))}</pre>
+        ` : `
+          <div style="padding:1rem; text-align:center; color:var(--text-muted); font-size:0.85rem;">لا تتضمن هذه العملية لقطة بيانات قابلة للعرض.</div>
+        `}
+      `;
+
+      if (restoreBtn) {
+        if (canRestore) {
+          restoreBtn.style.display = 'inline-flex';
+          restoreBtn.onclick = () => {
+            closeModal('modalAuditDetail');
+            restoreFromAuditSnapshot(log.id);
+          };
+        } else {
+          restoreBtn.style.display = 'none';
         }
       }
+
+      openModal('modalAuditDetail');
+    }
+
+    async function restoreFromAuditSnapshot(logId) {
+      const log = AppData.auditLogs.find(l => l.id === logId);
+      if (!log || !log.snapshot) {
+        showToast("لا توجد نسخة صالحة للاستعادة في هذا السجل!", "error");
+        return;
+      }
+
+      const targetCol = log.collectionName;
+      const targetId = log.recordId || log.snapshot.id;
+      if (!targetCol || !targetId) {
+        showToast("بيانات الاستعادة غير مكتملة!", "error");
+        return;
+      }
+
+      const colNameAr = getCollectionArabicName(targetCol);
+      if (!confirm(`هل أنت متأكد من استعادة هذه النسخة السابقة إلى قسم [${colNameAr}]؟\nسيتم تحديث السجل برقم (${targetId}) في سحابة Firestore فوراً.`)) {
+        return;
+      }
+
+      try {
+        if (!db) initFirebaseCore();
+
+        const dataToRestore = sanitizeForFirestore(log.snapshot);
+        dataToRestore.id = targetId;
+        dataToRestore.updatedAt = Date.now();
+        dataToRestore.revertedFromLogId = log.id;
+
+        await db.collection(targetCol).doc(targetId).set(dataToRestore, { merge: true });
+
+        await logAuditEvent(
+          'RESTORE',
+          `استرجاع نسخة سابقة: ${log.recordTitle || targetId}`,
+          targetCol,
+          targetId,
+          log.recordTitle || targetId,
+          `تم استرجاع نسخة البيانات السابقة المسجلة بتاريخ ${new Date(log.timestamp).toLocaleString('ar-SA')}`,
+          dataToRestore
+        );
+
+        showToast(`تمت استعادة النسخة السابقة للسجل (${targetId}) بنجاح!`, "success");
+        syncAllFromFirestore();
+      } catch (err) {
+        console.error("Audit Restore Error:", err);
+        showToast("فشلت الاستعادة: " + err.message, "error");
+      }
+    }
+
+    function exportAuditToExcel() {
+      if (!AppData.auditLogs.length) {
+        showToast("لا توجد عمليات مسجلة في سجل التدقيق لتصديرها!", "warning");
+        return;
+      }
+
+      const rows = AppData.auditLogs.map(l => ({
+        'التاريخ والوقت': l.timestamp ? new Date(l.timestamp).toLocaleString('ar-SA') : '',
+        'نوع العملية': l.action,
+        'القسم / الجدول': getCollectionArabicName(l.collectionName),
+        'عنوان السجل / العملية': l.title || l.recordTitle,
+        'معرف السجل (ID)': l.recordId,
+        'المستخدم المنفذ': `${l.userName || ''} (${l.userEmail || ''})`,
+        'تفاصيل التغيير': l.details,
+        'بيانات النسخة المحفوظة': l.snapshot ? JSON.stringify(l.snapshot) : ''
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "سجل التدقيق والعمليات");
+      XLSX.writeFile(wb, `CleanOps_Audit_Logs_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showToast("تم تصدير سجل التدقيق إلى Excel بنجاح!", "success");
     }
 
     /* ─────────────────────────────────────────────────────────────────
@@ -3369,6 +4271,24 @@
         pStatus.innerText = `🎉 تم رفع كافة السجلات (${totalTasks} سجل) ومزامنتها مع السحابة بنجاح!`;
         showToast(`تمت مزامنة ${totalTasks} سجل في سحابة Firestore بنجاح!`, "success");
 
+        await logAuditEvent(
+          'IMPORT',
+          `استيراد وتفريغ ملف هاتف / SQL (${totalTasks} سجل)`,
+          'cleaning_services_system',
+          'import_' + Date.now(),
+          'استيراد ملف قاعدة بيانات',
+          `تم استيراد ومزامنة إجمالي ${totalTasks} سجل بنجاح في سحابة Firestore وتحديث جداول النظام`,
+          {
+            totalImported: totalTasks,
+            sites: (StagedImportData.cleaning_sites || []).length,
+            workers: (StagedImportData.workers || []).length,
+            attendance: (StagedImportData.attendance_records || []).length,
+            inventory: (StagedImportData.inventory_items || []).length,
+            expenses: (StagedImportData.expenses || []).length,
+            invoices: (StagedImportData.invoices || []).length
+          }
+        );
+
         // Refresh cloud data
         setTimeout(() => {
           cancelImport();
@@ -3669,6 +4589,7 @@
 
         closeModal('modalAddAdmin');
         showToast(`تمت إضافة واعتماد حساب المسؤول (${email}) بنجاح!`, "success");
+        await logAuditEvent('ADMIN', `إضافة مسؤول إداري: ${email}`, 'authorized_admins', email, name, `تم اعتماد حساب مسؤول جديد [${name}] بدور [${role}] وصلاحية كاملة`, adminObj);
         loadAuthorizedAdmins();
       } catch (err) {
         console.error("Add Admin Error:", err);
@@ -3682,6 +4603,7 @@
         renderAdminsTable();
         closeModal('modalAddAdmin');
         showToast(`تم اعتماد المسؤول محلياً (${email}): ` + err.message, "warning");
+        await logAuditEvent('ADMIN', `إضافة مسؤول إداري (محلياً): ${email}`, 'authorized_admins', email, name, `تم اعتماد المسؤول محلياً: ${err.message}`, adminObj);
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -3704,6 +4626,7 @@
           ]);
           AppData.admins = AppData.admins.filter(a => a.email !== email);
           renderAdminsTable();
+          await logAuditEvent('ADMIN', `إلغاء صلاحية مسؤول: ${email}`, 'authorized_admins', email, email, `تم إلغاء صلاحية المسؤول وحذفه من القائمة المعتمدة`);
           showToast(`تم إلغاء صلاحية ${email}`, "success");
         } catch (err) {
           showToast("فشل الحذف: " + err.message, "error");
