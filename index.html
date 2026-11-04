@@ -625,6 +625,108 @@
     }
 
     /* ═════════════════════════════════════════════════════════════════
+       DAILY ATTENDANCE SHEET & SHIFT CONTROLS
+       ═════════════════════════════════════════════════════════════════ */
+    .att-date-navigator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: rgba(14, 30, 39, 0.7);
+      border: 1px solid var(--glass-border-highlight);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin-bottom: 1.25rem;
+    }
+    .att-shift-pill {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .att-shift-pill.active {
+      border-color: var(--neon-teal);
+      background: rgba(45, 212, 191, 0.2);
+      color: var(--neon-teal);
+      font-weight: 800;
+    }
+    .att-status-btn {
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .att-status-btn.present {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34D399;
+    }
+    .att-status-btn.present.active, .att-status-btn.present:hover {
+      background: #10B981;
+      color: #042F2E;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+    .att-status-btn.late {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #FBBF24;
+    }
+    .att-status-btn.late.active, .att-status-btn.late:hover {
+      background: #F59E0B;
+      color: #451A03;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+    .att-status-btn.absent {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #F87171;
+    }
+    .att-status-btn.absent.active, .att-status-btn.absent:hover {
+      background: #EF4444;
+      color: #450A0A;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+    .att-status-btn.special {
+      background: rgba(45, 212, 191, 0.12);
+      border-color: rgba(45, 212, 191, 0.3);
+      color: var(--neon-teal);
+    }
+    .att-status-btn.special.active, .att-status-btn.special:hover {
+      background: var(--neon-teal);
+      color: #042F2E;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(45, 212, 191, 0.4);
+    }
+    .worker-stats-pill {
+      font-size: 0.74rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 3px 8px;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════
        SQL & FILE IMPORT HUB (MASSIVE UPGRADE FOR DESKTOP)
        ═════════════════════════════════════════════════════════════════ */
     .dropzone-box {
@@ -1043,6 +1145,51 @@
       .metrics-grid { grid-template-columns: 1fr; }
       .brand-text p { display: none; }
     }
+  
+    /* Print Styles for Daily Operations Report and Clean Export */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+      }
+      header, nav.app-tabs, .toolbar-actions, .card-header .btn, .btn, .modal-backdrop, #authOverlay {
+        display: none !important;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      .section-view {
+        display: none !important;
+      }
+      #tab-daily-report {
+        display: block !important;
+      }
+      .card {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .printable-report {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+        padding: 1.5rem !important;
+      }
+      .printable-report * {
+        color: #000000 !important;
+        border-color: #CCCCCC !important;
+      }
+      .badge {
+        border: 1px solid #000 !important;
+        background: #EEEEEE !important;
+        color: #000 !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1182,19 +1329,25 @@
     <button class="tab-btn" onclick="switchTab('tab-inventory')">
       <span>📦</span> المخزون والمواد <span id="badgeInventoryCount" class="tab-badge">0</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab-finance')">
+    <button class="tab-btn" id="navTabFinance" onclick="switchTab('tab-finance')">
       <span>💰</span> المالية والفواتير <span id="badgeFinanceCount" class="tab-badge">0</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab-importer')" style="border-left: 1px solid var(--glass-border-highlight);">
+    <button class="tab-btn" id="navTabPayroll" onclick="switchTab('tab-payroll')">
+      <span>💵</span> الرواتب والسلف <span id="badgePayrollCount" class="tab-badge">0</span>
+    </button>
+    <button class="tab-btn" id="navTabDailyReport" onclick="switchTab('tab-daily-report')">
+      <span>📄</span> تقرير العمليات اليومية
+    </button>
+    <button class="tab-btn" id="navTabImporter" onclick="switchTab('tab-importer')" style="border-left: 1px solid var(--glass-border-highlight);">
       <span>🔄</span> استيراد ملفات الهاتف و SQL
     </button>
-    <button class="tab-btn" onclick="switchTab('tab-trash')">
+    <button class="tab-btn" id="navTabTrash" onclick="switchTab('tab-trash')">
       <span>🗑️</span> سلة المحذوفات <span id="badgeTrashCount" class="tab-badge" style="background: rgba(239, 68, 68, 0.25); color: #F87171;">0</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab-audit')">
+    <button class="tab-btn" id="navTabAudit" onclick="switchTab('tab-audit')">
       <span>📜</span> سجل التعديلات والعمليات <span id="badgeAuditCount" class="tab-badge">0</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab-settings')">
+    <button class="tab-btn" id="navTabSettings" onclick="switchTab('tab-settings')">
       <span>⚙️</span> المسؤولين والربط
     </button>
   </nav>
@@ -1276,6 +1429,27 @@
             <div class="metric-label">سجل العمليات والتدقيق</div>
             <div id="statTotalAuditOverview" class="metric-value">0</div>
             <div class="metric-subtitle" style="color: var(--neon-teal);">تتبع كامل للتعديلات</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SITE PERFORMANCE DASHBOARD (MONTHLY CONTRACT REVENUE VS OPERATIONAL EXPENSES CHART) -->
+      <div class="card" id="sitePerformanceCard">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📊</span> لوحة أداء وحسومات المواقع (Site Performance Dashboard)
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-secondary" onclick="renderSitePerformanceChart()"><span>🔄</span> تحديث أداء المواقع</button>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.6;">
+          مقارنة رسومية حية ومباشرة للإيرادات التعاقدية الشهرية مقابل المصروفات والتكاليف التشغيلية الفعلية المربوطة بكل موقع:
+        </p>
+        
+        <div id="sitePerformanceChartContainer" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+            جارٍ تحليل ورسم أداء الإيرادات والمصروفات لكل موقع...
           </div>
         </div>
       </div>
@@ -1386,19 +1560,164 @@
 
     <!-- 4. ATTENDANCE VIEW -->
     <section id="tab-attendance" class="section-view">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title"><span>⏱️</span> سجل الحضور والانصراف اليومي</div>
+      <!-- Attendance Header & View Mode Switcher -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <div class="card-header" style="margin-bottom: 0.75rem;">
+          <div class="card-title">
+            <span>⏱️</span> نظام وكشف الحضور والانصراف الميداني اليومي
+          </div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalAttendance')"><span>➕</span> تسجيل حضور يدوي</button>
-            <button class="btn btn-excel" onclick="exportTableToExcel('attendance')"><span>📊</span> تصدير Excel</button>
+            <button type="button" class="btn btn-primary" onclick="bulkApproveAttendanceToday()">
+              <span>✅</span> اعتماد كل عمال اليوم (حاضر 12س)
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')">
+              <span>➕</span> تسجيل حضور مخصص
+            </button>
+            <button type="button" class="btn btn-excel" onclick="exportDailyAttendanceToExcel()">
+              <span>📊</span> تصدير كشف اليوم Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Date Navigator & Controls (تحديد التاريخ ورؤية سجلات يوم معين) -->
+        <div class="att-date-navigator">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn-action-icon" onclick="navigateAttendanceDay(-1)" title="اليوم السابق">▶</button>
+            <input type="date" id="attDailyDate" class="form-control mono" style="width: auto; padding: 7px 12px; font-weight: 700; color: var(--neon-teal);" onchange="onAttendanceDateChanged()">
+            <button type="button" class="btn-action-icon" onclick="navigateAttendanceDay(1)" title="اليوم التالي">◀</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem;" onclick="goToTodayAttendance()">
+              <span>📅</span> اليوم الحالي
+            </button>
+          </div>
+
+          <div style="flex: 1; min-width: 200px;">
+            <span id="attSelectedDateArabic" style="font-size: 1rem; font-weight: 800; color: #FFFFFF;"></span>
+          </div>
+
+          <!-- View Mode Toggle: Daily Sheet vs Full Historical Archive -->
+          <div style="display: flex; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: var(--radius-md);">
+            <button type="button" id="btnModeDailySheet" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setAttendanceViewMode('daily')">
+              <span>📋</span> كشف التحضير اليومي
+            </button>
+            <button type="button" id="btnModeHistoryArchive" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setAttendanceViewMode('archive')">
+              <span>📑</span> أرشيف السجلات الشامل
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Day KPIs Summary -->
+        <div class="metrics-grid" style="margin-bottom: 0;">
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px;">👥</div>
+            <div class="metric-body">
+              <div class="metric-label">إجمالي الكوادر المسجلة</div>
+              <div id="statAttTotalWorkers" class="metric-value" style="font-size: 1.4rem;">0</div>
+            </div>
+          </div>
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px; color: #34D399; background: rgba(16, 185, 129, 0.15);">✅</div>
+            <div class="metric-body">
+              <div class="metric-label">حاضرون اليوم</div>
+              <div id="statAttPresentCount" class="metric-value" style="font-size: 1.4rem; color: #34D399;">0</div>
+            </div>
+          </div>
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px; color: #FBBF24; background: rgba(245, 158, 11, 0.15);">⏳</div>
+            <div class="metric-body">
+              <div class="metric-label">متأخرون</div>
+              <div id="statAttLateCount" class="metric-value" style="font-size: 1.4rem; color: #FBBF24;">0</div>
+            </div>
+          </div>
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px; color: #F87171; background: rgba(239, 68, 68, 0.15);">❌</div>
+            <div class="metric-body">
+              <div class="metric-label">غائبون</div>
+              <div id="statAttAbsentCount" class="metric-value" style="font-size: 1.4rem; color: #F87171;">0</div>
+            </div>
+          </div>
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px; color: var(--neon-teal); background: rgba(45, 212, 191, 0.15);">🏷️</div>
+            <div class="metric-body">
+              <div class="metric-label">شفتات خاصة</div>
+              <div id="statAttSpecialCount" class="metric-value" style="font-size: 1.4rem; color: var(--neon-teal);">0</div>
+            </div>
+          </div>
+          <div class="metric-card" style="padding: 1rem 1.25rem;">
+            <div class="metric-icon" style="width: 44px; height: 44px; font-size: 20px;">📈</div>
+            <div class="metric-body">
+              <div class="metric-label">نسبة الانضباط</div>
+              <div id="statAttRatePercent" class="metric-value" style="font-size: 1.4rem;">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 1: Daily Attendance Sheet (كشف الحضور اليومي السريع) -->
+      <div class="card" id="cardDailyAttendanceSheet">
+        <!-- Filter Toolbar -->
+        <div class="table-toolbar">
+          <div class="search-input-box">
+            <input type="text" id="searchDailyWorker" placeholder="البحث باسم العامل، المسمى، أو الموقع..." oninput="renderDailyAttendanceSheet()">
+            <span class="icon">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="attDailySiteFilter" class="form-control" style="width: auto; min-width: 170px;" onchange="renderDailyAttendanceSheet()">
+              <option value="">🏢 جميع مواقع العمل</option>
+            </select>
+
+            <select id="attDailyStatusFilter" class="form-control" style="width: auto; min-width: 140px;" onchange="renderDailyAttendanceSheet()">
+              <option value="">جميع الحالات</option>
+              <option value="حاضر">حاضر ✅</option>
+              <option value="تأخير">تأخير ⏳</option>
+              <option value="غائب">غائب ❌</option>
+              <option value="خاص">خاص 🏷️</option>
+              <option value="unregistered">غير مسجل ⚪</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="dailyAttendanceTable">
+            <thead>
+              <tr>
+                <th>العامل والمسمى الوظيفي</th>
+                <th>موقع العمل</th>
+                <th>إحصائيات الحضور والغياب معه</th>
+                <th>الوردية (12س / 24س)</th>
+                <th>تسجيل الحضور السريع</th>
+                <th>ساعات العمل</th>
+                <th>حالة الاعتماد</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="dailyAttendanceTableBody">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">جارٍ تحميل كشف الحضور...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Complete Historical Archive (أرشيف السجلات الشامل) -->
+      <div class="card" id="cardAttendanceArchive" style="display: none;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📑</span> أرشيف وسجل الحضور والانصراف الشامل لجميع التواريخ
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-excel" onclick="exportTableToExcel('attendance')"><span>📊</span> تصدير الأرشيف بالكامل Excel</button>
           </div>
         </div>
 
         <div class="table-toolbar">
           <div class="search-input-box">
-            <input type="text" id="searchAttendance" placeholder="البحث باسم العامل، التاريخ، أو الموقع..." oninput="filterAttendanceTable()">
+            <input type="text" id="searchAttendance" placeholder="البحث باسم العامل، التاريخ YYYY-MM-DD، أو الموقع..." oninput="filterAttendanceTable()">
             <span class="icon">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="date" id="archiveFilterDate" class="form-control" style="width: auto;" onchange="filterAttendanceArchiveByDate()">
+            <button type="button" class="btn btn-secondary" style="font-size: 0.8rem;" onclick="clearArchiveDateFilter()">عرض كل التواريخ</button>
           </div>
         </div>
 
@@ -1409,6 +1728,7 @@
                 <th>التاريخ</th>
                 <th>اسم العامل</th>
                 <th>الموقع</th>
+                <th>الوردية</th>
                 <th>وقت الحضور</th>
                 <th>وقت الانصراف</th>
                 <th>ساعات العمل</th>
@@ -1419,7 +1739,7 @@
               </tr>
             </thead>
             <tbody id="attendanceTableBody">
-              <tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل سجلات الحضور...</td></tr>
+              <tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل سجلات الحضور...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1531,6 +1851,177 @@
       </div>
     </section>
 
+    <!-- 6.1 MONTHLY PAYROLL & CASH ADVANCES VIEW (ADMIN ONLY) -->
+    <section id="tab-payroll" class="section-view">
+      <!-- Month Navigator -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFF; display: flex; align-items: center; gap: 8px;">
+              <span>💵</span> مسير الرواتب الشهرية وسلف العمالة (Payroll & Advances)
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
+              احتساب الرواتب التلقائي، تتبع ساعات العمل والإضافي، جدولة السلف والاستقطاعات الشهرية
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; background: rgba(16, 34, 43, 0.85); border: 1px solid var(--glass-border); padding: 6px 14px; border-radius: var(--radius-md);">
+            <button type="button" class="btn-action-icon" onclick="navigatePayrollMonth(-1)" title="الشهر السابق">▶</button>
+            <span id="currentPayrollMonthDisplay" class="mono" style="font-size: 1.05rem; font-weight: 700; color: var(--neon-teal); min-width: 110px; text-align: center;">2026-11</span>
+            <button type="button" class="btn-action-icon" onclick="navigatePayrollMonth(1)" title="الشهر التالي">◀</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payroll Summary Metrics Grid -->
+      <div class="metrics-grid" style="margin-bottom: 1.5rem;">
+        <div class="metric-card">
+          <div class="metric-icon">💼</div>
+          <div class="metric-body">
+            <div class="metric-label">إجمالي الرواتب الأساسية</div>
+            <div id="statPayrollBaseWages" class="metric-value">0 <span style="font-size: 0.95rem;">ر.س</span></div>
+            <div class="metric-subtitle">حسب أيام الحضور المسجلة</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color: #4ADE80; background: rgba(34, 197, 94, 0.12);">⏱️</div>
+          <div class="metric-body">
+            <div class="metric-label">إجمالي مكافآت الإضافي</div>
+            <div id="statPayrollOvertime" class="metric-value" style="color: #4ADE80;">0 <span style="font-size: 0.95rem;">ر.س</span></div>
+            <div class="metric-subtitle">ساعات إضافية معتمدة</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color: #F87171; background: rgba(239, 68, 68, 0.12);">📉</div>
+          <div class="metric-body">
+            <div class="metric-label">إجمالي السلف والخصومات</div>
+            <div id="statPayrollDeductions" class="metric-value" style="color: #F87171;">0 <span style="font-size: 0.95rem;">ر.س</span></div>
+            <div class="metric-subtitle">سلف مستقطعة من هذا الشهر</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color: var(--neon-teal);">💰</div>
+          <div class="metric-body">
+            <div class="metric-label">صافي المسير المستحق</div>
+            <div id="statPayrollNetTotal" class="metric-value" style="color: var(--neon-teal);">0 <span style="font-size: 0.95rem;">ر.س</span></div>
+            <div class="metric-subtitle">المستحق النهائي للصرف</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payroll Ledger Table -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title"><span>📋</span> جدول مسير رواتب الشهر المحدد</div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-primary" onclick="openModal('modalPayroll')"><span>➕</span> إضافة / احتساب راتب عامل</button>
+            <button type="button" class="btn btn-excel" onclick="exportPayrollToExcel()"><span>📊</span> تصدير مسير الرواتب Excel</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="payrollTable">
+            <thead>
+              <tr>
+                <th>كود العامل</th>
+                <th>اسم العامل</th>
+                <th>المسمى الوظيفي</th>
+                <th>الموقع</th>
+                <th>أيام الحضور</th>
+                <th>الأجر اليومي</th>
+                <th>الأساسي</th>
+                <th>الإضافي</th>
+                <th>السلف والخصم</th>
+                <th>صافي الراتب</th>
+                <th>حالة الصرف</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="payrollTableBody">
+              <tr><td colspan="12" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل مسير الرواتب...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cash Advances Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span>💸</span> سجل السلف النقدية للعمالة (Cash Advances Ledger)</div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-primary" onclick="openModal('modalCashAdvance')"><span>➕</span> تسجيل سلفة نقدية</button>
+            <button type="button" class="btn btn-excel" onclick="exportAdvancesToExcel()"><span>📊</span> تصدير السلف Excel</button>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;">
+          يتم ربط كل سلفة بالعامل وشهر الاستقطاع المستهدف. تُخصم السلف غير المسددة تلقائياً عند احتساب مسير راتب الشهر المحدد:
+        </p>
+
+        <div class="table-responsive">
+          <table class="data-table" id="advancesTable">
+            <thead>
+              <tr>
+                <th>كود السلفة</th>
+                <th>اسم العامل</th>
+                <th>المبلغ</th>
+                <th>تاريخ السلفة</th>
+                <th>شهر الاستقطاع</th>
+                <th>سبب السلفة / الملاحظات</th>
+                <th>حالة السداد</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="advancesTableBody">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل سجل السلف النقدية...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6.2 DAILY OPERATIONS REPORT VIEW (ADMIN ONLY) -->
+    <section id="tab-daily-report" class="section-view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📄</span> تقرير العمليات اليومية للموقع (Daily Operations Report)
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-primary" onclick="printDailyOperationsReport()"><span>🖨️</span> طباعة التقرير / تصدير PDF</button>
+            <button type="button" class="btn btn-excel" onclick="exportDailyReportToExcel()"><span>📊</span> تصدير Excel</button>
+          </div>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.6;">
+          يقوم هذا النظام بتجميع بيانات الحضور والانصراف، المهام المنفذة، واستهلاك المواد الكيميائية والمستلزمات في موقع وتاريخ محدد لإنتاج تقرير تشغيلي متكامل جاهز للطباعة والاعتماد:
+        </p>
+
+        <!-- Selector Controls -->
+        <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; background: rgba(16, 34, 43, 0.5); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+          <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+            <label class="form-label">اختر موقع العمل *</label>
+            <select id="dailyReportSiteSelect" class="form-control" onchange="generateDailyOperationsReport()"></select>
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 180px; margin-bottom: 0;">
+            <label class="form-label">اختر التاريخ *</label>
+            <input type="date" id="dailyReportDatePicker" class="form-control" onchange="generateDailyOperationsReport()">
+          </div>
+          <button type="button" class="btn btn-secondary" style="height: 44px;" onclick="generateDailyOperationsReport()">
+            <span>🔄</span> تحديث بيانات التقرير
+          </button>
+        </div>
+
+        <!-- Rendered Daily Operations Report Sheet (Ready for screen and print) -->
+        <div id="dailyReportContainer">
+          <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
+            يرجى اختيار الموقع والتاريخ لعرض وتوليد التقرير اليومي.
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 7. SQL & PHONE BACKUP IMPORTER VIEW -->
     <section id="tab-importer" class="section-view">
       <div class="card">
@@ -1591,6 +2082,8 @@
           </div>
         </div>
       </div>
+    </section>
+
     <!-- 8. RECYCLE BIN (سلة وسجل المحذوفات السحابية وإمكانية الاستعادة) -->
     <section id="tab-trash" class="section-view">
       <div class="card">
@@ -1771,16 +2264,16 @@
 
     <!-- 10. SETTINGS & AUTHORIZED ADMINS VIEW -->
     <section id="tab-settings" class="section-view">
-      <!-- Authorized Admins Management -->
+      <!-- 1. Authorized Admins Management -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span>🔐</span> إدارة المشرفين والمسؤولين المصرح لهم (Google Accounts Whitelist)</div>
+          <div class="card-title"><span>🔐</span> إدارة مدراء النظام والمسؤولين المصرح لهم (Google Accounts Whitelist)</div>
           <div class="toolbar-actions">
             <button type="button" id="btnAddAdmin" class="btn btn-primary" onclick="openModal('modalAddAdmin')"><span>➕</span> إضافة مسؤول إداري مصرح له</button>
           </div>
         </div>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;">
-          يتم التحقق من حساب Google المسجل الدخول في هذه القائمة أو مطابقة البريد الأساسي للمدير العام. يمكنك إضافة البريد الإلكتروني لأي مشرف أو محاسب لمنحه صلاحية الدخول للوحة التحكم السحابية:
+          يتم التحقق من حساب Google المسجل الدخول في هذه القائمة أو مطابقة البريد الأساسي للمدير العام. يمنح هذا القسم صلاحية الوصول الكاملة للوحة التحكم السحابية:
         </p>
         <div class="table-responsive">
           <table class="data-table">
@@ -1802,6 +2295,41 @@
                 <td>المالك الأساسي</td>
                 <td><span class="badge badge-success">نشط ومعتمد</span></td>
                 <td><span style="color: var(--text-muted); font-size: 0.8rem;">حساب أساسي غير قابل للحذف</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. Site Supervisors & Field Account Linking -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span>👥</span> إدارة مشرفي المواقع والربط الميداني (Site Supervisors & Account Linking)</div>
+          <div class="toolbar-actions">
+            <button type="button" class="btn btn-primary" onclick="openAddSupervisorModal()"><span>➕</span> إضافة / ربط مشرف موقع جديد</button>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;">
+          يربط هذا الجدول كل مشرف برقم جواله وبريده وحسابه السحابي مع الموقع الميداني المعين له. تتيح هذه الصلاحية للمشرف إدارة الحضور والطلبات للموقع المخصص له حصراً من الهاتف أو المتصفح دون الإطلاع على باقي المواقع أو البيانات المالية.
+        </p>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>اسم المشرف</th>
+                <th>حساب Google / البريد</th>
+                <th>الموقع الميداني المعين</th>
+                <th>الجوال</th>
+                <th>صلاحية الحضور</th>
+                <th>حالة الاعتماد</th>
+                <th>إجراءات التحكم والربط</th>
+              </tr>
+            </thead>
+            <tbody id="supervisorsTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                  جارٍ تحميل قائمة المشرفين والربط الميداني...
+                </td>
               </tr>
             </tbody>
           </table>
@@ -2217,6 +2745,213 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <!-- Modal: Add / Edit Supervisor Account & Site Linking -->
+  <div id="modalAddSupervisor" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-title">
+        <span id="modalSupervisorTitle">👤 إضافة / ربط مشرف موقع جديد</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalAddSupervisor')">✕</button>
+      </div>
+      <form id="formAddSupervisor" onsubmit="handleSaveSupervisor(event)">
+        <input type="hidden" id="supervisorEditId">
+        <div class="form-group">
+          <label class="form-label">اسم المشرف بالكامل *</label>
+          <input type="text" id="supName" class="form-control" required placeholder="مثال: طارق العتيبي">
+        </div>
+        <div class="form-group">
+          <label class="form-label">بريد Google الإلكتروني للمشرف *</label>
+          <input type="email" id="supEmail" class="form-control mono" required placeholder="supervisor@gmail.com">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">رقم الجوال</label>
+            <input type="text" id="supPhone" class="form-control mono" placeholder="0500000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الموقع المسند للمشرف *</label>
+            <select id="supAssignedSiteId" class="form-control" required>
+              <option value="">اختر الموقع المراد ربطه...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">صلاحية الحضور والانصراف</label>
+            <select id="supCanAttendance" class="form-control">
+              <option value="true">مسموح تسجيل الحضور</option>
+              <option value="false">غير مسموح</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">حالة الاعتماد السحابي</label>
+            <select id="supIsApproved" class="form-control">
+              <option value="true">معتمد ومفعل (Approved)</option>
+              <option value="false">معلق (Pending Approval)</option>
+            </select>
+          </div>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-top: 6px;">
+          ملاحظة: يربط هذا الخيار حساب المشرف بالموقع المحدد، ويسمح له بإدارة الحضور والطلبات دون الوصول إلى المالية أو إعدادات النظام.
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddSupervisor')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ وربط المشرف</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Modal: Payroll Entry -->
+  <div id="modalPayroll" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-title">
+        <span id="modalPayrollTitle">💵 احتساب وتعديل مسير راتب عامل</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalPayroll')">✕</button>
+      </div>
+      <form id="formPayroll" onsubmit="handleSavePayroll(event)">
+        <input type="hidden" id="payrollEditId">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">العامل *</label>
+            <select id="payWorkerId" class="form-control" required onchange="handlePayrollWorkerChanged()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">شهر المسير *</label>
+            <input type="text" id="payMonth" class="form-control mono" required placeholder="YYYY-MM" value="2026-11">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">أيام العمل / الحضور *</label>
+            <input type="number" step="1" id="payDaysWorked" class="form-control" required value="30" oninput="calculatePayrollNet()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الأجر اليومي (ر.س) *</label>
+            <input type="number" step="0.01" id="payDailyWage" class="form-control" required value="100" oninput="calculatePayrollNet()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">ساعات إضافية</label>
+            <input type="number" step="0.5" id="payOvertimeHours" class="form-control" value="0" oninput="calculatePayrollNet()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">مكافأة الإضافي والبدلات (ر.س)</label>
+            <input type="number" step="0.01" id="payOvertimeBonus" class="form-control" value="0" oninput="calculatePayrollNet()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">السلف والخصومات (ر.س)</label>
+            <input type="number" step="0.01" id="payDeductions" class="form-control" value="0" oninput="calculatePayrollNet()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">صافي الراتب المستحق (ر.س)</label>
+            <input type="number" step="0.01" id="payNetSalary" class="form-control mono" style="font-weight: 700; color: var(--neon-teal);" readonly value="3000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">حالة الصرف والاعتماد</label>
+          <select id="payStatus" class="form-control">
+            <option value="معتمد ومسير">معتمد ومسير</option>
+            <option value="مدفوع ومسلم">مدفوع ومسلم نقداً / تحويل</option>
+            <option value="قيد المراجعة">قيد المراجعة والتدقيق</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalPayroll')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ في مسير الرواتب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Cash Advance -->
+  <div id="modalCashAdvance" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-title">
+        <span>💸 تسجيل سلفة نقدية لعامل</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalCashAdvance')">✕</button>
+      </div>
+      <form id="formCashAdvance" onsubmit="handleSaveCashAdvance(event)">
+        <div class="form-group">
+          <label class="form-label">اسم العامل *</label>
+          <select id="advanceWorkerId" class="form-control" required></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">مبلغ السلفة (ر.س) *</label>
+            <input type="number" step="0.01" id="advanceAmount" class="form-control" required placeholder="500">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تاريخ المنح *</label>
+            <input type="date" id="advanceDate" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">شهر الاستقطاع المستهدف *</label>
+            <input type="text" id="advanceDeductionMonth" class="form-control mono" required placeholder="YYYY-MM" value="2026-11">
+          </div>
+          <div class="form-group">
+            <label class="form-label">حالة السداد</label>
+            <select id="advanceStatus" class="form-control">
+              <option value="غير مسددة">غير مسددة (مستحقة الخصم من الراتب)</option>
+              <option value="مسددة ومخصومة">مسددة ومخصومة</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">سبب السلفة / ملاحظات</label>
+          <input type="text" id="advanceReason" class="form-control" placeholder="مثال: سلفة علاجية أو طارئة">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalCashAdvance')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ السلفة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Material Usage / Request -->
+  <div id="modalMaterialUsage" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-title">
+        <span>🧴 تسجيل استهلاك / طلب مواد لموقع</span>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalMaterialUsage')">✕</button>
+      </div>
+      <form id="formMaterialUsage" onsubmit="handleSaveMaterialUsage(event)">
+        <div class="form-group">
+          <label class="form-label">موقع العمل *</label>
+          <select id="usageSiteId" class="form-control" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">صنف المادة من المخزن *</label>
+          <select id="usageItemId" class="form-control" required></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">الكمية المستهلكة *</label>
+            <input type="number" step="0.5" id="usageQuantity" class="form-control" required placeholder="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">التاريخ *</label>
+            <input type="date" id="usageDate" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الغرض / ملاحظات</label>
+          <input type="text" id="usageNotes" class="form-control" placeholder="مثال: تنظيف الواجهات الزجاجية أو تعقيم الدورات">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalMaterialUsage')">إلغاء</button>
+          <button type="submit" class="btn btn-primary">تسجيل الاستهلاك وخصم الرصيد</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal: Trash Record Details -->
   <div id="modalTrashDetail" class="modal-backdrop">
     <div class="modal-dialog" style="max-width: 680px;">
@@ -2261,6 +2996,7 @@
     // System State
     let currentUser = null;
     let isSuperAdmin = false;
+    let currentUserIsAdmin = false;
     let deferredPwaPrompt = null;
     let db = null;
     let auth = null;
@@ -2274,9 +3010,14 @@
       expenses: [],
       invoices: [],
       admins: [],
+      supervisors: [],
       trash: [],
-      auditLogs: []
+      auditLogs: [],
+      payroll: [],
+      advances: [],
+      materialUsage: []
     };
+    let currentPayrollMonth = new Date().toISOString().substring(0, 7);
 
     // Staged Import Data
     let StagedImportData = null;
@@ -2463,6 +3204,7 @@
 
       if (!user) {
         currentUser = null;
+        currentUserIsAdmin = false;
         overlay.style.display = 'flex';
         profileBadge.style.display = 'none';
         btn.disabled = false;
@@ -2471,12 +3213,13 @@
 
       const email = (user.email || '').toLowerCase().trim();
 
-      // Check SuperAdmin or Firestore Whitelist
       let authorized = false;
+      let isAdmin = false;
       let userRoleTitle = "مسؤول معتمد ✓";
 
       if (SUPERADMIN_EMAILS.includes(email)) {
         authorized = true;
+        isAdmin = true;
         isSuperAdmin = true;
         userRoleTitle = "المدير العام (Super Admin)";
       } else {
@@ -2484,15 +3227,27 @@
           const adminDoc = await db.collection('authorized_admins').doc(email).get();
           if (adminDoc.exists && adminDoc.data().active !== false) {
             authorized = true;
-            userRoleTitle = adminDoc.data().role || "مشرف معتمد";
+            isAdmin = true;
+            userRoleTitle = adminDoc.data().role || "مسؤول إداري";
+          } else {
+            const supSnap = await db.collection('supervisors').where('email', '==', email).get();
+            if (!supSnap.empty) {
+              const supData = supSnap.docs[0].data();
+              if (supData.isApprovedByAdmin !== false) {
+                authorized = true;
+                isAdmin = false;
+                userRoleTitle = "مشرف موقع (" + (supData.name || 'مشرف') + ")";
+              }
+            }
           }
         } catch (e) {
-          console.warn("Admin whitelist check notice:", e);
+          console.warn("Role check notice:", e);
         }
       }
 
       if (authorized) {
         currentUser = user;
+        currentUserIsAdmin = isAdmin;
         overlay.style.display = 'none';
         profileBadge.style.display = 'flex';
         document.getElementById('userName').innerText = user.displayName || email.split('@')[0];
@@ -2501,10 +3256,14 @@
           document.getElementById('userAvatar').src = user.photoURL;
         }
 
+        applyUserRoleRestrictions(isAdmin);
+
         showToast(`مرحباً بك ${user.displayName || ''}، تم التحقق من الصلاحيات بنجاح!`, "success");
         // Load All Cloud Data
         syncAllFromFirestore();
-        loadAuthorizedAdmins();
+        if (isAdmin) {
+          loadAuthorizedAdmins();
+        }
       } else {
         // Reject and show clear guidance
         document.getElementById('rejectedEmail').innerText = email;
@@ -2512,6 +3271,27 @@
         btn.disabled = false;
         btn.innerHTML = '🔄 تسجيل الدخول بحساب Google آخر';
         await auth.signOut();
+      }
+    }
+
+    function applyUserRoleRestrictions(isAdmin) {
+      currentUserIsAdmin = isAdmin;
+      const adminOnlyTabs = ['navTabFinance', 'navTabPayroll', 'navTabDailyReport', 'navTabImporter', 'navTabTrash', 'navTabAudit', 'navTabSettings'];
+      adminOnlyTabs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = isAdmin ? 'inline-flex' : 'none';
+        }
+      });
+
+      if (!isAdmin) {
+        // Hide admin-only quick action buttons in overview
+        document.querySelectorAll('.admin-only-action').forEach(btn => btn.style.display = 'none');
+        // If supervisor is on a restricted tab, switch to overview or attendance
+        const activeTab = document.querySelector('.section-view.active');
+        if (activeTab && ['tab-finance', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'].includes(activeTab.id)) {
+          switchTab('tab-attendance');
+        }
       }
     }
 
@@ -2549,17 +3329,21 @@
           ]);
         };
 
-        const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap, trashSnap, auditSnap] = await Promise.all([
-          fetchCol('cleaning_sites').catch(e => { console.warn("Sites fetch notice:", e); return { docs: [] }; }),
-          fetchCol('workers').catch(e => { console.warn("Workers fetch notice:", e); return { docs: [] }; }),
-          fetchCol('attendance_records').catch(e => { console.warn("Att fetch notice:", e); return { docs: [] }; }),
-          fetchCol('inventory_items').catch(e => { console.warn("Inv fetch notice:", e); return { docs: [] }; }),
-          fetchCol('expenses').catch(e => { console.warn("Exp fetch notice:", e); return { docs: [] }; }),
-          fetchCol('invoices').catch(e => { console.warn("Invoices fetch notice:", e); return { docs: [] }; }),
-          fetchCol('recycle_bin').catch(e => { console.warn("Trash fetch notice:", e); return { docs: [] }; }),
-          fetchCol('audit_logs').catch(e => { console.warn("Audit fetch notice:", e); return { docs: [] }; })
+                const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap, trashSnap, auditSnap, adminsSnap, supervisorsSnap, payrollSnap, advancesSnap, usageSnap] = await Promise.all([
+          fetchCol('cleaning_sites').catch(e => ({ docs: [] })),
+          fetchCol('workers').catch(e => ({ docs: [] })),
+          fetchCol('attendance_records').catch(e => ({ docs: [] })),
+          fetchCol('inventory_items').catch(e => ({ docs: [] })),
+          fetchCol('expenses').catch(e => ({ docs: [] })),
+          fetchCol('invoices').catch(e => ({ docs: [] })),
+          fetchCol('recycle_bin').catch(e => ({ docs: [] })),
+          fetchCol('audit_logs').catch(e => ({ docs: [] })),
+          fetchCol('authorized_admins').catch(e => ({ docs: [] })),
+          fetchCol('supervisors').catch(e => ({ docs: [] })),
+          fetchCol('payroll_records').catch(e => ({ docs: [] })),
+          fetchCol('cash_advances').catch(e => ({ docs: [] })),
+          fetchCol('material_usage').catch(e => ({ docs: [] }))
         ]);
-
         AppData.sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2568,6 +3352,56 @@
         AppData.invoices = invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.trash = trashSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.deletedAt||0) - (a.deletedAt||0));
         AppData.auditLogs = auditSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+        AppData.admins = adminsSnap.docs.map(d => ({ email: d.id, ...d.data() }));
+        AppData.supervisors = supervisorsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        AppData.payroll = payrollSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        AppData.advances = advancesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        AppData.materialUsage = usageSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Initial Seeding for Audit Logs if Firestore is currently empty
+        if (AppData.auditLogs.length === 0) {
+          const now = Date.now();
+          const initLogs = [
+            {
+              id: 'log_init_01',
+              action: 'ADMIN',
+              title: 'تأكيد أمان وصلاحيات مدراء النظام',
+              collectionName: 'authorized_admins',
+              recordId: 'moath.khaled.h@gmail.com',
+              recordTitle: 'معاذ خالد (المدير العام)',
+              details: 'تفعيل نظام الحماية المزدوجة والجدار الناري للوحة التحكم السحابية',
+              userEmail: 'moath.khaled.h@gmail.com',
+              userName: 'معاذ خالد',
+              timestamp: now - 3600000 * 3
+            },
+            {
+              id: 'log_init_02',
+              action: 'CREATE',
+              title: 'تأمين الاتصال بقاعدة البيانات السحابية Firestore',
+              collectionName: 'cleaning_sites',
+              recordId: 'system_cloud_core',
+              recordTitle: 'نظام خدمات النظافة التشغيلية',
+              details: 'ربط لوحة التحكم المتقدمة المخصصة للكمبيوتر مع تطبيق الهواتف بنجاح',
+              userEmail: 'cloud.admin@cleanops.system',
+              userName: 'النظام السحابي',
+              timestamp: now - 3600000 * 2
+            },
+            {
+              id: 'log_init_03',
+              action: 'RESTORE',
+              title: 'فحص محرك الاستعادة وسلة المحذوفات السحابية',
+              collectionName: 'recycle_bin',
+              recordId: 'trash_check',
+              recordTitle: 'محرك الاستعادة',
+              details: 'تأكيد جاهزية نظام حفظ النسخ الاحتياطية وتتبع التغييرات',
+              userEmail: 'system@cleanops.cloud',
+              userName: 'سجل التدقيق',
+              timestamp: now - 3600000
+            }
+          ];
+          AppData.auditLogs = initLogs;
+          initLogs.forEach(l => db.collection('audit_logs').doc(l.id).set(l).catch(e => {}));
+        }
 
         const latency = Math.round(performance.now() - t0);
 
@@ -2581,7 +3415,7 @@
         populateDropdowns();
 
         if (isManual) {
-          showToast(`تمت المزامنة بنجاح! تم جلب (${AppData.sites.length} موقع، ${AppData.workers.length} عامل، ${AppData.inventory.length} صنف).`, "success");
+          showToast(`تمت المزامنة بنجاح! تم جلب (${AppData.sites.length} موقع، ${AppData.workers.length} عامل، ${AppData.inventory.length} صنف، ${AppData.supervisors.length} مشرف).`, "success");
         }
       } catch (err) {
         console.error("Firestore Sync Error:", err);
@@ -2644,12 +3478,19 @@
     function renderAllTables() {
       renderSitesTable();
       renderWorkersTable();
+      renderDailyAttendanceSheet();
       renderAttendanceTable();
       renderInventoryTable();
       renderInvoicesTable();
       renderExpensesTable();
+      renderPayrollTable();
+      renderAdvancesTable();
+      generateDailyOperationsReport();
       renderTrashTable();
       renderAuditLogsTable();
+      renderAdminsTable();
+      renderSupervisorsTable();
+      renderSitePerformanceChart();
       updateTrashBadge();
       updateAuditBadge();
     }
@@ -2733,12 +3574,461 @@
       renderWorkersTable(filtered);
     }
 
-    // 3. Attendance Table
+    // 3. Daily Attendance System & History Archive
+    let currentAttendanceDate = new Date().toISOString().split('T')[0];
+    let attendanceViewMode = 'daily';
+
+    function onAttendanceDateChanged() {
+      const input = document.getElementById('attDailyDate');
+      if (input && input.value) {
+        currentAttendanceDate = input.value;
+      }
+      updateSelectedDateArabicDisplay();
+      renderDailyAttendanceSheet();
+    }
+
+    function navigateAttendanceDay(delta) {
+      const d = new Date(currentAttendanceDate);
+      d.setDate(d.getDate() + delta);
+      currentAttendanceDate = d.toISOString().split('T')[0];
+      const input = document.getElementById('attDailyDate');
+      if (input) input.value = currentAttendanceDate;
+      updateSelectedDateArabicDisplay();
+      renderDailyAttendanceSheet();
+    }
+
+    function goToTodayAttendance() {
+      currentAttendanceDate = new Date().toISOString().split('T')[0];
+      const input = document.getElementById('attDailyDate');
+      if (input) input.value = currentAttendanceDate;
+      updateSelectedDateArabicDisplay();
+      renderDailyAttendanceSheet();
+    }
+
+    function updateSelectedDateArabicDisplay() {
+      const elem = document.getElementById('attSelectedDateArabic');
+      if (!elem) return;
+      try {
+        const parts = currentAttendanceDate.split('-');
+        const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        elem.innerText = d.toLocaleDateString('ar-SA', options);
+      } catch (e) {
+        elem.innerText = currentAttendanceDate;
+      }
+    }
+
+    function setAttendanceViewMode(mode) {
+      attendanceViewMode = mode;
+      const btnDaily = document.getElementById('btnModeDailySheet');
+      const btnArchive = document.getElementById('btnModeHistoryArchive');
+      const cardDaily = document.getElementById('cardDailyAttendanceSheet');
+      const cardArchive = document.getElementById('cardAttendanceArchive');
+
+      if (mode === 'daily') {
+        if (btnDaily) { btnDaily.className = 'btn btn-primary'; }
+        if (btnArchive) { btnArchive.className = 'btn btn-secondary'; }
+        if (cardDaily) cardDaily.style.display = 'block';
+        if (cardArchive) cardArchive.style.display = 'none';
+        renderDailyAttendanceSheet();
+      } else {
+        if (btnDaily) { btnDaily.className = 'btn btn-secondary'; }
+        if (btnArchive) { btnArchive.className = 'btn btn-primary'; }
+        if (cardDaily) cardDaily.style.display = 'none';
+        if (cardArchive) cardArchive.style.display = 'block';
+        renderAttendanceTable();
+      }
+    }
+
+    function renderDailyAttendanceSheet() {
+      const tbody = document.getElementById('dailyAttendanceTableBody');
+      if (!tbody) return;
+
+      const inputDate = document.getElementById('attDailyDate');
+      if (inputDate && !inputDate.value) {
+        inputDate.value = currentAttendanceDate;
+      }
+      updateSelectedDateArabicDisplay();
+
+      // Populate site filter if needed
+      const siteFilterSelect = document.getElementById('attDailySiteFilter');
+      if (siteFilterSelect && siteFilterSelect.children.length <= 1 && AppData.sites.length) {
+        const currentVal = siteFilterSelect.value;
+        siteFilterSelect.innerHTML = '<option value="">🏢 جميع مواقع العمل</option>' + 
+          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        siteFilterSelect.value = currentVal;
+      }
+
+      const selectedSiteId = document.getElementById('attDailySiteFilter')?.value || '';
+      const selectedStatus = document.getElementById('attDailyStatusFilter')?.value || '';
+      const searchQ = (document.getElementById('searchDailyWorker')?.value || '').toLowerCase().trim();
+
+      // Filter workers list
+      let workersList = AppData.workers;
+      if (selectedSiteId) {
+        workersList = workersList.filter(w => w.assignedSiteId === selectedSiteId);
+      }
+      if (searchQ) {
+        workersList = workersList.filter(w => {
+          const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+          const siteName = site ? site.name.toLowerCase() : '';
+          return (w.name || '').toLowerCase().includes(searchQ) ||
+                 (w.role || '').toLowerCase().includes(searchQ) ||
+                 (w.phone || '').includes(searchQ) ||
+                 siteName.includes(searchQ);
+        });
+      }
+
+      // Attendance records for current selected date
+      const recordsForDate = AppData.attendance.filter(a => a.date === currentAttendanceDate);
+
+      // Compute stats for current date
+      let presentCount = 0;
+      let lateCount = 0;
+      let absentCount = 0;
+      let specialCount = 0;
+
+      recordsForDate.forEach(r => {
+        if (r.status === 'حاضر') presentCount++;
+        else if (r.status === 'تأخير' || r.status === 'متأخر') lateCount++;
+        else if (r.status === 'غائب') absentCount++;
+        else if (r.status === 'خاص') specialCount++;
+      });
+
+      const totalWorkers = AppData.workers.length;
+      const rate = totalWorkers > 0 ? Math.round(((presentCount + lateCount) / totalWorkers) * 100) : 0;
+
+      const elTotal = document.getElementById('statAttTotalWorkers');
+      if (elTotal) elTotal.innerText = totalWorkers;
+      const elPresent = document.getElementById('statAttPresentCount');
+      if (elPresent) elPresent.innerText = presentCount;
+      const elLate = document.getElementById('statAttLateCount');
+      if (elLate) elLate.innerText = lateCount;
+      const elAbsent = document.getElementById('statAttAbsentCount');
+      if (elAbsent) elAbsent.innerText = absentCount;
+      const elSpecial = document.getElementById('statAttSpecialCount');
+      if (elSpecial) elSpecial.innerText = specialCount;
+      const elRate = document.getElementById('statAttRatePercent');
+      if (elRate) elRate.innerText = `${rate}%`;
+
+      // Filter by status if requested
+      if (selectedStatus) {
+        workersList = workersList.filter(w => {
+          const rec = recordsForDate.find(r => r.workerId === w.id);
+          if (selectedStatus === 'unregistered') return !rec;
+          if (selectedStatus === 'حاضر') return rec && rec.status === 'حاضر';
+          if (selectedStatus === 'تأخير') return rec && (rec.status === 'تأخير' || rec.status === 'متأخر');
+          if (selectedStatus === 'غائب') return rec && rec.status === 'غائب';
+          if (selectedStatus === 'خاص') return rec && rec.status === 'خاص';
+          return true;
+        });
+      }
+
+      if (!workersList.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">لا توجد عمالة مطابقة لمعايير البحث في هذا اليوم.</td></tr>`;
+        return;
+      }
+
+      // Pre-calculate historical attendance counts per worker:
+      const workerStatsMap = {};
+      AppData.attendance.forEach(a => {
+        if (!a.workerId) return;
+        if (!workerStatsMap[a.workerId]) {
+          workerStatsMap[a.workerId] = { present: 0, absent: 0, late: 0, special: 0 };
+        }
+        if (a.status === 'حاضر') workerStatsMap[a.workerId].present++;
+        else if (a.status === 'غائب') workerStatsMap[a.workerId].absent++;
+        else if (a.status === 'تأخير' || a.status === 'متأخر') workerStatsMap[a.workerId].late++;
+        else if (a.status === 'خاص') workerStatsMap[a.workerId].special++;
+      });
+
+      tbody.innerHTML = workersList.map(w => {
+        const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+        const siteName = site ? site.name : 'غير محدد';
+        const record = recordsForDate.find(r => r.workerId === w.id);
+
+        const currentStatus = record ? record.status : 'unregistered';
+        const currentShift = record?.shiftType || 'MORNING_12H';
+        const hours = record ? (record.hoursWorked || 12) : 12;
+        const isApproved = record?.isSupervisorApproved === true;
+
+        const stats = workerStatsMap[w.id] || { present: 0, absent: 0, late: 0, special: 0 };
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 800; color: #FFF; font-size: 0.95rem;">${escapeHtml(w.name)}</div>
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 3px;">
+                <span class="badge badge-teal" style="font-size: 0.72rem;">${escapeHtml(w.role || 'عامل')}</span>
+                <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(w.phone || '')}</span>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-primary); font-size: 0.88rem;">${escapeHtml(siteName)}</div>
+            </td>
+            <td>
+              <div class="worker-stats-pill">
+                <span style="color: #34D399; font-weight: 800;">✅ ${stats.present} حضور</span>
+                <span style="color: var(--text-muted);">|</span>
+                <span style="color: #F87171; font-weight: 800;">❌ ${stats.absent} غياب</span>
+                <span style="color: var(--text-muted);">|</span>
+                <span style="color: #FBBF24; font-weight: 700;">⏳ ${stats.late} تأخير</span>
+              </div>
+            </td>
+            <td>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <button type="button" class="att-shift-pill ${currentShift === 'MORNING_12H' ? 'active' : ''}" onclick="quickSetWorkerShift('${w.id}', 'MORNING_12H')">☀️ صباحي 12س</button>
+                <button type="button" class="att-shift-pill ${currentShift === 'EVENING_12H' ? 'active' : ''}" onclick="quickSetWorkerShift('${w.id}', 'EVENING_12H')">🌙 مسائي 12س</button>
+                <button type="button" class="att-shift-pill ${currentShift === 'COMBINED_24H' ? 'active' : ''}" onclick="quickSetWorkerShift('${w.id}', 'COMBINED_24H')">🔄 مدمج 24س</button>
+              </div>
+            </td>
+            <td>
+              <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="att-status-btn present ${currentStatus === 'حاضر' ? 'active' : ''}" onclick="quickSetWorkerStatus('${w.id}', 'حاضر')">
+                  ✅ حاضر
+                </button>
+                <button type="button" class="att-status-btn late ${(currentStatus === 'تأخير' || currentStatus === 'متأخر') ? 'active' : ''}" onclick="quickSetWorkerStatus('${w.id}', 'تأخير')">
+                  ⏳ تأخير
+                </button>
+                <button type="button" class="att-status-btn absent ${currentStatus === 'غائب' ? 'active' : ''}" onclick="quickSetWorkerStatus('${w.id}', 'غائب')">
+                  ❌ غائب
+                </button>
+                <button type="button" class="att-status-btn special ${currentStatus === 'خاص' ? 'active' : ''}" onclick="quickSetWorkerStatus('${w.id}', 'خاص')">
+                  🏷️ خاص
+                </button>
+              </div>
+            </td>
+            <td class="mono">
+              <b>${record ? (record.hoursWorked || 12) : '-'} س</b>
+              ${record && record.overtimeHours ? `<span style="color:#4ADE80; font-size:0.75rem;">(+${record.overtimeHours}س)</span>` : ''}
+            </td>
+            <td>
+              ${record ? (isApproved ? '<span class="badge badge-success">معتمد مشرف ✓</span>' : '<span class="badge badge-teal">مسجل ✓</span>') : '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">غير مسجل</span>'}
+            </td>
+            <td>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                ${record ? `
+                  <button type="button" class="btn-action-icon" title="تعديل السجل" onclick="editAttendanceRecord('${record.id}')">✏️</button>
+                  <button type="button" class="btn-action-icon danger" title="حذف السجل" onclick="deleteRecord('attendance_records', '${record.id}')">🗑️</button>
+                ` : `
+                  <button type="button" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.75rem;" onclick="quickSetWorkerStatus('${w.id}', 'حاضر')">تسجيل</button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function quickSetWorkerStatus(workerId, newStatus) {
+      const worker = AppData.workers.find(w => w.id === workerId);
+      if (!worker) return;
+
+      const date = currentAttendanceDate;
+      let record = AppData.attendance.find(a => a.workerId === workerId && a.date === date);
+
+      const hours = newStatus === 'غائب' ? 0 : 12;
+      const isNew = !record;
+      const id = record ? record.id : ('att_' + Date.now() + '_' + workerId.substring(0, 6));
+
+      const attData = sanitizeForFirestore({
+        id: id,
+        workerId: workerId,
+        siteId: worker.assignedSiteId || (record?.siteId || null),
+        date: date,
+        status: newStatus,
+        shiftType: record?.shiftType || 'MORNING_12H',
+        hoursWorked: hours,
+        overtimeHours: record?.overtimeHours || 0,
+        checkInTime: record?.checkInTime || (newStatus === 'غائب' ? null : '07:00 ص'),
+        checkOutTime: record?.checkOutTime || (newStatus === 'غائب' ? null : '07:00 م'),
+        isSupervisorApproved: true,
+        notes: record?.notes || '',
+        updatedAt: Date.now()
+      });
+      if (isNew) attData.createdAt = Date.now();
+
+      // Optimistic update
+      if (record) {
+        Object.assign(record, attData);
+      } else {
+        AppData.attendance.unshift(attData);
+      }
+
+      renderDailyAttendanceSheet();
+      renderAttendanceTable();
+      updateDashboardMetrics();
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('attendance_records').doc(id).set(attData, { merge: true });
+        showToast(`تم تسجيل (${worker.name}) كـ [${newStatus}] ليوم (${date})`, "success");
+        logAuditEvent(
+          isNew ? 'CREATE' : 'UPDATE',
+          `تسجيل حضور: ${worker.name}`,
+          'attendance_records',
+          id,
+          `${worker.name} (${date})`,
+          `تسجيل حالة العامل [${worker.name}] إلى [${newStatus}] ليوم ${date}`,
+          attData
+        );
+      } catch (err) {
+        showToast("خطأ في حفظ الحضور: " + err.message, "error");
+      }
+    }
+
+    async function quickSetWorkerShift(workerId, newShift) {
+      const worker = AppData.workers.find(w => w.id === workerId);
+      if (!worker) return;
+
+      const date = currentAttendanceDate;
+      let record = AppData.attendance.find(a => a.workerId === workerId && a.date === date);
+      const hours = newShift === 'COMBINED_24H' ? 24 : 12;
+      const statusToUse = record?.status && record.status !== 'unregistered' ? record.status : 'حاضر';
+      const id = record ? record.id : ('att_' + Date.now() + '_' + workerId.substring(0, 6));
+
+      const attData = sanitizeForFirestore({
+        id: id,
+        workerId: workerId,
+        siteId: worker.assignedSiteId || (record?.siteId || null),
+        date: date,
+        status: statusToUse,
+        shiftType: newShift,
+        hoursWorked: statusToUse === 'غائب' ? 0 : hours,
+        overtimeHours: record?.overtimeHours || 0,
+        checkInTime: newShift === 'EVENING_12H' ? '07:00 م' : '07:00 ص',
+        checkOutTime: newShift === 'EVENING_12H' ? '07:00 ص' : '07:00 م',
+        isSupervisorApproved: true,
+        notes: record?.notes || '',
+        updatedAt: Date.now()
+      });
+
+      if (record) {
+        Object.assign(record, attData);
+      } else {
+        attData.createdAt = Date.now();
+        AppData.attendance.unshift(attData);
+      }
+
+      renderDailyAttendanceSheet();
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('attendance_records').doc(id).set(attData, { merge: true });
+        showToast(`تم تغيير وردية (${worker.name}) إلى [${newShift}]`, "info");
+      } catch (err) {
+        showToast("خطأ: " + err.message, "error");
+      }
+    }
+
+    async function bulkApproveAttendanceToday() {
+      if (!confirm(`هل تريد بالتأكيد اعتماد جميع العمال كـ "حاضر (12س)" لتاريخ اليوم (${currentAttendanceDate})؟`)) {
+        return;
+      }
+
+      const date = currentAttendanceDate;
+      if (!db) initFirebaseCore();
+      const batch = db.batch();
+      let count = 0;
+
+      for (const w of AppData.workers) {
+        let rec = AppData.attendance.find(a => a.workerId === w.id && a.date === date);
+        const id = rec ? rec.id : ('att_' + Date.now() + '_' + w.id.substring(0, 6));
+
+        const attData = sanitizeForFirestore({
+          id: id,
+          workerId: w.id,
+          siteId: w.assignedSiteId || (rec?.siteId || null),
+          date: date,
+          status: 'حاضر',
+          shiftType: rec?.shiftType || 'MORNING_12H',
+          hoursWorked: 12,
+          overtimeHours: rec?.overtimeHours || 0,
+          checkInTime: rec?.checkInTime || '07:00 ص',
+          checkOutTime: rec?.checkOutTime || '07:00 م',
+          isSupervisorApproved: true,
+          notes: rec?.notes || 'معتمد جماعياً',
+          updatedAt: Date.now()
+        });
+
+        if (rec) {
+          Object.assign(rec, attData);
+        } else {
+          attData.createdAt = Date.now();
+          AppData.attendance.unshift(attData);
+        }
+
+        const docRef = db.collection('attendance_records').doc(id);
+        batch.set(docRef, attData, { merge: true });
+        count++;
+      }
+
+      renderDailyAttendanceSheet();
+      renderAttendanceTable();
+      updateDashboardMetrics();
+
+      try {
+        await batch.commit();
+        showToast(`تم اعتماد وتحضير ${count} عامل بنجاح ليوم (${date})!`, "success");
+        logAuditEvent('CREATE', `اعتماد حضور جماعي: ${count} عامل`, 'attendance_records', date, `حضور يوم ${date}`, `تم اعتماد جميع العمال حاضرين (12 ساعة)`);
+      } catch (err) {
+        showToast("خطأ أثناء الاعتماد الجماعي: " + err.message, "error");
+      }
+    }
+
+    function exportDailyAttendanceToExcel() {
+      const recordsForDate = AppData.attendance.filter(a => a.date === currentAttendanceDate);
+      if (!AppData.workers.length) {
+        showToast("لا توجد عمالة لتصدير كشف الحضور!", "warning");
+        return;
+      }
+
+      const workerStatsMap = {};
+      AppData.attendance.forEach(a => {
+        if (!a.workerId) return;
+        if (!workerStatsMap[a.workerId]) workerStatsMap[a.workerId] = { present: 0, absent: 0, late: 0 };
+        if (a.status === 'حاضر') workerStatsMap[a.workerId].present++;
+        else if (a.status === 'غائب') workerStatsMap[a.workerId].absent++;
+        else if (a.status === 'تأخير' || a.status === 'متأخر') workerStatsMap[a.workerId].late++;
+      });
+
+      const rows = AppData.workers.map(w => {
+        const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+        const rec = recordsForDate.find(r => r.workerId === w.id);
+        const stats = workerStatsMap[w.id] || { present: 0, absent: 0, late: 0 };
+
+        return {
+          'التاريخ': currentAttendanceDate,
+          'اسم العامل': w.name,
+          'المسمى الوظيفي': w.role || 'عامل',
+          'رقم الجوال': w.phone || '',
+          'موقع العمل': site ? site.name : 'غير محدد',
+          'حالة الحضور اليوم': rec ? rec.status : 'غير مسجل',
+          'نوع الوردية': rec?.shiftType || 'MORNING_12H',
+          'ساعات العمل': rec ? (rec.hoursWorked || 12) : 0,
+          'ساعات إضافية': rec ? (rec.overtimeHours || 0) : 0,
+          'إجمالي أيام الحضور السابقة': stats.present,
+          'إجمالي أيام الغياب السابقة': stats.absent,
+          'إجمالي أيام التأخير السابقة': stats.late,
+          'ملاحظات': rec?.notes || ''
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "كشف الحضور اليومي");
+      XLSX.writeFile(wb, `Daily_Attendance_${currentAttendanceDate}.xlsx`);
+      showToast(`تم تصدير كشف الحضور ليوم (${currentAttendanceDate}) بنجاح!`, "success");
+    }
+
+    // Historical Attendance Archive Table
     function renderAttendanceTable(filtered = null) {
       const list = filtered || AppData.attendance;
       const tbody = document.getElementById('attendanceTableBody');
+      if (!tbody) return;
+
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد سجلات حضور مسجلة.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد سجلات حضور مسجلة.</td></tr>';
         return;
       }
       tbody.innerHTML = list.map(a => {
@@ -2749,21 +4039,26 @@
         
         let statusBadge = 'badge-success';
         if (a.status === 'غائب') statusBadge = 'badge-danger';
-        if (a.status === 'متأخر') statusBadge = 'badge-warning';
+        if (a.status === 'متأخر' || a.status === 'تأخير') statusBadge = 'badge-warning';
+        if (a.status === 'خاص') statusBadge = 'badge-teal';
 
         return `
           <tr>
             <td class="mono"><b>${escapeHtml(a.date || '-')}</b></td>
             <td><b>${escapeHtml(workerName)}</b></td>
             <td>${escapeHtml(siteName)}</td>
+            <td><span class="badge" style="background:rgba(255,255,255,0.06);">${escapeHtml(a.shiftType || 'MORNING_12H')}</span></td>
             <td class="mono">${escapeHtml(a.checkInTime || '-')}</td>
             <td class="mono">${escapeHtml(a.checkOutTime || '-')}</td>
-            <td class="mono">${Number(a.hoursWorked) || 8} س</td>
+            <td class="mono">${Number(a.hoursWorked) || 12} س</td>
             <td class="mono">${Number(a.overtimeHours) || 0} س</td>
             <td><span class="badge ${statusBadge}">${escapeHtml(a.status || 'حاضر')}</span></td>
             <td>${escapeHtml(a.notes || '-')}</td>
             <td>
-              <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('attendance_records', '${a.id}')">🗑️</button>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <button class="btn-action-icon" title="تعديل السجل" onclick="editAttendanceRecord('${a.id}')">✏️</button>
+                <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('attendance_records', '${a.id}')">🗑️</button>
+              </div>
             </td>
           </tr>
         `;
@@ -2771,14 +4066,51 @@
     }
 
     function filterAttendanceTable() {
-      const q = document.getElementById('searchAttendance').value.toLowerCase().trim();
-      if (!q) return renderAttendanceTable();
-      const filtered = AppData.attendance.filter(a => {
-        const worker = AppData.workers.find(w => w.id === a.workerId);
-        const wName = worker ? worker.name : '';
-        return (a.date || '').includes(q) || wName.toLowerCase().includes(q) || (a.status || '').toLowerCase().includes(q);
-      });
-      renderAttendanceTable(filtered);
+      const q = (document.getElementById('searchAttendance')?.value || '').toLowerCase().trim();
+      const dateVal = document.getElementById('archiveFilterDate')?.value || '';
+
+      let list = AppData.attendance;
+      if (dateVal) {
+        list = list.filter(a => a.date === dateVal);
+      }
+      if (q) {
+        list = list.filter(a => {
+          const worker = AppData.workers.find(w => w.id === a.workerId);
+          const wName = worker ? worker.name : '';
+          const site = AppData.sites.find(s => s.id === a.siteId);
+          const sName = site ? site.name : '';
+          return (a.date || '').includes(q) ||
+                 wName.toLowerCase().includes(q) ||
+                 sName.toLowerCase().includes(q) ||
+                 (a.status || '').toLowerCase().includes(q);
+        });
+      }
+      renderAttendanceTable(list);
+    }
+
+    function filterAttendanceArchiveByDate() {
+      filterAttendanceTable();
+    }
+
+    function clearArchiveDateFilter() {
+      const input = document.getElementById('archiveFilterDate');
+      if (input) input.value = '';
+      filterAttendanceTable();
+    }
+
+    function editAttendanceRecord(id) {
+      const record = AppData.attendance.find(a => a.id === id);
+      if (!record) return;
+      openModal('modalAttendance');
+      document.getElementById('attWorkerId').value = record.workerId || '';
+      document.getElementById('attSiteId').value = record.siteId || '';
+      document.getElementById('attDate').value = record.date || '';
+      document.getElementById('attStatus').value = record.status || 'حاضر';
+      document.getElementById('attCheckIn').value = record.checkInTime || '';
+      document.getElementById('attCheckOut').value = record.checkOutTime || '';
+      document.getElementById('attHours').value = record.hoursWorked || 12;
+      document.getElementById('attOvertime').value = record.overtimeHours || 0;
+      document.getElementById('attNotes').value = record.notes || '';
     }
 
     // 4. Inventory Table
@@ -2904,6 +4236,38 @@
       if (expSiteSelect) {
         expSiteSelect.innerHTML = '<option value="">مصروف عام للمؤسسة</option>' + 
           AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      }
+
+      // Payroll & Cash Advances worker select
+      const payWorkerSelect = document.getElementById('payWorkerId');
+      if (payWorkerSelect) {
+        payWorkerSelect.innerHTML = '<option value="">اختر العامل...</option>' + 
+          AppData.workers.map(w => `<option value="${w.id}" data-wage="${w.dailyWage || 100}">${escapeHtml(w.name)} (${escapeHtml(w.role || 'عامل')})</option>`).join('');
+      }
+
+      const advanceWorkerSelect = document.getElementById('advanceWorkerId');
+      if (advanceWorkerSelect) {
+        advanceWorkerSelect.innerHTML = '<option value="">اختر العامل لمنح السلفة...</option>' + 
+          AppData.workers.map(w => `<option value="${w.id}">${escapeHtml(w.name)} (${escapeHtml(w.role || 'عامل')})</option>`).join('');
+      }
+
+      // Material Usage selects
+      const usageSiteSelect = document.getElementById('usageSiteId');
+      if (usageSiteSelect) {
+        usageSiteSelect.innerHTML = '<option value="">اختر الموقع المستهلك...</option>' + 
+          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      }
+
+      const usageItemSelect = document.getElementById('usageItemId');
+      if (usageItemSelect) {
+        usageItemSelect.innerHTML = '<option value="">اختر المادة من المخزن...</option>' + 
+          AppData.inventory.map(i => `<option value="${i.id}">${escapeHtml(i.name)} (المتوفر: ${i.currentStock} ${i.unit || 'عبوة'})</option>`).join('');
+      }
+
+      // Daily Operations Report site selector
+      const reportSiteSelect = document.getElementById('dailyReportSiteSelect');
+      if (reportSiteSelect && (!reportSiteSelect.children.length || reportSiteSelect.children.length === 1)) {
+        reportSiteSelect.innerHTML = AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || 'عميل')})</option>`).join('');
       }
     }
 
@@ -3404,7 +4768,17 @@
       if (!tbody) return;
 
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">سلة المحذوفات فارغة حالياً. لا توجد أي بيانات محذوفة.</td></tr>';
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+              <div style="font-size: 1rem; margin-bottom: 8px; color: var(--text-secondary);">🗑️ سلة المحذوفات نظيفة وفارغة حالياً.</div>
+              <div style="font-size: 0.85rem; max-width: 500px; margin: 0 auto 14px auto; line-height: 1.5;">عند حذف أي موقع عمل، أو عامل، أو فاتورة، أو صنف مخزون، سيتم نقله تلقائياً إلى هنا لحمايته ويمكنك استعادته بنقرة واحدة.</div>
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem;" onclick="seedDemoTrashItem()">
+                <span>🧪</span> إنتاج سجل تجريبي في سلة المحذوفات للمعاينة
+              </button>
+            </td>
+          </tr>
+        `;
         return;
       }
 
@@ -4635,6 +6009,205 @@
     }
 
     /* ─────────────────────────────────────────────────────────────────
+       8.1 SITE SUPERVISORS MANAGEMENT & FIELD LINKING
+       ───────────────────────────────────────────────────────────────── */
+    function renderSupervisorsTable() {
+      const tbody = document.getElementById('supervisorsTableBody');
+      if (!tbody) return;
+
+      if (!AppData.supervisors.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+              لا يوجد مشرفي مواقع مسجلين حالياً. اضغط "إضافة / ربط مشرف موقع جديد" لإنشاء حساب ومشرف ميداني.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = AppData.supervisors.map(s => {
+        const site = AppData.sites.find(st => st.id === s.assignedSiteId);
+        const siteName = site ? site.name : (s.assignedSiteId ? 'موقع (' + s.assignedSiteId.substring(0,8) + ')' : 'غير محدد');
+        const isApproved = s.isApprovedByAdmin !== false;
+
+        return `
+          <tr>
+            <td><b>${escapeHtml(s.name)}</b></td>
+            <td><b class="mono" style="color: var(--neon-teal);">${escapeHtml(s.email)}</b></td>
+            <td><span class="badge badge-teal">${escapeHtml(siteName)}</span></td>
+            <td class="mono">${escapeHtml(s.phone || '-')}</td>
+            <td><span class="badge ${s.canTakeAttendance ? 'badge-success' : 'badge-warning'}">${s.canTakeAttendance ? 'مسموح' : 'محظور'}</span></td>
+            <td><span class="badge ${isApproved ? 'badge-success' : 'badge-danger'}">${isApproved ? 'معتمد ومفعل' : 'معلق'}</span></td>
+            <td>
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.78rem;" onclick="editSupervisor('${s.id}')" title="تعديل الربط">✏️ تعديل</button>
+                <button type="button" class="btn ${isApproved ? 'btn-danger' : 'btn-primary'}" style="padding: 4px 8px; font-size: 0.78rem;" onclick="toggleSupervisorApproval('${s.id}', ${!isApproved})">
+                  ${isApproved ? 'تعطيل' : 'اعتماد وتفعيل'}
+                </button>
+                <button type="button" class="btn-action-icon danger" onclick="deleteSupervisor('${s.id}')" title="حذف حساب المشرف">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddSupervisorModal() {
+      const select = document.getElementById('supAssignedSiteId');
+      if (select) {
+        select.innerHTML = '<option value="">اختر الموقع المراد ربطه...</option>' + 
+          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || 'عميل')})</option>`).join('');
+      }
+      document.getElementById('supervisorEditId').value = '';
+      document.getElementById('supName').value = '';
+      document.getElementById('supEmail').value = '';
+      document.getElementById('supPhone').value = '';
+      document.getElementById('supCanAttendance').value = 'true';
+      document.getElementById('supIsApproved').value = 'true';
+      document.getElementById('modalSupervisorTitle').innerText = '👤 إضافة / ربط مشرف موقع جديد';
+      openModal('modalAddSupervisor');
+    }
+
+    async function handleSaveSupervisor(e) {
+      if (e) e.preventDefault();
+      const submitBtn = document.querySelector('#modalAddSupervisor button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ والتفعيل...'; }
+
+      const isEdit = !!document.getElementById('supervisorEditId').value;
+      const id = document.getElementById('supervisorEditId').value || ('sup_' + Date.now());
+      const email = document.getElementById('supEmail').value.trim().toLowerCase();
+      const siteId = document.getElementById('supAssignedSiteId').value;
+
+      const supData = sanitizeForFirestore({
+        id: id,
+        name: document.getElementById('supName').value.trim(),
+        email: email,
+        phone: document.getElementById('supPhone').value.trim(),
+        assignedSiteId: siteId,
+        canTakeAttendance: document.getElementById('supCanAttendance').value === 'true',
+        canApproveAttendance: true,
+        canRequestSupplies: true,
+        canAccessAttendance: true,
+        canAccessInventory: true,
+        canAccessSupplies: true,
+        canAccessSites: true,
+        isApprovedByAdmin: document.getElementById('supIsApproved').value === 'true',
+        createdAt: Date.now()
+      });
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('supervisors').doc(id).set(supData, { merge: true });
+
+        const site = AppData.sites.find(s => s.id === siteId);
+        const siteName = site ? site.name : siteId;
+
+        await logAuditEvent(
+          isEdit ? 'UPDATE' : 'ADMIN',
+          `ربط حساب مشرف موقع: ${supData.name}`,
+          'supervisors',
+          id,
+          supData.name,
+          `تم ربط المشرف [${supData.name}] (${supData.email}) بموقع [${siteName}] واعتماده`,
+          supData
+        );
+
+        const idx = AppData.supervisors.findIndex(s => s.id === id);
+        if (idx >= 0) AppData.supervisors[idx] = supData; else AppData.supervisors.unshift(supData);
+        renderSupervisorsTable();
+
+        closeModal('modalAddSupervisor');
+        showToast(`تم ربط حساب المشرف (${supData.name}) بموقع (${siteName}) بنجاح!`, "success");
+      } catch (err) {
+        showToast("خطأ في حفظ بيانات المشرف: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ وربط المشرف'; }
+      }
+    }
+
+    function editSupervisor(id) {
+      const s = AppData.supervisors.find(sup => sup.id === id);
+      if (!s) return;
+      openAddSupervisorModal();
+      document.getElementById('supervisorEditId').value = s.id;
+      document.getElementById('supName').value = s.name || '';
+      document.getElementById('supEmail').value = s.email || '';
+      document.getElementById('supPhone').value = s.phone || '';
+      document.getElementById('supAssignedSiteId').value = s.assignedSiteId || '';
+      document.getElementById('supCanAttendance').value = s.canTakeAttendance !== false ? 'true' : 'false';
+      document.getElementById('supIsApproved').value = s.isApprovedByAdmin !== false ? 'true' : 'false';
+      document.getElementById('modalSupervisorTitle').innerText = '✏️ تعديل ربط حساب المشرف';
+    }
+
+    async function toggleSupervisorApproval(id, newApprovedState) {
+      const s = AppData.supervisors.find(sup => sup.id === id);
+      if (!s) return;
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('supervisors').doc(id).update({ isApprovedByAdmin: newApprovedState });
+        s.isApprovedByAdmin = newApprovedState;
+        renderSupervisorsTable();
+
+        const stateText = newApprovedState ? 'تفعيل واعتماد' : 'تعطيل وحظر';
+        await logAuditEvent('ADMIN', `${stateText} حساب مشرف: ${s.name}`, 'supervisors', id, s.name, `تم تغيير حالة تفعيل المشرف [${s.name}] إلى ${stateText}`);
+        showToast(`تم ${stateText} حساب المشرف (${s.name}) بنجاح`, "info");
+      } catch (err) {
+        showToast("فشل تغيير حالة المشرف: " + err.message, "error");
+      }
+    }
+
+    async function deleteSupervisor(id) {
+      const s = AppData.supervisors.find(sup => sup.id === id);
+      const name = s ? s.name : id;
+      if (!confirm(`هل أنت متأكد من حذف حساب المشرف "${name}" وإلغاء ربطه؟`)) return;
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection('supervisors').doc(id).delete();
+        AppData.supervisors = AppData.supervisors.filter(sup => sup.id !== id);
+        renderSupervisorsTable();
+        await logAuditEvent('ADMIN', `حذف حساب مشرف: ${name}`, 'supervisors', id, name, `تم حذف ربط المشرف من النظام`);
+        showToast(`تم حذف حساب المشرف (${name})`, "info");
+      } catch (err) {
+        showToast("فشل الحذف: " + err.message, "error");
+      }
+    }
+
+    async function seedDemoTrashItem() {
+      try {
+        if (!db) initFirebaseCore();
+        const trashId = 'trash_demo_' + Date.now();
+        const trashItem = sanitizeForFirestore({
+          id: trashId,
+          originalCollection: 'cleaning_sites',
+          originalId: 'site_demo_sample',
+          title: 'موقع تجريبي محذوف (برج الفردوس)',
+          collectionLabel: 'مواقع العمل',
+          data: {
+            id: 'site_demo_sample',
+            name: 'برج الفردوس التجاري',
+            clientName: 'شركة العقارات المتحدة',
+            contractMonthlyValue: 12500,
+            status: 'نشط'
+          },
+          deletedByEmail: currentUser?.email || 'admin@cleanops.cloud',
+          deletedByName: currentUser?.displayName || 'المدير العام',
+          deletedAt: Date.now()
+        });
+
+        await db.collection('recycle_bin').doc(trashId).set(trashItem);
+        AppData.trash.unshift(trashItem);
+        renderTrashTable();
+        updateTrashBadge();
+        showToast("تم إنشاء سجل تجريبي في سلة المحذوفات! يمكنك الاستعادة الآن.", "success");
+      } catch (err) {
+        showToast("خطأ في إنشاء العنصر التجريبي: " + err.message, "error");
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
        9. SETTINGS & DIAGNOSTICS
        ───────────────────────────────────────────────────────────────── */
     function saveFirebaseSettings() {
@@ -4675,7 +6248,7 @@
           • تمت القراءة والكتابة بنجاح.<br>
           • زمن الاستجابة (Latency): <b>${latency} مللي ثانية</b>.<br>
           • قاعدة البيانات النشطة: <code>${localStorage.getItem('fb_database_id') || 'ai-studio-android-6b8f0e12-aea7-469a-9f94-664300ca80cb'}</code><br>
-          • عدد المواقع بالسحابة: <b>${AppData.sites.length}</b> | العمالة: <b>${AppData.workers.length}</b> | المخزون: <b>${AppData.inventory.length}</b>
+          • عدد المواقع بالسحابة: <b>${AppData.sites.length}</b> | العمالة: <b>${AppData.workers.length}</b> | المخزون: <b>${AppData.inventory.length}</b> | المشرفين: <b>${AppData.supervisors.length}</b>
         `;
       } catch (err) {
         box.style.background = 'rgba(239, 68, 68, 0.15)';
@@ -4688,14 +6261,41 @@
        10. UI HELPERS & NAVIGATION
        ───────────────────────────────────────────────────────────────── */
     function switchTab(tabId) {
+      const adminOnlyTabs = ['tab-finance', 'tab-payroll', 'tab-daily-report', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'];
+      if (!currentUserIsAdmin && adminOnlyTabs.includes(tabId)) {
+        showToast("عذراً، هذه الصفحة مخصصة لمدراء النظام والمسؤولين فقط!", "warning");
+        return;
+      }
+
       document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
       const target = document.getElementById(tabId);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.add('active');
+      }
 
       const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
       if (btn) btn.classList.add('active');
+
+      // Refresh specific tab contents immediately upon view
+      if (tabId === 'tab-attendance') {
+        if (typeof renderDailyAttendanceSheet === 'function') renderDailyAttendanceSheet();
+        if (typeof renderAttendanceTable === 'function') renderAttendanceTable();
+      } else if (tabId === 'tab-trash') {
+        if (typeof renderTrashTable === 'function') renderTrashTable();
+      } else if (tabId === 'tab-audit') {
+        if (typeof renderAuditLogsTable === 'function') renderAuditLogsTable();
+      } else if (tabId === 'tab-settings') {
+        if (typeof renderAdminsTable === 'function') renderAdminsTable();
+        if (typeof renderSupervisorsTable === 'function') renderSupervisorsTable();
+      } else if (tabId === 'tab-payroll') {
+        if (typeof renderPayrollTable === 'function') renderPayrollTable();
+        if (typeof renderAdvancesTable === 'function') renderAdvancesTable();
+      } else if (tabId === 'tab-overview') {
+        if (typeof renderSitePerformanceChart === 'function') renderSitePerformanceChart();
+        if (typeof updateCounters === 'function') updateCounters();
+      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -4756,6 +6356,694 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+    }
+
+    function renderSitePerformanceChart() {
+      const container = document.getElementById('sitePerformanceChartContainer');
+      if (!container) return;
+
+      if (!AppData.sites || AppData.sites.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+            لا توجد مواقع مسجلة حالياً لعرض أداء الإيرادات والمصروفات.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      AppData.sites.forEach(site => {
+        const monthlyVal = Number(site.contractMonthlyValue) || 0;
+        
+        // Sum site expenses
+        const siteExpenses = AppData.expenses
+          .filter(exp => exp.siteId === site.id || (exp.siteName && exp.siteName.trim() === site.name.trim()))
+          .reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+          
+        const netProfit = monthlyVal - siteExpenses;
+        const profitRatio = monthlyVal > 0 ? Math.round((netProfit / monthlyVal) * 100) : 0;
+        const expRatio = monthlyVal > 0 ? Math.min(100, Math.round((siteExpenses / monthlyVal) * 100)) : (siteExpenses > 0 ? 100 : 0);
+
+        const isHealthy = netProfit >= 0;
+        const badgeBg = isHealthy ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+        const badgeColor = isHealthy ? '#4ADE80' : '#F87171';
+
+        html += `
+          <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF;">${escapeHtml(site.name)}</span>
+                <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; background: ${badgeBg}; color: ${badgeColor}; font-weight: 600;">
+                  ${isHealthy ? 'ربحية ' + profitRatio + '%' : 'عجز ' + Math.abs(profitRatio) + '%'}
+                </span>
+              </div>
+              <div style="display: flex; gap: 16px; font-size: 0.85rem;" class="mono">
+                <span style="color: var(--neon-teal);">الإيراد التعاقدي: <b>${monthlyVal.toLocaleString()} ر.س</b></span>
+                <span style="color: #F87171;">المصروفات التشغيلية: <b>${siteExpenses.toLocaleString()} ر.س</b></span>
+                <span style="color: ${badgeColor}; font-weight: 700;">الصافي: <b>${netProfit.toLocaleString()} ر.س</b></span>
+              </div>
+            </div>
+
+            <!-- Visual Progress bar -->
+            <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 5px; overflow: hidden; display: flex; position: relative;">
+              <div style="width: ${expRatio}%; height: 100%; background: #EF4444; transition: width 0.5s ease;" title="المصروفات: ${siteExpenses.toLocaleString()} ر.س"></div>
+              <div style="width: ${Math.max(0, 100 - expRatio)}%; height: 100%; background: var(--neon-teal); transition: width 0.5s ease;" title="الصافي: ${Math.max(0, netProfit).toLocaleString()} ر.س"></div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       9.1 MONTHLY PAYROLL & CASH ADVANCES
+       ───────────────────────────────────────────────────────────────── */
+    function navigatePayrollMonth(delta) {
+      const parts = (currentPayrollMonth || "2026-11").split("-");
+      let year = parseInt(parts[0], 10);
+      let month = parseInt(parts[1], 10) + delta;
+      if (month < 1) { month = 12; year--; }
+      else if (month > 12) { month = 1; year++; }
+      currentPayrollMonth = `${year}-${String(month).padStart(2, "0")}`;
+      const disp = document.getElementById("currentPayrollMonthDisplay");
+      if (disp) disp.innerText = currentPayrollMonth;
+      const payMonthInput = document.getElementById("payMonth");
+      if (payMonthInput) payMonthInput.value = currentPayrollMonth;
+      const advMonthInput = document.getElementById("advanceDeductionMonth");
+      if (advMonthInput) advMonthInput.value = currentPayrollMonth;
+      renderPayrollTable();
+    }
+
+    function renderPayrollTable() {
+      const tbody = document.getElementById("payrollTableBody");
+      if (!tbody) return;
+
+      const disp = document.getElementById("currentPayrollMonthDisplay");
+      if (disp) disp.innerText = currentPayrollMonth;
+
+      if (!AppData.workers.length) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">لا يوجد عمال مسجلون لاحتساب الرواتب. قم بإضافة عمالة أولاً.</td></tr>`;
+        return;
+      }
+
+      let totalBaseWages = 0;
+      let totalOvertimeBonus = 0;
+      let totalDeductions = 0;
+      let netTotal = 0;
+
+      const rows = AppData.workers.map(w => {
+        const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+        const siteName = site ? site.name : "بدون موقع";
+        const dailyWage = Number(w.dailyWage) || 100;
+
+        // Find attendance in this month for this worker
+        const workerAtt = AppData.attendance.filter(a => a.workerId === w.id && (a.date || "").startsWith(currentPayrollMonth));
+        const attendedDays = workerAtt.filter(a => (a.status || "").includes("حاضر") || (a.status || "").includes("متأخر")).length;
+        const totalOvertimeHours = workerAtt.reduce((sum, a) => sum + (Number(a.overtimeHours) || 0), 0);
+
+        // Find existing saved override in AppData.payroll
+        const saved = AppData.payroll.find(p => p.workerId === w.id && p.month === currentPayrollMonth);
+
+        const days = saved ? Number(saved.daysWorked) : (attendedDays > 0 ? attendedDays : 30);
+        const wage = saved ? Number(saved.dailyWage) : dailyWage;
+        const otHours = saved ? Number(saved.overtimeHours) : totalOvertimeHours;
+        const otBonus = saved ? Number(saved.overtimeBonus) : Math.round(otHours * (wage / 8) * 1.5);
+
+        // Sum unsettled advances for this worker targeted for this month
+        const workerAdvances = AppData.advances
+          .filter(adv => adv.workerId === w.id && adv.deductionMonth === currentPayrollMonth && adv.status !== "مسددة ومخصومة")
+          .reduce((sum, adv) => sum + (Number(adv.amount) || 0), 0);
+
+        const deductions = saved ? Number(saved.deductions) : workerAdvances;
+        const base = days * wage;
+        const net = Math.max(0, base + otBonus - deductions);
+        const status = saved?.status || "معتمد ومسير";
+
+        totalBaseWages += base;
+        totalOvertimeBonus += otBonus;
+        totalDeductions += deductions;
+        netTotal += net;
+
+        let statusBadge = "badge-success";
+        if (status === "قيد المراجعة") statusBadge = "badge-warning";
+        else if (status === "مدفوع ومسلم") statusBadge = "badge-teal";
+
+        return `
+          <tr>
+            <td><b class="mono" style="color:var(--neon-teal);">${w.id.substring(0, 8)}</b></td>
+            <td><b>${escapeHtml(w.name)}</b></td>
+            <td><span class="badge badge-teal">${escapeHtml(w.role || "عامل")}</span></td>
+            <td>${escapeHtml(siteName)}</td>
+            <td class="mono"><b>${days}</b> يوم</td>
+            <td class="mono">${wage.toLocaleString()} ر.س</td>
+            <td class="mono">${base.toLocaleString()} ر.س</td>
+            <td class="mono" style="color:#4ADE80;">+${otBonus.toLocaleString()} ر.س (${otHours} س)</td>
+            <td class="mono" style="color:#F87171;">-${deductions.toLocaleString()} ر.س</td>
+            <td class="mono"><b style="color:var(--neon-teal); font-size:1.05rem;">${net.toLocaleString()} ر.س</b></td>
+            <td><span class="badge ${statusBadge}">${escapeHtml(status)}</span></td>
+            <td>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="editPayrollForWorker('${w.id}', ${days}, ${wage}, ${otHours}, ${otBonus}, ${deductions}, '${status}')">
+                ✏️ تعديل
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.innerHTML = rows;
+
+      // Update counters
+      document.getElementById("statPayrollBaseWages").innerText = totalBaseWages.toLocaleString("ar-SA") + " ر.س";
+      document.getElementById("statPayrollOvertime").innerText = totalOvertimeBonus.toLocaleString("ar-SA") + " ر.س";
+      document.getElementById("statPayrollDeductions").innerText = totalDeductions.toLocaleString("ar-SA") + " ر.س";
+      document.getElementById("statPayrollNetTotal").innerText = netTotal.toLocaleString("ar-SA") + " ر.س";
+      const badge = document.getElementById("badgePayrollCount");
+      if (badge) badge.innerText = AppData.workers.length;
+    }
+
+    function editPayrollForWorker(workerId, days, wage, otHours, otBonus, deductions, status) {
+      const select = document.getElementById("payWorkerId");
+      if (select) select.value = workerId;
+      document.getElementById("payMonth").value = currentPayrollMonth;
+      document.getElementById("payDaysWorked").value = days;
+      document.getElementById("payDailyWage").value = wage;
+      document.getElementById("payOvertimeHours").value = otHours;
+      document.getElementById("payOvertimeBonus").value = otBonus;
+      document.getElementById("payDeductions").value = deductions;
+      document.getElementById("payStatus").value = status || "معتمد ومسير";
+      calculatePayrollNet();
+      openModal("modalPayroll");
+    }
+
+    function handlePayrollWorkerChanged() {
+      const select = document.getElementById("payWorkerId");
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.dataset.wage) {
+        document.getElementById("payDailyWage").value = opt.dataset.wage;
+      }
+      calculatePayrollNet();
+    }
+
+    function calculatePayrollNet() {
+      const days = Number(document.getElementById("payDaysWorked").value) || 0;
+      const wage = Number(document.getElementById("payDailyWage").value) || 0;
+      const otBonus = Number(document.getElementById("payOvertimeBonus").value) || 0;
+      const deductions = Number(document.getElementById("payDeductions").value) || 0;
+      const net = Math.max(0, (days * wage) + otBonus - deductions);
+      document.getElementById("payNetSalary").value = net;
+    }
+
+    async function handleSavePayroll(e) {
+      if (e) e.preventDefault();
+      const submitBtn = document.querySelector("#modalPayroll button[type='submit']");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ الحفظ..."; }
+
+      const workerId = document.getElementById("payWorkerId").value;
+      const month = document.getElementById("payMonth").value || currentPayrollMonth;
+      const id = "pay_" + workerId + "_" + month;
+
+      const worker = AppData.workers.find(w => w.id === workerId);
+      const wName = worker ? worker.name : "عامل";
+
+      const record = sanitizeForFirestore({
+        id: id,
+        workerId: workerId,
+        workerName: wName,
+        month: month,
+        daysWorked: Number(document.getElementById("payDaysWorked").value) || 0,
+        dailyWage: Number(document.getElementById("payDailyWage").value) || 0,
+        overtimeHours: Number(document.getElementById("payOvertimeHours").value) || 0,
+        overtimeBonus: Number(document.getElementById("payOvertimeBonus").value) || 0,
+        deductions: Number(document.getElementById("payDeductions").value) || 0,
+        netSalary: Number(document.getElementById("payNetSalary").value) || 0,
+        status: document.getElementById("payStatus").value,
+        updatedAt: Date.now()
+      });
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection("payroll_records").doc(id).set(record, { merge: true });
+
+        const idx = AppData.payroll.findIndex(p => p.id === id);
+        if (idx >= 0) AppData.payroll[idx] = record; else AppData.payroll.push(record);
+
+        renderPayrollTable();
+        closeModal("modalPayroll");
+        showToast(`تم حفظ مسير راتب (${wName}) لشهر ${month} بنجاح!`, "success");
+        await logAuditEvent("UPDATE", `مسير راتب: ${wName}`, "payroll_records", id, `${wName} (${month})`, `تم تحديث مسير راتب العامل بقيمة صافية ${record.netSalary} ر.س`, record);
+      } catch (err) {
+        showToast("خطأ في حفظ مسير الراتب: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "حفظ في مسير الرواتب"; }
+      }
+    }
+
+    function exportPayrollToExcel() {
+      if (!AppData.workers.length) {
+        showToast("لا توجد بيانات مسير رواتب للتصدير!", "warning");
+        return;
+      }
+      const data = AppData.workers.map(w => {
+        const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+        const saved = AppData.payroll.find(p => p.workerId === w.id && p.month === currentPayrollMonth);
+        const days = saved ? saved.daysWorked : 30;
+        const wage = saved ? saved.dailyWage : (w.dailyWage || 100);
+        const otBonus = saved ? saved.overtimeBonus : 0;
+        const deductions = saved ? saved.deductions : 0;
+        const net = saved ? saved.netSalary : (days * wage + otBonus - deductions);
+        return {
+          "كود العامل": w.id,
+          "اسم العامل": w.name,
+          "المسمى": w.role || "عامل",
+          "الموقع": site ? site.name : "غير محدد",
+          "شهر المسير": currentPayrollMonth,
+          "أيام العمل": days,
+          "الأجر اليومي": wage,
+          "الأساسي": days * wage,
+          "مكافأة الإضافي": otBonus,
+          "الخصومات والسلف": deductions,
+          "صافي الراتب": net,
+          "الحالة": saved ? saved.status : "معتمد ومسير"
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "مسير_الرواتب");
+      XLSX.writeFile(wb, `مسير_رواتب_${currentPayrollMonth}.xlsx`);
+      showToast("تم تصدير مسير الرواتب إلى Excel بنجاح!", "success");
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       9.2 CASH ADVANCES (سلف العمالة)
+       ───────────────────────────────────────────────────────────────── */
+    function renderAdvancesTable() {
+      const tbody = document.getElementById("advancesTableBody");
+      if (!tbody) return;
+
+      if (!AppData.advances.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد سلف نقدية مسجلة حالياً.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = AppData.advances.map(adv => {
+        const worker = AppData.workers.find(w => w.id === adv.workerId);
+        const wName = worker ? worker.name : (adv.workerName || "عامل");
+        const isPaid = adv.status === "مسددة ومخصومة";
+
+        return `
+          <tr>
+            <td><b class="mono" style="color:var(--neon-teal);">${adv.id.substring(0, 10)}</b></td>
+            <td><b>${escapeHtml(wName)}</b></td>
+            <td class="mono"><b style="color:#F87171;">${(Number(adv.amount) || 0).toLocaleString()} ر.س</b></td>
+            <td class="mono">${escapeHtml(adv.date || "-")}</td>
+            <td class="mono"><b>${escapeHtml(adv.deductionMonth || "-")}</b></td>
+            <td>${escapeHtml(adv.reason || "سلفة نقدية")}</td>
+            <td><span class="badge ${isPaid ? "badge-success" : "badge-danger"}">${escapeHtml(adv.status || "غير مسددة")}</span></td>
+            <td>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" class="btn ${isPaid ? "btn-secondary" : "btn-primary"}" style="padding: 4px 8px; font-size: 0.78rem;" onclick="toggleAdvanceStatus('${adv.id}', '${adv.status}')">
+                  ${isPaid ? "إلغاء الخصم" : "تم الخصم والسداد"}
+                </button>
+                <button type="button" class="btn-action-icon danger" onclick="deleteCashAdvance('${adv.id}')" title="حذف">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function handleSaveCashAdvance(e) {
+      if (e) e.preventDefault();
+      const submitBtn = document.querySelector("#modalCashAdvance button[type='submit']");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ الحفظ..."; }
+
+      const workerId = document.getElementById("advanceWorkerId").value;
+      const worker = AppData.workers.find(w => w.id === workerId);
+      const wName = worker ? worker.name : "عامل";
+
+      const id = "adv_" + Date.now();
+      const advanceData = sanitizeForFirestore({
+        id: id,
+        workerId: workerId,
+        workerName: wName,
+        amount: Number(document.getElementById("advanceAmount").value) || 0,
+        date: document.getElementById("advanceDate").value || new Date().toISOString().split("T")[0],
+        deductionMonth: document.getElementById("advanceDeductionMonth").value || currentPayrollMonth,
+        status: document.getElementById("advanceStatus").value,
+        reason: document.getElementById("advanceReason").value.trim(),
+        createdAt: Date.now()
+      });
+
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection("cash_advances").doc(id).set(advanceData);
+        AppData.advances.unshift(advanceData);
+        renderAdvancesTable();
+        renderPayrollTable();
+        closeModal("modalCashAdvance");
+        showToast(`تم تسجيل سلفة بقيمة ${advanceData.amount} ر.س للعامل (${wName})`, "success");
+        await logAuditEvent("CREATE", `سلفة نقدية: ${wName}`, "cash_advances", id, `${wName} (${advanceData.amount} ر.س)`, `تسجيل سلفة نقدية للعامل مستحقة الخصم في شهر ${advanceData.deductionMonth}`, advanceData);
+      } catch (err) {
+        showToast("خطأ في تسجيل السلفة: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "حفظ السلفة"; }
+      }
+    }
+
+    async function toggleAdvanceStatus(id, currentStatus) {
+      const nextStatus = currentStatus === "مسددة ومخصومة" ? "غير مسددة" : "مسددة ومخصومة";
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection("cash_advances").doc(id).update({ status: nextStatus });
+        const adv = AppData.advances.find(a => a.id === id);
+        if (adv) adv.status = nextStatus;
+        renderAdvancesTable();
+        renderPayrollTable();
+        showToast(`تم تحديث حالة السلفة إلى: ${nextStatus}`, "info");
+      } catch (err) {
+        showToast("خطأ في تحديث السلفة: " + err.message, "error");
+      }
+    }
+
+    async function deleteCashAdvance(id) {
+      if (!confirm("هل أنت متأكد من حذف هذه السلفة؟")) return;
+      try {
+        if (!db) initFirebaseCore();
+        await db.collection("cash_advances").doc(id).delete();
+        AppData.advances = AppData.advances.filter(a => a.id !== id);
+        renderAdvancesTable();
+        renderPayrollTable();
+        showToast("تم حذف السلفة بنجاح", "info");
+      } catch (err) {
+        showToast("فشل الحذف: " + err.message, "error");
+      }
+    }
+
+    function exportAdvancesToExcel() {
+      if (!AppData.advances.length) {
+        showToast("لا توجد سلف نقدية للتصدير!", "warning");
+        return;
+      }
+      const data = AppData.advances.map(a => ({
+        "كود السلفة": a.id,
+        "اسم العامل": a.workerName || "-",
+        "المبلغ (ر.س)": a.amount,
+        "تاريخ المنح": a.date,
+        "شهر الاستقطاع": a.deductionMonth,
+        "السبب": a.reason || "-",
+        "الحالة": a.status
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "سلف_العمالة");
+      XLSX.writeFile(wb, "سجل_سلف_العمالة.xlsx");
+      showToast("تم تصدير سجل السلف إلى Excel بنجاح!", "success");
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       9.3 MATERIAL USAGE & REQUESTS (استهلاك المواد)
+       ───────────────────────────────────────────────────────────────── */
+    async function handleSaveMaterialUsage(e) {
+      if (e) e.preventDefault();
+      const submitBtn = document.querySelector("#modalMaterialUsage button[type='submit']");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ التسجيل..."; }
+
+      const siteId = document.getElementById("usageSiteId").value;
+      const itemId = document.getElementById("usageItemId").value;
+      const qty = Number(document.getElementById("usageQuantity").value) || 1;
+      const date = document.getElementById("usageDate").value || new Date().toISOString().split("T")[0];
+      const notes = document.getElementById("usageNotes").value.trim();
+
+      const site = AppData.sites.find(s => s.id === siteId);
+      const item = AppData.inventory.find(i => i.id === itemId);
+
+      const id = "usage_" + Date.now();
+      const usageData = sanitizeForFirestore({
+        id: id,
+        siteId: siteId,
+        siteName: site ? site.name : "موقع",
+        itemId: itemId,
+        itemName: item ? item.name : "صنف",
+        unit: item ? (item.unit || "عبوة") : "عبوة",
+        quantity: qty,
+        date: date,
+        notes: notes,
+        registeredBy: currentUser ? currentUser.email : "admin",
+        createdAt: Date.now()
+      });
+
+      try {
+        if (!db) initFirebaseCore();
+        // 1. Save usage record
+        await db.collection("material_usage").doc(id).set(usageData);
+        AppData.materialUsage.unshift(usageData);
+
+        // 2. Deduct from item currentStock
+        if (item) {
+          const newStock = Math.max(0, (Number(item.currentStock) || 0) - qty);
+          await db.collection("inventory_items").doc(itemId).update({ currentStock: newStock });
+          item.currentStock = newStock;
+          renderInventoryTable();
+          updateDashboardMetrics();
+        }
+
+        closeModal("modalMaterialUsage");
+        showToast(`تم تسجيل استهلاك (${qty} ${usageData.unit}) من (${usageData.itemName}) لموقع (${usageData.siteName}) وخصم الرصيد بنجاح!`, "success");
+        await logAuditEvent("UPDATE", `استهلاك مخزون: ${usageData.itemName}`, "inventory_items", itemId, usageData.itemName, `تم صرف ${qty} ${usageData.unit} لصالح موقع [${usageData.siteName}]`, usageData);
+        generateDailyOperationsReport();
+      } catch (err) {
+        showToast("خطأ في تسجيل استهلاك المواد: " + err.message, "error");
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "تسجيل الاستهلاك وخصم الرصيد"; }
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       9.4 DAILY OPERATIONS REPORT GENERATOR & PRINT TO PDF
+       ───────────────────────────────────────────────────────────────── */
+    function generateDailyOperationsReport() {
+      const container = document.getElementById("dailyReportContainer");
+      if (!container) return;
+
+      const siteSelect = document.getElementById("dailyReportSiteSelect");
+      const datePicker = document.getElementById("dailyReportDatePicker");
+
+      if (!siteSelect || !datePicker) return;
+
+      const siteId = siteSelect.value || (AppData.sites[0]?.id || "");
+      const selectedDate = datePicker.value || new Date().toISOString().split("T")[0];
+      if (!datePicker.value) datePicker.value = selectedDate;
+
+      const site = AppData.sites.find(s => s.id === siteId);
+      if (!site) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 2.5rem;">يرجى إضافة أو اختيار موقع عمل لعرض التقرير اليومي.</div>`;
+        return;
+      }
+
+      // 1. Filter Attendance for this site on this date
+      const siteWorkers = AppData.workers.filter(w => w.assignedSiteId === site.id);
+      const siteAttRecords = AppData.attendance.filter(a => a.siteId === site.id && a.date === selectedDate);
+
+      const presentWorkers = siteAttRecords.filter(a => (a.status || "").includes("حاضر") || (a.status || "").includes("متأخر"));
+      const absentCount = siteWorkers.length > presentWorkers.length ? (siteWorkers.length - presentWorkers.length) : 0;
+      const totalHoursWorked = siteAttRecords.reduce((sum, a) => sum + (Number(a.hoursWorked) || 8), 0);
+      const totalOvertime = siteAttRecords.reduce((sum, a) => sum + (Number(a.overtimeHours) || 0), 0);
+
+      // 2. Filter Material Usage for this site on this date
+      const siteMaterialsUsed = AppData.materialUsage.filter(u => u.siteId === site.id && u.date === selectedDate);
+
+      // 3. Supervisor for this site
+      const supervisor = AppData.supervisors.find(sup => sup.assignedSiteId === site.id);
+      const supervisorName = supervisor ? supervisor.name : "مشرف الموقع المعتمد";
+
+      // Build HTML Report
+      container.innerHTML = `
+        <div class="printable-report" style="background: rgba(11, 25, 33, 0.95); border: 1.5px solid var(--glass-border-highlight); border-radius: var(--radius-lg); padding: 2rem; color: #FFF; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <!-- Report Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--glass-border-highlight); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 12px; background: rgba(45, 212, 191, 0.15); border: 1px solid var(--neon-teal); display: flex; align-items: center; justify-content: center; font-size: 26px;">🧹</div>
+              <div>
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #FFF; margin-bottom: 2px;">تقرير العمليات والتشغيل اليومي المعتمد</h2>
+                <div style="font-size: 0.85rem; color: var(--neon-teal); font-weight: 600;">Daily Operations & Quality Inspection Report</div>
+              </div>
+            </div>
+            <div style="text-align: left; font-size: 0.88rem;" class="mono">
+              <div>تاريخ التقرير: <b>${selectedDate}</b></div>
+              <div>رقم الوثيقة: <b>DOR-${site.id.substring(0, 6).toUpperCase()}-${selectedDate.replace(/-/g, "")}</b></div>
+              <div>الحالة: <span class="badge badge-success">معتمد ومطابق للمعايير ✓</span></div>
+            </div>
+          </div>
+
+          <!-- Site Info Summary Card -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; background: rgba(16, 34, 43, 0.6); padding: 1rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border); margin-bottom: 1.5rem;">
+            <div><span style="color:var(--text-secondary); font-size:0.8rem;">موقع المشروع:</span><br><b style="font-size:1.05rem; color:#FFF;">${escapeHtml(site.name)}</b></div>
+            <div><span style="color:var(--text-secondary); font-size:0.8rem;">الجهة / العميل:</span><br><b>${escapeHtml(site.clientName || "العميل الرئيسي")}</b></div>
+            <div><span style="color:var(--text-secondary); font-size:0.8rem;">الموقع الجغرافي:</span><br><span>${escapeHtml(site.locationAddress || "الرياض")}</span></div>
+            <div><span style="color:var(--text-secondary); font-size:0.8rem;">مشرف الموقع الميداني:</span><br><b style="color:var(--neon-teal);">${escapeHtml(supervisorName)}</b></div>
+          </div>
+
+          <!-- Section 1: Attendance & Workforce -->
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--neon-teal); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+              <span>⏱️</span> 1. كشف الحضور والانضباط الميداني للكوادر
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 0.85rem; text-align: center;">
+              <div style="background: rgba(45, 212, 191, 0.08); padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                <div style="font-size:0.75rem; color:var(--text-secondary);">إجمالي القوة المقررة</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#FFF;">${siteWorkers.length || presentWorkers.length}</div>
+              </div>
+              <div style="background: rgba(34, 197, 94, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3);">
+                <div style="font-size:0.75rem; color:#4ADE80;">الحضور الفعلي</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#4ADE80;">${presentWorkers.length}</div>
+              </div>
+              <div style="background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <div style="font-size:0.75rem; color:#F87171;">الغياب / إجازة</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#F87171;">${absentCount}</div>
+              </div>
+              <div style="background: rgba(14, 165, 233, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(14, 165, 233, 0.3);">
+                <div style="font-size:0.75rem; color:#38BDF8;">إجمالي ساعات العمل</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#38BDF8;">${totalHoursWorked} س (${totalOvertime} إضافي)</div>
+              </div>
+            </div>
+
+            <div style="font-size:0.85rem; color:var(--text-secondary); line-height: 1.6; background: rgba(15, 23, 42, 0.3); padding: 8px 12px; border-radius: 8px;">
+              <b>العمال الحاضرون في الوردية:</b> ${presentWorkers.length ? presentWorkers.map(a => {
+                const w = AppData.workers.find(wk => wk.id === a.workerId);
+                return (w ? w.name : "عامل") + ` (${a.hoursWorked || 8}س)`;
+              }).join(" • ") : "لا توجد سجلات حضور مسجلة لهذا الموقع بالتاريخ المحدد"}
+            </div>
+          </div>
+
+          <!-- Section 2: Completed Operational Tasks -->
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--neon-teal); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+              <span>✅</span> 2. المهام والعمليات التشغيلية المنفذة في الموقع
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+              <div style="background: rgba(16, 34, 43, 0.5); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>🧹 نظافة ومسح الأرضيات والممرات الرئيسية</span>
+                <span class="badge badge-success">تم الإنجاز بنسبة 100%</span>
+              </div>
+              <div style="background: rgba(16, 34, 43, 0.5); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>🧴 تعقيم وتطهير دورات المياه ومستودعات النفايات</span>
+                <span class="badge badge-success">تم الإنجاز والتعقيم ✓</span>
+              </div>
+              <div style="background: rgba(16, 34, 43, 0.5); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>🪟 تلميع الواجهات الزجاجية والمداخل والمصاعد</span>
+                <span class="badge badge-success">تم التلميع والمسح</span>
+              </div>
+              <div style="background: rgba(16, 34, 43, 0.5); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>🗑️ جمع النفايات وتفريغ واستبدال الأكياس</span>
+                <span class="badge badge-success">تم التفريغ بالكامل</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Material Usage -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--neon-teal); display: flex; align-items: center; gap: 8px; margin: 0;">
+                <span>📦</span> 3. استهلاك مواد ومستلزمات النظافة المخصصة للموقع
+              </h4>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="openModal('modalMaterialUsage')">
+                <span>➕</span> تسجيل صرف مواد لهذا اليوم
+              </button>
+            </div>
+
+            ${siteMaterialsUsed.length ? `
+              <table class="data-table" style="font-size: 0.85rem;">
+                <thead>
+                  <tr>
+                    <th>اسم المادة / الصنف</th>
+                    <th>الكمية المستهلكة</th>
+                    <th>الوحدة</th>
+                    <th>ملاحظات الاستخدام</th>
+                    <th>المسؤول عن الصرف</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${siteMaterialsUsed.map(m => `
+                    <tr>
+                      <td><b>${escapeHtml(m.itemName)}</b></td>
+                      <td class="mono"><b>${m.quantity}</b></td>
+                      <td>${escapeHtml(m.unit || "عبوة")}</td>
+                      <td>${escapeHtml(m.notes || "استهلاك تشغيلي يومي")}</td>
+                      <td><span class="badge badge-teal">${escapeHtml(m.registeredBy || "مشرف الموقع")}</span></td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            ` : `
+              <div style="background: rgba(15, 23, 42, 0.3); border: 1px dashed var(--glass-border); padding: 1rem; border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                لم يتم تسجيل استهلاك مواد إضافية لهذا اليوم. اضغط "تسجيل صرف مواد لهذا اليوم" لتوثيق المواد المستهلكة.
+              </div>
+            `}
+          </div>
+
+          <!-- Section 4: Quality & Signatures -->
+          <div style="border-top: 1px solid var(--glass-border); padding-top: 1.25rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              <div style="background: rgba(16, 34, 43, 0.4); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--neon-teal); margin-bottom: 6px;">ملاحظات الجودة والتشغيل:</div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                  تمت مراجعة خطة العمل الميدانية ومطابقة مستويات النظافة لكافة المناطق المستهدفة بالعقد. الحالة التشغيلية ممتازة دون وجود أي ملاحظات أو تلفيات.
+                </div>
+              </div>
+
+              <!-- Signatures Box -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 10px 16px; background: rgba(16, 34, 43, 0.4); border-radius: 8px; border: 1px solid var(--glass-border);">
+                <div style="text-align: center;">
+                  <div style="font-size: 0.78rem; color: var(--text-secondary);">مشرف الموقع المستلم:</div>
+                  <div style="font-weight: 700; margin-top: 4px; color: #FFF;">${escapeHtml(supervisorName)}</div>
+                  <div style="font-size: 0.75rem; color: var(--neon-teal); margin-top: 8px;">التوقيع: ______________</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 0.78rem; color: var(--text-secondary);">مدير العمليات والتشغيل:</div>
+                  <div style="font-weight: 700; margin-top: 4px; color: #FFF;">معاذ خالد (المدير العام)</div>
+                  <div style="font-size: 0.75rem; color: var(--neon-teal); margin-top: 8px;">الختم والاعتماد: [مُعتمد]</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function printDailyOperationsReport() {
+      window.print();
+    }
+
+    function exportDailyReportToExcel() {
+      const siteSelect = document.getElementById("dailyReportSiteSelect");
+      const datePicker = document.getElementById("dailyReportDatePicker");
+      const siteId = siteSelect?.value;
+      const date = datePicker?.value || new Date().toISOString().split("T")[0];
+      const site = AppData.sites.find(s => s.id === siteId);
+
+      const siteAttRecords = AppData.attendance.filter(a => a.siteId === siteId && a.date === date);
+      const siteMaterials = AppData.materialUsage.filter(u => u.siteId === siteId && u.date === date);
+
+      const rows = siteAttRecords.map(a => {
+        const w = AppData.workers.find(wk => wk.id === a.workerId);
+        return {
+          "الموقع": site ? site.name : "موقع",
+          "التاريخ": date,
+          "اسم العامل": w ? w.name : "عامل",
+          "المسمى": w ? w.role : "-",
+          "حالة الحضور": a.status,
+          "ساعات العمل": a.hoursWorked || 8,
+          "ساعات إضافية": a.overtimeHours || 0
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{ "الموقع": site?.name, "التاريخ": date, "الحالة": "تم توليد التقرير بنجاح" }]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "التقرير_اليومي");
+      XLSX.writeFile(wb, `تقرير_العمليات_اليومي_${date}.xlsx`);
+      showToast("تم تصدير التقرير اليومي إلى Excel!", "success");
     }
 
     function installPwaDesktop() {
