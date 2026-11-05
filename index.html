@@ -1461,10 +1461,10 @@
             <span>⚡</span> مركز الأوامر والعمليات السريعة للحواسيب
           </div>
           <div class="toolbar-actions">
-            <button type="button" class="btn btn-primary" onclick="openModal('modalSite')"><span>➕</span> إضافة موقع</button>
+            <button type="button" class="btn btn-primary" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalWorker')"><span>➕</span> إضافة عامل</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')"><span>⏱️</span> تسجيل حضور</button>
-            <button type="button" class="btn btn-secondary" onclick="openModal('modalInventory')"><span>📦</span> إضافة مادة</button>
+            <button type="button" class="btn btn-secondary" onclick="openAddInventoryModal()"><span>📦</span> إضافة مادة</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalAddAdmin')"><span>🔐</span> إضافة مسؤول إداري</button>
             <button type="button" class="btn btn-secondary" onclick="switchTab('tab-trash')"><span>🗑️</span> سلة المحذوفات</button>
             <button type="button" class="btn btn-secondary" onclick="switchTab('tab-audit')"><span>📜</span> سجل العمليات</button>
@@ -1483,7 +1483,7 @@
         <div class="card-header">
           <div class="card-title"><span>🏢</span> مواقع العمل وعقود النظافة التشغيلية</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalSite')"><span>➕</span> إضافة موقع جديد</button>
+            <button class="btn btn-primary" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع جديد</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('sites')"><span>📊</span> تصدير Excel</button>
           </div>
         </div>
@@ -1750,17 +1750,34 @@
     <section id="tab-inventory" class="section-view">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span>📦</span> مستودع أدوات ومواد النظافة والمطهرات</div>
+          <div class="card-title"><span>📦</span> مستودع أدوات ومواد النظافة والمطهرات المخصصة للمواقع</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalInventory')"><span>➕</span> إضافة صنف مادة</button>
-            <button class="btn btn-excel" onclick="exportTableToExcel('inventory')"><span>📊</span> تصدير Excel</button>
+            <button type="button" class="btn btn-primary" onclick="openAddInventoryModal()"><span>➕</span> إضافة صنف مادة</button>
+            <button type="button" class="btn btn-secondary" onclick="openModal('modalMaterialUsage')"><span>🧴</span> صرف / استهلاك لموقع</button>
+            <button type="button" class="btn btn-excel" onclick="exportTableToExcel('inventory')"><span>📊</span> تصدير Excel</button>
           </div>
         </div>
 
         <div class="table-toolbar">
           <div class="search-input-box">
-            <input type="text" id="searchInventory" placeholder="البحث بالاسم أو التصنيف..." oninput="filterInventoryTable()">
+            <input type="text" id="searchInventory" placeholder="البحث باسم الصنف، التصنيف، أو موقع العمل..." oninput="filterInventoryTable()">
             <span class="icon">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="filterInventorySite" class="form-control" style="width: auto; min-width: 180px;" onchange="filterInventoryTable()">
+              <option value="">🏢 جميع المواقع والمستودع</option>
+              <option value="general">🏬 مستودع عام (غير مخصص)</option>
+            </select>
+
+            <select id="filterInventoryCategory" class="form-control" style="width: auto; min-width: 150px;" onchange="filterInventoryTable()">
+              <option value="">جميع التصنيفات</option>
+              <option value="منظفات ومطهرات">منظفات ومطهرات</option>
+              <option value="أدوات ومستهلكات">أدوات ومستهلكات</option>
+              <option value="أدوات ومعدات">أدوات ومعدات</option>
+              <option value="أكياس وورقيات">أكياس وورقيات</option>
+              <option value="مهمات وقاية شخصية">مهمات وقاية شخصية</option>
+            </select>
           </div>
         </div>
 
@@ -1770,6 +1787,7 @@
               <tr>
                 <th>كود المادة</th>
                 <th>اسم الصنف / المادة</th>
+                <th>موقع العمل المخصص</th>
                 <th>التصنيف</th>
                 <th>الوحدة</th>
                 <th>الرصيد الحالي</th>
@@ -1781,7 +1799,7 @@
               </tr>
             </thead>
             <tbody id="inventoryTableBody">
-              <tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل أصناف المخزون...</td></tr>
+              <tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل أصناف المخزون...</td></tr>
             </tbody>
           </table>
         </div>
@@ -2377,7 +2395,7 @@
     <div class="modal-dialog">
       <div class="modal-title">
         <span id="modalSiteTitle">🏢 إضافة موقع عمل جديد</span>
-        <button class="btn-action-icon" onclick="closeModal('modalSite')">✕</button>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalSite')">✕</button>
       </div>
       <form id="formSite" onsubmit="handleSaveSite(event)">
         <input type="hidden" id="siteEditId">
@@ -2387,11 +2405,11 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">اسم العميل *</label>
+            <label class="form-label">اسم العميل أو الشركة *</label>
             <input type="text" id="siteClientName" class="form-control" required placeholder="مثال: شركة التطوير العقاري">
           </div>
           <div class="form-group">
-            <label class="form-label">هاتف العميل</label>
+            <label class="form-label">هاتف العميل للتواصل</label>
             <input type="text" id="siteClientPhone" class="form-control" placeholder="0500000000">
           </div>
         </div>
@@ -2401,21 +2419,31 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">قيمة العقد الشهري (ر.س) *</label>
-            <input type="number" step="0.01" id="siteContractValue" class="form-control" required placeholder="15000">
+            <label class="form-label">قيمة العقد الشهري *</label>
+            <input type="number" step="0.01" id="siteContractValue" class="form-control" required placeholder="10000">
           </div>
           <div class="form-group">
-            <label class="form-label">حالة الموقع</label>
-            <select id="siteStatus" class="form-control">
-              <option value="نشط">نشط</option>
-              <option value="تحت الصيانة">تحت الصيانة</option>
-              <option value="منتهي">منتهي</option>
+            <label class="form-label">عملة العقد *</label>
+            <select id="siteCurrency" class="form-control">
+              <option value="SAR">ريال سعودي (ر.س)</option>
+              <option value="USD">دولار أمريكي ($)</option>
+              <option value="YER">ريال يمني (ر.ي)</option>
             </select>
           </div>
         </div>
+        <div class="form-group">
+          <label class="form-label">حالة الموقع</label>
+          <select id="siteStatus" class="form-control">
+            <option value="نشط">نشط</option>
+            <option value="معلق">معلق</option>
+            <option value="مكتمل">مكتمل</option>
+            <option value="تحت الصيانة">تحت الصيانة</option>
+            <option value="منتهي">منتهي</option>
+          </select>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeModal('modalSite')">إلغاء</button>
-          <button type="submit" class="btn btn-primary">حفظ في السحابة</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveSite">حفظ في السحابة</button>
         </div>
       </form>
     </div>
@@ -2552,7 +2580,7 @@
     <div class="modal-dialog">
       <div class="modal-title">
         <span id="modalInventoryTitle">📦 إضافة صنف جديد للمخزون</span>
-        <button class="btn-action-icon" onclick="closeModal('modalInventory')">✕</button>
+        <button type="button" class="btn-action-icon" onclick="closeModal('modalInventory')">✕</button>
       </div>
       <form id="formInventory" onsubmit="handleSaveInventory(event)">
         <input type="hidden" id="inventoryEditId">
@@ -2562,17 +2590,30 @@
         </div>
         <div class="form-row">
           <div class="form-group">
+            <label class="form-label">موقع العمل المخصص (اختياري)</label>
+            <select id="inventorySiteId" class="form-control">
+              <option value="">🏬 مستودع عام (غير مخصص لموقع محدد)</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label class="form-label">التصنيف</label>
             <select id="invCategory" class="form-control">
               <option value="منظفات ومطهرات">منظفات ومطهرات</option>
+              <option value="أدوات ومستهلكات">أدوات ومستهلكات</option>
               <option value="أدوات ومعدات">أدوات ومعدات</option>
               <option value="أكياس وورقيات">أكياس وورقيات</option>
               <option value="مهمات وقاية شخصية">مهمات وقاية شخصية</option>
             </select>
           </div>
+        </div>
+        <div class="form-row">
           <div class="form-group">
             <label class="form-label">الوحدة</label>
-            <input type="text" id="invUnit" class="form-control" placeholder="عبوة / كرتون / حبة" value="عبوة">
+            <input type="text" id="invUnit" class="form-control" placeholder="عبوة / لتر / كرتون / حبة" value="عبوة">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تكلفة الوحدة (ر.س)</label>
+            <input type="number" step="0.01" id="invCostPerUnit" class="form-control" value="25.0">
           </div>
         </div>
         <div class="form-row">
@@ -2585,13 +2626,9 @@
             <input type="number" step="0.1" id="invMinThreshold" class="form-control" required value="5">
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">تكلفة الوحدة (ر.س)</label>
-          <input type="number" step="0.01" id="invCostPerUnit" class="form-control" value="25.0">
-        </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeModal('modalInventory')">إلغاء</button>
-          <button type="submit" class="btn btn-primary">حفظ في المخزن السحابي</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveInventory">حفظ في المخزن السحابي</button>
         </div>
       </form>
     </div>
@@ -2672,7 +2709,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">الموقع / العميل *</label>
-            <select id="invSiteId" class="form-control" required onchange="handleInvoiceSiteSelected()"></select>
+            <select id="invoiceSiteId" class="form-control" required onchange="handleInvoiceSiteSelected()"></select>
           </div>
         </div>
         <div class="form-row">
@@ -2997,6 +3034,8 @@
     let currentUser = null;
     let isSuperAdmin = false;
     let currentUserIsAdmin = false;
+    let currentSupervisorSiteId = null;
+    let currentSupervisorData = null;
     let deferredPwaPrompt = null;
     let db = null;
     let auth = null;
@@ -3007,6 +3046,7 @@
       workers: [],
       attendance: [],
       inventory: [],
+      transactions: [],
       expenses: [],
       invoices: [],
       admins: [],
@@ -3236,6 +3276,8 @@
               if (supData.isApprovedByAdmin !== false) {
                 authorized = true;
                 isAdmin = false;
+                currentSupervisorSiteId = supData.assignedSiteId || null;
+                currentSupervisorData = supData;
                 userRoleTitle = "مشرف موقع (" + (supData.name || 'مشرف') + ")";
               }
             }
@@ -3284,12 +3326,19 @@
         }
       });
 
+      document.querySelectorAll('.admin-only-action').forEach(btn => {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+      });
+
+      const perfCard = document.getElementById('sitePerformanceCard');
+      if (perfCard) {
+        perfCard.style.display = isAdmin ? 'block' : 'none';
+      }
+
       if (!isAdmin) {
-        // Hide admin-only quick action buttons in overview
-        document.querySelectorAll('.admin-only-action').forEach(btn => btn.style.display = 'none');
         // If supervisor is on a restricted tab, switch to overview or attendance
         const activeTab = document.querySelector('.section-view.active');
-        if (activeTab && ['tab-finance', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'].includes(activeTab.id)) {
+        if (activeTab && ['tab-finance', 'tab-payroll', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'].includes(activeTab.id)) {
           switchTab('tab-attendance');
         }
       }
@@ -3329,11 +3378,12 @@
           ]);
         };
 
-                const [sitesSnap, workersSnap, attSnap, invSnap, expSnap, invoicesSnap, trashSnap, auditSnap, adminsSnap, supervisorsSnap, payrollSnap, advancesSnap, usageSnap] = await Promise.all([
+                const [sitesSnap, workersSnap, attSnap, invSnap, transSnap, expSnap, invoicesSnap, trashSnap, auditSnap, adminsSnap, supervisorsSnap, payrollSnap, advancesSnap, usageSnap] = await Promise.all([
           fetchCol('cleaning_sites').catch(e => ({ docs: [] })),
           fetchCol('workers').catch(e => ({ docs: [] })),
           fetchCol('attendance_records').catch(e => ({ docs: [] })),
           fetchCol('inventory_items').catch(e => ({ docs: [] })),
+          fetchCol('inventory_transactions').catch(e => ({ docs: [] })),
           fetchCol('expenses').catch(e => ({ docs: [] })),
           fetchCol('invoices').catch(e => ({ docs: [] })),
           fetchCol('recycle_bin').catch(e => ({ docs: [] })),
@@ -3348,6 +3398,7 @@
         AppData.workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        AppData.transactions = transSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
         AppData.expenses = expSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.invoices = invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.trash = trashSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.deletedAt||0) - (a.deletedAt||0));
@@ -3430,25 +3481,42 @@
        4. RENDERING TABLES & METRICS
        ───────────────────────────────────────────────────────────────── */
     function updateDashboardMetrics() {
+      const isSuper = !currentUserIsAdmin;
+
       // Sites
-      document.getElementById('statTotalSites').innerText = AppData.sites.length;
-      document.getElementById('badgeSitesCount').innerText = AppData.sites.length;
-      const totalMonthlyVal = AppData.sites.reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
-      document.getElementById('statSitesMonthly').innerText = totalMonthlyVal.toLocaleString('ar-SA') + ' ر.س شهرياً';
+      let sitesList = AppData.sites;
+      let workersList = AppData.workers;
+      let attendanceList = AppData.attendance;
+
+      if (isSuper && currentSupervisorSiteId) {
+        sitesList = sitesList.filter(s => s.id === currentSupervisorSiteId);
+        workersList = workersList.filter(w => w.assignedSiteId === currentSupervisorSiteId);
+        attendanceList = attendanceList.filter(a => a.siteId === currentSupervisorSiteId);
+      }
+
+      document.getElementById('statTotalSites').innerText = sitesList.length;
+      document.getElementById('badgeSitesCount').innerText = sitesList.length;
+
+      if (isSuper) {
+        document.getElementById('statSitesMonthly').innerHTML = '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted); font-size:0.8rem;">🔒 سري (إدارة)</span>';
+      } else {
+        const totalMonthlyVal = AppData.sites.reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
+        document.getElementById('statSitesMonthly').innerText = totalMonthlyVal.toLocaleString('ar-SA') + ' ر.س شهرياً';
+      }
 
       // Workers
-      document.getElementById('statTotalWorkers').innerText = AppData.workers.length;
-      document.getElementById('badgeWorkersCount').innerText = AppData.workers.length;
-      const activeWorkers = AppData.workers.filter(w => (w.status || '').includes('رأس العمل')).length;
+      document.getElementById('statTotalWorkers').innerText = workersList.length;
+      document.getElementById('badgeWorkersCount').innerText = workersList.length;
+      const activeWorkers = workersList.filter(w => (w.status || '').includes('رأس العمل')).length;
       document.getElementById('statActiveWorkers').innerText = `${activeWorkers} على رأس العمل`;
 
       // Attendance Today
       const todayStr = new Date().toISOString().split('T')[0];
-      const todayRecords = AppData.attendance.filter(a => a.date === todayStr);
+      const todayRecords = attendanceList.filter(a => a.date === todayStr);
       const todayPresent = todayRecords.filter(a => (a.status || '').includes('حاضر') || (a.status || '').includes('متأخر')).length;
       document.getElementById('statTodayPresent').innerText = todayPresent;
-      document.getElementById('badgeAttCount').innerText = AppData.attendance.length;
-      const ratio = AppData.workers.length ? Math.round((todayPresent / AppData.workers.length) * 100) : 0;
+      document.getElementById('badgeAttCount').innerText = attendanceList.length;
+      const ratio = workersList.length ? Math.round((todayPresent / workersList.length) * 100) : 0;
       document.getElementById('statTodayRatio').innerText = `نسبة الحضور ${ratio}%`;
 
       // Inventory
@@ -3457,22 +3525,27 @@
       const lowStockCount = AppData.inventory.filter(i => (Number(i.currentStock) || 0) <= (Number(i.minThreshold) || 5)).length;
       document.getElementById('statLowStock').innerText = `${lowStockCount} بحاجة لإعادة طلب`;
 
-      // Finance
-      const totalInvVal = AppData.invoices.reduce((sum, i) => sum + (Number(i.totalAmount) || 0), 0);
-      const unpaidCount = AppData.invoices.filter(i => (i.status || '').includes('غير مدفوعة')).length;
-      document.getElementById('statTotalInvoices').innerText = totalInvVal.toLocaleString('ar-SA');
-      document.getElementById('statUnpaidInvoices').innerText = `${unpaidCount} غير مدفوعة`;
+      // Finance (strictly hidden/masked for supervisor)
+      if (isSuper) {
+        document.getElementById('statTotalInvoices').innerHTML = '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted); font-size:0.8rem;">🔒 سري</span>';
+        document.getElementById('statUnpaidInvoices').innerText = 'صلاحية مدير عام';
+        document.getElementById('statTotalExpenses').innerHTML = '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted); font-size:0.8rem;">🔒 سري</span>';
+      } else {
+        const totalInvVal = AppData.invoices.reduce((sum, i) => sum + (Number(i.totalAmount) || 0), 0);
+        const unpaidCount = AppData.invoices.filter(i => (i.status || '').includes('غير مدفوعة')).length;
+        document.getElementById('statTotalInvoices').innerText = totalInvVal.toLocaleString('ar-SA');
+        document.getElementById('statUnpaidInvoices').innerText = `${unpaidCount} غير مدفوعة`;
+        const totalExpVal = AppData.expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+        document.getElementById('statTotalExpenses').innerText = totalExpVal.toLocaleString('ar-SA');
+      }
       document.getElementById('badgeFinanceCount').innerText = AppData.invoices.length + AppData.expenses.length;
-
-      const totalExpVal = AppData.expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-      document.getElementById('statTotalExpenses').innerText = totalExpVal.toLocaleString('ar-SA');
 
       // Trash & Audit Counters
       const trashElem = document.getElementById('statTotalTrashOverview');
-      if (trashElem) trashElem.innerText = AppData.trash.length;
+      if (trashElem) trashElem.innerText = isSuper ? '-' : AppData.trash.length;
 
       const auditElem = document.getElementById('statTotalAuditOverview');
-      if (auditElem) auditElem.innerText = AppData.auditLogs.length;
+      if (auditElem) auditElem.innerText = isSuper ? '-' : AppData.auditLogs.length;
     }
 
     function renderAllTables() {
@@ -3497,33 +3570,57 @@
 
     // 1. Sites Table
     function renderSitesTable(filtered = null) {
-      const list = filtered || AppData.sites;
+      let list = filtered || AppData.sites;
       const tbody = document.getElementById('sitesTableBody');
+      if (!tbody) return;
+
+      // Scoped security: if supervisor, show only their assigned site
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        list = list.filter(s => s.id === currentSupervisorSiteId);
+      }
+
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد مواقع مسجلة حالياً. اضغط "إضافة موقع جديد" للبدء.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد مواقع مسجلة حالياً.</td></tr>';
         return;
       }
-      tbody.innerHTML = list.map(s => `
-        <tr>
-          <td><b class="mono" style="color:var(--neon-teal);">${s.id.substring(0, 10)}</b></td>
-          <td><b>${escapeHtml(s.name)}</b></td>
-          <td>${escapeHtml(s.clientName || '-')}</td>
-          <td class="mono">${escapeHtml(s.clientPhone || '-')}</td>
-          <td>${escapeHtml(s.locationAddress || '-')}</td>
-          <td class="mono"><b>${(Number(s.contractMonthlyValue) || 0).toLocaleString()} ر.س</b></td>
-          <td><span class="badge ${s.status === 'نشط' ? 'badge-success' : 'badge-warning'}">${escapeHtml(s.status || 'نشط')}</span></td>
-          <td>
-            <button class="btn-action-icon" title="تعديل" onclick="editSite('${s.id}')">✏️</button>
-            <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('cleaning_sites', '${s.id}')">🗑️</button>
-          </td>
-        </tr>
-      `).join('');
+
+      const isSuper = !currentUserIsAdmin;
+
+      tbody.innerHTML = list.map(s => {
+        const curSym = s.currency === 'USD' ? '$' : (s.currency === 'YER' ? 'ر.ي' : 'ر.س');
+        const contractDisplay = isSuper 
+          ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري (إدارة)</span>'
+          : `<b class="mono">${(Number(s.contractMonthlyValue) || 0).toLocaleString()} ${curSym}</b>`;
+
+        const st = s.status || 'نشط';
+        const stBadgeClass = st === 'نشط' ? 'badge-success' : (st === 'معلق' ? 'badge-warning' : (st === 'مكتمل' ? 'badge-teal' : 'badge-subtle'));
+
+        return `
+          <tr>
+            <td><b class="mono" style="color:var(--neon-teal);">${s.id.substring(0, 10)}</b></td>
+            <td><b>${escapeHtml(s.name)}</b></td>
+            <td>${escapeHtml(s.clientName || '-')}</td>
+            <td class="mono">${escapeHtml(s.clientPhone || '-')}</td>
+            <td>${escapeHtml(s.locationAddress || '-')}</td>
+            <td>${contractDisplay}</td>
+            <td><span class="badge ${stBadgeClass}">${escapeHtml(st)}</span></td>
+            <td>
+              <button class="btn-action-icon" title="تعديل" onclick="editSite('${s.id}')">✏️</button>
+              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('cleaning_sites', '${s.id}')">🗑️</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function filterSitesTable() {
       const q = document.getElementById('searchSites').value.toLowerCase().trim();
-      if (!q) return renderSitesTable();
-      const filtered = AppData.sites.filter(s => 
+      let list = AppData.sites;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        list = list.filter(s => s.id === currentSupervisorSiteId);
+      }
+      if (!q) return renderSitesTable(list);
+      const filtered = list.filter(s => 
         (s.name || '').toLowerCase().includes(q) ||
         (s.clientName || '').toLowerCase().includes(q) ||
         (s.locationAddress || '').toLowerCase().includes(q) ||
@@ -3534,15 +3631,29 @@
 
     // 2. Workers Table
     function renderWorkersTable(filtered = null) {
-      const list = filtered || AppData.workers;
+      let list = filtered || AppData.workers;
       const tbody = document.getElementById('workersTableBody');
+      if (!tbody) return;
+
+      // Scoped security: if supervisor, show only workers assigned to their site
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        list = list.filter(w => w.assignedSiteId === currentSupervisorSiteId);
+      }
+
       if (!list.length) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا يوجد عمال مسجلين حالياً.</td></tr>';
         return;
       }
+
+      const isSuper = !currentUserIsAdmin;
+
       tbody.innerHTML = list.map(w => {
         const site = AppData.sites.find(s => s.id === w.assignedSiteId);
         const siteName = site ? site.name : 'غير محدد';
+        const wageDisplay = isSuper
+          ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>'
+          : `<span class="mono">${(Number(w.dailyWage) || 0).toLocaleString()} ر.س</span>`;
+
         return `
           <tr>
             <td><b class="mono" style="color:var(--neon-teal);">${w.id.substring(0, 8)}</b></td>
@@ -3550,12 +3661,12 @@
             <td><span class="badge badge-teal">${escapeHtml(w.role || 'عامل نظافة')}</span></td>
             <td class="mono">${escapeHtml(w.nationalId || '-')}</td>
             <td class="mono">${escapeHtml(w.phone || '-')}</td>
-            <td>${escapeHtml(siteName)}</td>
-            <td class="mono">${(Number(w.dailyWage) || 0).toLocaleString()} ر.س</td>
+            <td><span class="badge badge-teal">🏢 ${escapeHtml(siteName)}</span></td>
+            <td>${wageDisplay}</td>
             <td><span class="badge ${(w.status || '').includes('رأس العمل') ? 'badge-success' : 'badge-danger'}">${escapeHtml(w.status || 'على رأس العمل')}</span></td>
             <td>
               <button class="btn-action-icon" title="تعديل" onclick="editWorker('${w.id}')">✏️</button>
-              <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('workers', '${w.id}')">🗑️</button>
+              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('workers', '${w.id}')">🗑️</button>` : ''}
             </td>
           </tr>
         `;
@@ -3564,8 +3675,12 @@
 
     function filterWorkersTable() {
       const q = document.getElementById('searchWorkers').value.toLowerCase().trim();
-      if (!q) return renderWorkersTable();
-      const filtered = AppData.workers.filter(w => 
+      let list = AppData.workers;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        list = list.filter(w => w.assignedSiteId === currentSupervisorSiteId);
+      }
+      if (!q) return renderWorkersTable(list);
+      const filtered = list.filter(w => 
         (w.name || '').toLowerCase().includes(q) ||
         (w.nationalId || '').includes(q) ||
         (w.phone || '').includes(q) ||
@@ -4115,12 +4230,17 @@
 
     // 4. Inventory Table
     function renderInventoryTable(filtered = null) {
-      const list = filtered || AppData.inventory;
+      let list = filtered || AppData.inventory;
       const tbody = document.getElementById('inventoryTableBody');
+      if (!tbody) return;
+
+      const isSuper = !currentUserIsAdmin;
+
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد أصناف مواد في المستودع.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد أصناف مواد مطابقة في المستودع.</td></tr>';
         return;
       }
+
       tbody.innerHTML = list.map(item => {
         const stock = Number(item.currentStock) || 0;
         const min = Number(item.minThreshold) || 5;
@@ -4128,30 +4248,88 @@
         const totalVal = stock * cost;
         const isLow = stock <= min;
 
+        // Resolve site link
+        const site = item.siteId ? AppData.sites.find(s => s.id === item.siteId) : null;
+        const siteLabel = site ? site.name : (item.siteName || (item.siteId ? 'موقع مخصص' : '🏬 مستودع عام'));
+        const isAssigned = !!(item.siteId || item.siteName);
+
+        const costDisplay = isSuper 
+          ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>' 
+          : `<span class="mono">${cost.toLocaleString()} ر.س</span>`;
+        const totalDisplay = isSuper 
+          ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>' 
+          : `<b class="mono">${totalVal.toLocaleString()} ر.س</b>`;
+
         return `
           <tr>
             <td><b class="mono" style="color:var(--neon-teal);">${item.id.substring(0, 8)}</b></td>
             <td><b>${escapeHtml(item.name)}</b></td>
+            <td>
+              <span class="badge ${isAssigned ? 'badge-teal' : 'badge-subtle'}" title="${escapeHtml(siteLabel)}">
+                ${isAssigned ? '🏢 ' : ''}${escapeHtml(siteLabel)}
+              </span>
+            </td>
             <td><span class="badge badge-teal">${escapeHtml(item.category || 'عام')}</span></td>
             <td>${escapeHtml(item.unit || 'عبوة')}</td>
-            <td class="mono"><b style="font-size:1rem; color:${isLow ? '#F87171' : '#34D399'}">${stock}</b></td>
+            <td class="mono"><b style="font-size:1.05rem; color:${isLow ? '#F87171' : '#34D399'}">${stock}</b></td>
             <td class="mono">${min}</td>
-            <td class="mono">${cost.toLocaleString()} ر.س</td>
-            <td class="mono"><b>${totalVal.toLocaleString()} ر.س</b></td>
-            <td><span class="badge ${isLow ? 'badge-danger' : 'badge-success'}">${isLow ? '⚠️ منخفض - اطلب الآن' : 'متوفر ومناسب'}</span></td>
+            <td>${costDisplay}</td>
+            <td>${totalDisplay}</td>
+            <td><span class="badge ${isLow ? 'badge-danger' : 'badge-success'}">${isLow ? '⚠️ منخفض - اطلب' : 'متوفر ومناسب'}</span></td>
             <td>
+              <button class="btn-action-icon" title="صرف / استهلاك سريع لموقع" onclick="quickConsumeItem('${item.id}')">🧴</button>
               <button class="btn-action-icon" title="تعديل" onclick="editInventory('${item.id}')">✏️</button>
-              <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('inventory_items', '${item.id}')">🗑️</button>
+              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('inventory_items', '${item.id}')">🗑️</button>` : ''}
             </td>
           </tr>
         `;
       }).join('');
     }
 
+    function quickConsumeItem(itemId) {
+      const item = AppData.inventory.find(i => i.id === itemId);
+      if (!item) return;
+      openModal('modalMaterialUsage');
+      const itemSelect = document.getElementById('usageItemId');
+      if (itemSelect) itemSelect.value = item.id;
+      if (item.siteId) {
+        const siteSelect = document.getElementById('usageSiteId');
+        if (siteSelect) siteSelect.value = item.siteId;
+      } else if (currentSupervisorSiteId) {
+        const siteSelect = document.getElementById('usageSiteId');
+        if (siteSelect) siteSelect.value = currentSupervisorSiteId;
+      }
+    }
+
     function filterInventoryTable() {
-      const q = document.getElementById('searchInventory').value.toLowerCase().trim();
-      if (!q) return renderInventoryTable();
-      const filtered = AppData.inventory.filter(i => (i.name || '').toLowerCase().includes(q) || (i.category || '').toLowerCase().includes(q));
+      const q = (document.getElementById('searchInventory')?.value || '').toLowerCase().trim();
+      const cat = document.getElementById('filterInventoryCategory')?.value || '';
+      const siteFilter = document.getElementById('filterInventorySite')?.value || '';
+
+      let filtered = AppData.inventory;
+
+      if (q) {
+        filtered = filtered.filter(i => {
+          const site = i.siteId ? AppData.sites.find(s => s.id === i.siteId) : null;
+          const siteName = (site ? site.name : (i.siteName || '')).toLowerCase();
+          return (i.name || '').toLowerCase().includes(q) ||
+                 (i.category || '').toLowerCase().includes(q) ||
+                 siteName.includes(q);
+        });
+      }
+
+      if (cat) {
+        filtered = filtered.filter(i => i.category === cat);
+      }
+
+      if (siteFilter) {
+        if (siteFilter === 'general' || siteFilter === '__GENERAL__') {
+          filtered = filtered.filter(i => !i.siteId);
+        } else {
+          filtered = filtered.filter(i => i.siteId === siteFilter);
+        }
+      }
+
       renderInventoryTable(filtered);
     }
 
@@ -4226,10 +4404,29 @@
       }
 
       // Sites in invoice & expense
-      const invSiteSelect = document.getElementById('invSiteId');
-      if (invSiteSelect) {
-        invSiteSelect.innerHTML = '<option value="">اختر الموقع / العميل</option>' + 
+      const invoiceSiteSelect = document.getElementById('invoiceSiteId');
+      if (invoiceSiteSelect) {
+        invoiceSiteSelect.innerHTML = '<option value="">اختر الموقع / العميل</option>' + 
           AppData.sites.map(s => `<option value="${s.id}" data-client="${escapeHtml(s.clientName || '')}" data-value="${s.contractMonthlyValue || 0}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || '')})</option>`).join('');
+      }
+
+      // Sites in inventory modal (dedicated to a site or general warehouse)
+      const invSiteSelect = document.getElementById('inventorySiteId');
+      if (invSiteSelect) {
+        const curInvSite = invSiteSelect.value;
+        invSiteSelect.innerHTML = '<option value="">🏬 مستودع عام (غير مخصص لموقع محدد)</option>' + 
+          AppData.sites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)} (${escapeHtml(s.clientName || '')})</option>`).join('');
+        if (curInvSite) invSiteSelect.value = curInvSite;
+      }
+
+      // Sites in inventory filter toolbar
+      const filterSiteSelect = document.getElementById('filterInventorySite');
+      if (filterSiteSelect) {
+        const curFilter = filterSiteSelect.value;
+        filterSiteSelect.innerHTML = '<option value="">🏢 جميع المواقع والمستودع</option>' + 
+          '<option value="general">🏬 مستودع عام (غير مخصص)</option>' + 
+          AppData.sites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)}</option>`).join('');
+        if (curFilter) filterSiteSelect.value = curFilter;
       }
 
       const expSiteSelect = document.getElementById('expSiteId');
@@ -4272,7 +4469,8 @@
     }
 
     function handleInvoiceSiteSelected() {
-      const select = document.getElementById('invSiteId');
+      const select = document.getElementById('invoiceSiteId');
+      if (!select) return;
       const option = select.options[select.selectedIndex];
       if (option && option.dataset.value) {
         document.getElementById('invTotalAmount').value = option.dataset.value;
@@ -4282,13 +4480,51 @@
     /* ─────────────────────────────────────────────────────────────────
        5. CRUD ACTIONS & FIRESTORE WRITES
        ───────────────────────────────────────────────────────────────── */
+    function openAddSiteModal() {
+      if (!currentUserIsAdmin) {
+        showToast("صلاحية إضافة موقع جديد مخصصة للمدير العام فقط.", "warning");
+        return;
+      }
+      document.getElementById('siteEditId').value = '';
+      document.getElementById('siteName').value = '';
+      document.getElementById('siteClientName').value = '';
+      document.getElementById('siteClientPhone').value = '';
+      document.getElementById('siteAddress').value = '';
+      document.getElementById('siteContractValue').value = '';
+      if (document.getElementById('siteCurrency')) document.getElementById('siteCurrency').value = 'SAR';
+      if (document.getElementById('siteStatus')) document.getElementById('siteStatus').value = 'نشط';
+      document.getElementById('modalSiteTitle').innerText = '🏢 إضافة موقع عمل جديد';
+      openModal('modalSite');
+    }
+
+    function editSite(id) {
+      const site = AppData.sites.find(s => s.id === id);
+      if (!site) {
+        showToast("لم يتم العثور على بيانات الموقع", "error");
+        return;
+      }
+      document.getElementById('siteEditId').value = site.id;
+      document.getElementById('siteName').value = site.name || '';
+      document.getElementById('siteClientName').value = site.clientName || '';
+      document.getElementById('siteClientPhone').value = site.clientPhone || '';
+      document.getElementById('siteAddress').value = site.locationAddress || '';
+      document.getElementById('siteContractValue').value = site.contractMonthlyValue || 0;
+      if (document.getElementById('siteCurrency')) document.getElementById('siteCurrency').value = site.currency || 'SAR';
+      if (document.getElementById('siteStatus')) document.getElementById('siteStatus').value = site.status || 'نشط';
+      document.getElementById('modalSiteTitle').innerText = '✏️ تعديل بيانات الموقع: ' + (site.name || '');
+      openModal('modalSite');
+    }
+
     async function handleSaveSite(e) {
       if (e) e.preventDefault();
-      const submitBtn = e?.target?.querySelector('button[type="submit"]');
+      const submitBtn = document.getElementById('btnSaveSite') || e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ في السحابة...'; }
 
-      const isEdit = !!document.getElementById('siteEditId').value;
-      const id = document.getElementById('siteEditId').value || ('site_' + Date.now());
+      const editId = (document.getElementById('siteEditId')?.value || '').trim();
+      const isEdit = !!editId;
+      const id = isEdit ? editId : ('site_' + Date.now());
+      const existingSite = AppData.sites.find(s => s.id === id) || {};
+
       const siteData = sanitizeForFirestore({
         id: id,
         name: document.getElementById('siteName').value.trim(),
@@ -4296,16 +4532,34 @@
         clientPhone: document.getElementById('siteClientPhone').value.trim(),
         locationAddress: document.getElementById('siteAddress').value.trim(),
         contractMonthlyValue: Number(document.getElementById('siteContractValue').value) || 0,
-        status: document.getElementById('siteStatus').value,
+        currency: document.getElementById('siteCurrency')?.value || 'SAR',
+        status: document.getElementById('siteStatus').value || 'نشط',
+        createdAt: existingSite.createdAt || Date.now(),
         updatedAt: Date.now()
       });
 
+      // 1. Optimistic instant local update
+      const idx = AppData.sites.findIndex(s => s.id === id);
+      if (idx >= 0) {
+        AppData.sites[idx] = { ...AppData.sites[idx], ...siteData };
+      } else {
+        AppData.sites.unshift(siteData);
+      }
+
+      renderSitesTable();
+      updateDashboardMetrics();
+      populateDropdowns();
+      if (typeof renderSitePerformanceChart === 'function') {
+        renderSitePerformanceChart();
+      }
+
+      closeModal('modalSite');
+      showToast(isEdit ? "تم تعديل بيانات الموقع بنجاح!" : "تمت إضافة الموقع بنجاح!", "success");
+
+      // 2. Persist to Firestore & Audit Log
       try {
         if (!db) initFirebaseCore();
-        await Promise.race([
-          db.collection('cleaning_sites').doc(id).set(siteData, { merge: true }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ السحابي")), 10000))
-        ]);
+        await db.collection('cleaning_sites').doc(id).set(siteData, { merge: true });
 
         await logAuditEvent(
           isEdit ? 'UPDATE' : 'CREATE',
@@ -4313,38 +4567,14 @@
           'cleaning_sites',
           id,
           siteData.name,
-          isEdit ? `تعديل بيانات موقع عمل (القيمة الشهرية: ${siteData.contractMonthlyValue} ر.س، الحالة: ${siteData.status})` : `إضافة موقع عمل جديد للعميل ${siteData.clientName} بقيمة ${siteData.contractMonthlyValue} ر.س شهرياً`,
+          isEdit ? `تعديل بيانات موقع عمل (القيمة الشهرية: ${siteData.contractMonthlyValue} ${siteData.currency}، الحالة: ${siteData.status})` : `إضافة موقع عمل جديد للعميل ${siteData.clientName} بقيمة ${siteData.contractMonthlyValue} ${siteData.currency} شهرياً`,
           siteData
         );
-
-        const idx = AppData.sites.findIndex(s => s.id === id);
-        if (idx >= 0) AppData.sites[idx] = siteData; else AppData.sites.unshift(siteData);
-        renderSitesTable();
-        updateDashboardMetrics();
-        populateDropdowns();
-
-        closeModal('modalSite');
-        showToast("تم حفظ الموقع بنجاح في السحابة!", "success");
-        syncAllFromFirestore();
       } catch (err) {
-        showToast("خطأ أثناء الحفظ: " + err.message, "error");
+        console.warn("Firestore site save notice:", err);
       } finally {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ في السحابة'; }
       }
-    }
-
-    function editSite(id) {
-      const site = AppData.sites.find(s => s.id === id);
-      if (!site) return;
-      document.getElementById('siteEditId').value = site.id;
-      document.getElementById('siteName').value = site.name || '';
-      document.getElementById('siteClientName').value = site.clientName || '';
-      document.getElementById('siteClientPhone').value = site.clientPhone || '';
-      document.getElementById('siteAddress').value = site.locationAddress || '';
-      document.getElementById('siteContractValue').value = site.contractMonthlyValue || 0;
-      document.getElementById('siteStatus').value = site.status || 'نشط';
-      document.getElementById('modalSiteTitle').innerText = '✏️ تعديل بيانات الموقع';
-      openModal('modalSite');
     }
 
     async function handleSaveWorker(e) {
@@ -4467,13 +4697,61 @@
       }
     }
 
+    function openAddInventoryModal() {
+      document.getElementById('inventoryEditId').value = '';
+      document.getElementById('invName').value = '';
+      document.getElementById('invCategory').value = 'منظفات ومطهرات';
+      document.getElementById('invUnit').value = 'عبوة';
+      document.getElementById('invCurrentStock').value = '10';
+      document.getElementById('invMinThreshold').value = '5';
+      document.getElementById('invCostPerUnit').value = '25.0';
+
+      const siteSelect = document.getElementById('inventorySiteId');
+      if (siteSelect) {
+        siteSelect.value = (!currentUserIsAdmin && currentSupervisorSiteId) ? currentSupervisorSiteId : '';
+      }
+
+      document.getElementById('modalInventoryTitle').innerText = '📦 إضافة صنف جديد للمخزون';
+      openModal('modalInventory');
+    }
+
+    function editInventory(id) {
+      const item = AppData.inventory.find(i => i.id === id);
+      if (!item) {
+        showToast("لم يتم العثور على الصنف في المخزون", "error");
+        return;
+      }
+      document.getElementById('inventoryEditId').value = item.id;
+      document.getElementById('invName').value = item.name || '';
+      document.getElementById('invCategory').value = item.category || 'منظفات ومطهرات';
+      document.getElementById('invUnit').value = item.unit || 'عبوة';
+      document.getElementById('invCurrentStock').value = item.currentStock || 0;
+      document.getElementById('invMinThreshold').value = item.minThreshold || 5;
+      document.getElementById('invCostPerUnit').value = item.costPerUnit || 0;
+
+      const siteSelect = document.getElementById('inventorySiteId');
+      if (siteSelect) {
+        siteSelect.value = item.siteId || '';
+      }
+
+      document.getElementById('modalInventoryTitle').innerText = '✏️ تعديل صنف المخزون: ' + (item.name || '');
+      openModal('modalInventory');
+    }
+
     async function handleSaveInventory(e) {
       if (e) e.preventDefault();
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
-      const isEdit = !!document.getElementById('inventoryEditId').value;
-      const id = document.getElementById('inventoryEditId').value || ('item_' + Date.now());
+      const editId = (document.getElementById('inventoryEditId')?.value || '').trim();
+      const isEdit = !!editId;
+      const id = isEdit ? editId : ('item_' + Date.now());
+      const existingItem = AppData.inventory.find(i => i.id === id) || {};
+
+      const selectedSiteId = (document.getElementById('inventorySiteId')?.value || '').trim();
+      const matchedSite = selectedSiteId ? AppData.sites.find(s => s.id === selectedSiteId) : null;
+      const selectedSiteName = matchedSite ? matchedSite.name : (selectedSiteId ? 'موقع مخصص' : null);
+
       const invData = sanitizeForFirestore({
         id: id,
         name: document.getElementById('invName').value.trim(),
@@ -4482,15 +4760,31 @@
         currentStock: Number(document.getElementById('invCurrentStock').value) || 0,
         minThreshold: Number(document.getElementById('invMinThreshold').value) || 5,
         costPerUnit: Number(document.getElementById('invCostPerUnit').value) || 0,
+        siteId: selectedSiteId || null,
+        siteName: selectedSiteName,
+        createdAt: existingItem.createdAt || Date.now(),
         updatedAt: Date.now()
       });
 
+      // 1. Optimistic Instant Update
+      const idx = AppData.inventory.findIndex(i => i.id === id);
+      if (idx >= 0) {
+        AppData.inventory[idx] = { ...AppData.inventory[idx], ...invData };
+      } else {
+        AppData.inventory.unshift(invData);
+      }
+
+      renderInventoryTable();
+      updateDashboardMetrics();
+      populateDropdowns();
+
+      closeModal('modalInventory');
+      showToast(isEdit ? `تم تعديل الصنف (${invData.name}) بنجاح!` : `تمت إضافة الصنف (${invData.name}) وربطه بالمستودع بنجاح!`, "success");
+
+      // 2. Persist to Firestore & Audit Log
       try {
         if (!db) initFirebaseCore();
-        await Promise.race([
-          db.collection('inventory_items').doc(id).set(invData, { merge: true }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
-        ]);
+        await db.collection('inventory_items').doc(id).set(invData, { merge: true });
 
         await logAuditEvent(
           isEdit ? 'UPDATE' : 'CREATE',
@@ -4498,37 +4792,16 @@
           'inventory_items',
           id,
           invData.name,
-          isEdit ? `تعديل صنف المخزون [${invData.name}] (الرصيد: ${invData.currentStock} ${invData.unit}، التكلفة: ${invData.costPerUnit} ر.س)` : `إضافة صنف جديد بالمستودع [${invData.name}] برصيد ${invData.currentStock} ${invData.unit}`,
+          isEdit 
+            ? `تعديل صنف المخزون [${invData.name}] (موقع: ${invData.siteName || 'مستودع عام'}، الرصيد: ${invData.currentStock} ${invData.unit}، التكلفة: ${invData.costPerUnit} ر.س)` 
+            : `إضافة صنف جديد بالمستودع [${invData.name}] مربوط بموقع [${invData.siteName || 'مستودع عام'}] برصيد ${invData.currentStock} ${invData.unit}`,
           invData
         );
-
-        const idx = AppData.inventory.findIndex(i => i.id === id);
-        if (idx >= 0) AppData.inventory[idx] = invData; else AppData.inventory.unshift(invData);
-        renderInventoryTable();
-        updateDashboardMetrics();
-
-        closeModal('modalInventory');
-        showToast("تم حفظ صنف المخزون في السحابة!", "success");
-        syncAllFromFirestore();
       } catch (err) {
-        showToast("خطأ أثناء الحفظ: " + err.message, "error");
+        console.warn("Firestore inventory save notice:", err);
       } finally {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'حفظ في المخزن السحابي'; }
       }
-    }
-
-    function editInventory(id) {
-      const item = AppData.inventory.find(i => i.id === id);
-      if (!item) return;
-      document.getElementById('inventoryEditId').value = item.id;
-      document.getElementById('invName').value = item.name || '';
-      document.getElementById('invCategory').value = item.category || 'منظفات ومطهرات';
-      document.getElementById('invUnit').value = item.unit || 'عبوة';
-      document.getElementById('invCurrentStock').value = item.currentStock || 0;
-      document.getElementById('invMinThreshold').value = item.minThreshold || 5;
-      document.getElementById('invCostPerUnit').value = item.costPerUnit || 0;
-      document.getElementById('modalInventoryTitle').innerText = '✏️ تعديل صنف المخزون';
-      openModal('modalInventory');
     }
 
     async function handleSaveExpense(e) {
@@ -4670,6 +4943,10 @@
        5.2 RECYCLE BIN (SAFE DELETE & INSTANT RESTORATION)
        ───────────────────────────────────────────────────────────────── */
     async function deleteRecord(collectionName, id) {
+      if (!currentUserIsAdmin) {
+        showToast("عفواً، لا يملك المشرف صلاحية حذف السجلات. هذه الصلاحية للمدير العام فقط.", "error");
+        return;
+      }
       let record = null;
       let collectionLabel = 'سجل';
       let recordTitle = id;
@@ -5311,6 +5588,22 @@
           const values = extractSqlValues(rawValues);
 
           if (table === 'cleaning_sites' && values.length >= 7) {
+            let currency = 'SAR';
+            let status = 'نشط';
+            let createdAt = Date.now();
+            let updatedAt = Date.now();
+
+            if (values.length >= 10) {
+              currency = values[6] || 'SAR';
+              status = values[7] || 'نشط';
+              createdAt = Number(values[8]) || Date.now();
+              updatedAt = Number(values[9]) || Date.now();
+            } else if (values.length >= 8) {
+              status = values[6] || 'نشط';
+              createdAt = Number(values[7]) || Date.now();
+              updatedAt = Number(values[8]) || Date.now();
+            }
+
             parsed.cleaning_sites.push({
               id: values[0],
               name: values[1],
@@ -5318,9 +5611,10 @@
               clientPhone: values[3],
               locationAddress: values[4],
               contractMonthlyValue: Number(values[5]) || 0,
-              status: values[6] || 'نشط',
-              createdAt: Number(values[7]) || Date.now(),
-              updatedAt: Number(values[8]) || Date.now()
+              currency: currency,
+              status: status,
+              createdAt: createdAt,
+              updatedAt: updatedAt
             });
           } else if (table === 'workers' && values.length >= 8) {
             parsed.workers.push({
@@ -5352,6 +5646,30 @@
               updatedAt: Number(values[12]) || Date.now()
             });
           } else if (table === 'inventory_items' && values.length >= 6) {
+            let siteId = null;
+            let siteName = null;
+            let createdAt = Date.now();
+            let updatedAt = Date.now();
+
+            if (values.length >= 11) {
+              siteId = (values[7] && values[7] !== 'NULL') ? values[7] : null;
+              siteName = (values[8] && values[8] !== 'NULL') ? values[8] : null;
+              createdAt = Number(values[9]) || Date.now();
+              updatedAt = Number(values[10]) || Date.now();
+            } else if (values.length === 10) {
+              siteId = (values[7] && values[7] !== 'NULL') ? values[7] : null;
+              createdAt = Number(values[8]) || Date.now();
+              updatedAt = Number(values[9]) || Date.now();
+            } else if (values.length >= 8) {
+              if (!isNaN(Number(values[7])) && Number(values[7]) > 1000000000) {
+                createdAt = Number(values[7]);
+                updatedAt = Number(values[8]) || createdAt;
+              } else {
+                siteId = (values[7] && values[7] !== 'NULL') ? values[7] : null;
+                createdAt = Number(values[8]) || Date.now();
+              }
+            }
+
             parsed.inventory_items.push({
               id: values[0],
               name: values[1],
@@ -5360,8 +5678,10 @@
               currentStock: Number(values[4]) || 0,
               minThreshold: Number(values[5]) || 5,
               costPerUnit: Number(values[6]) || 0,
-              createdAt: Number(values[7]) || Date.now(),
-              updatedAt: Number(values[8]) || Date.now()
+              siteId: siteId,
+              siteName: siteName,
+              createdAt: createdAt,
+              updatedAt: updatedAt
             });
           } else if (table === 'expenses' && values.length >= 6) {
             parsed.expenses.push({
@@ -5699,9 +6019,9 @@
       sql += `PRAGMA foreign_keys = OFF;\nBEGIN TRANSACTION;\n\n`;
 
       // 1. Sites
-      sql += `-- جدول المواقع (cleaning_sites) - إجمالي: ${AppData.sites.length}\n`;
+      sql += `-- جدول مواقع العمل وعقود النظافة (cleaning_sites) - إجمالي: ${AppData.sites.length}\n`;
       AppData.sites.forEach(s => {
-        sql += `INSERT OR REPLACE INTO cleaning_sites VALUES (${escapeSql(s.id)}, ${escapeSql(s.name)}, ${escapeSql(s.clientName)}, ${escapeSql(s.clientPhone)}, ${escapeSql(s.locationAddress)}, ${Number(s.contractMonthlyValue)||0}, ${escapeSql(s.status)}, ${s.createdAt||Date.now()}, ${s.updatedAt||Date.now()});\n`;
+        sql += `INSERT OR REPLACE INTO cleaning_sites VALUES (${escapeSql(s.id)}, ${escapeSql(s.name)}, ${escapeSql(s.clientName)}, ${escapeSql(s.clientPhone)}, ${escapeSql(s.locationAddress)}, ${Number(s.contractMonthlyValue)||0}, ${escapeSql(s.currency||'SAR')}, ${escapeSql(s.status||'نشط')}, ${s.createdAt||Date.now()}, ${s.updatedAt||Date.now()});\n`;
       });
       sql += `\n`;
 
@@ -5720,9 +6040,9 @@
       sql += `\n`;
 
       // 4. Inventory
-      sql += `-- جدول أدوات ومواد النظافة (inventory_items) - إجمالي: ${AppData.inventory.length}\n`;
+      sql += `-- جدول أدوات ومواد النظافة المخصصة للمواقع (inventory_items) - إجمالي: ${AppData.inventory.length}\n`;
       AppData.inventory.forEach(i => {
-        sql += `INSERT OR REPLACE INTO inventory_items VALUES (${escapeSql(i.id)}, ${escapeSql(i.name)}, ${escapeSql(i.category)}, ${escapeSql(i.unit)}, ${Number(i.currentStock)||0}, ${Number(i.minThreshold)||5}, ${Number(i.costPerUnit)||0}, ${i.createdAt||Date.now()}, ${i.updatedAt||Date.now()});\n`;
+        sql += `INSERT OR REPLACE INTO inventory_items VALUES (${escapeSql(i.id)}, ${escapeSql(i.name)}, ${escapeSql(i.category)}, ${escapeSql(i.unit)}, ${Number(i.currentStock)||0}, ${Number(i.minThreshold)||5}, ${Number(i.costPerUnit)||0}, ${escapeSql(i.siteId)}, ${escapeSql(i.siteName)}, ${i.createdAt||Date.now()}, ${i.updatedAt||Date.now()});\n`;
       });
       sql += `\n`;
 
@@ -5779,7 +6099,8 @@
           'الهاتف': s.clientPhone,
           'العنوان': s.locationAddress,
           'قيمة العقد الشهري': s.contractMonthlyValue,
-          'الحالة': s.status
+          'العملة': s.currency || 'SAR',
+          'الحالة': s.status || 'نشط'
         }));
       } else if (type === 'workers') {
         data = AppData.workers.map(w => ({
@@ -5803,15 +6124,21 @@
           'ملاحظات': a.notes
         }));
       } else if (type === 'inventory') {
-        data = AppData.inventory.map(i => ({
-          'كود الصنف': i.id,
-          'اسم المادة': i.name,
-          'التصنيف': i.category,
-          'الوحدة': i.unit,
-          'الرصيد الحالي': i.currentStock,
-          'الحد الأدنى': i.minThreshold,
-          'تكلفة الوحدة': i.costPerUnit
-        }));
+        data = AppData.inventory.map(i => {
+          const site = i.siteId ? AppData.sites.find(s => s.id === i.siteId) : null;
+          const siteName = site ? site.name : (i.siteName || (i.siteId ? 'موقع مخصص' : 'مستودع عام'));
+          return {
+            'كود الصنف': i.id,
+            'اسم المادة': i.name,
+            'موقع العمل المخصص': siteName,
+            'التصنيف': i.category,
+            'الوحدة': i.unit,
+            'الرصيد الحالي': i.currentStock,
+            'الحد الأدنى': i.minThreshold,
+            'تكلفة الوحدة': i.costPerUnit,
+            'إجمالي القيمة': (Number(i.currentStock)||0) * (Number(i.costPerUnit)||0)
+          };
+        });
       } else if (type === 'invoices') {
         data = AppData.invoices.map(i => ({
           'رقم الفاتورة': i.invoiceNumber,
@@ -6359,6 +6686,13 @@
     }
 
     function renderSitePerformanceChart() {
+      const perfCard = document.getElementById('sitePerformanceCard');
+      if (!currentUserIsAdmin) {
+        if (perfCard) perfCard.style.display = 'none';
+        return;
+      }
+      if (perfCard) perfCard.style.display = 'block';
+
       const container = document.getElementById('sitePerformanceChartContainer');
       if (!container) return;
 
