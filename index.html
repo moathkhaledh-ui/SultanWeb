@@ -1152,7 +1152,7 @@
         background: #FFFFFF !important;
         color: #000000 !important;
       }
-      header, nav.app-tabs, .toolbar-actions, .card-header .btn, .btn, .modal-backdrop, #authOverlay {
+      header, nav.app-tabs, .toolbar-actions, .card-header, .btn, .modal-backdrop, #authOverlay, .report-controls {
         display: none !important;
       }
       main {
@@ -2053,12 +2053,12 @@
           </div>
         </div>
 
-        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.6;">
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.6;" class="report-controls">
           يقوم هذا النظام بتجميع بيانات الحضور والانصراف، المهام المنفذة، واستهلاك المواد الكيميائية والمستلزمات في موقع وتاريخ محدد لإنتاج تقرير تشغيلي متكامل جاهز للطباعة والاعتماد:
         </p>
 
         <!-- Selector Controls -->
-        <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; background: rgba(16, 34, 43, 0.5); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; background: rgba(16, 34, 43, 0.5); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;" class="report-controls">
           <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
             <label class="form-label">اختر موقع العمل *</label>
             <select id="dailyReportSiteSelect" class="form-control" onchange="generateDailyOperationsReport()"></select>
@@ -6388,72 +6388,108 @@
       let filename = `CleanOps_${type}.xlsx`;
 
       if (type === 'sites') {
-        data = AppData.sites.map(s => ({
-          'كود الموقع': s.id,
+        data = AppData.sites.map((s, idx) => ({
+          'م': idx + 1,
           'اسم الموقع': s.name,
           'العميل': s.clientName,
           'الهاتف': s.clientPhone,
           'العنوان': s.locationAddress,
           'قيمة العقد الشهري': s.contractMonthlyValue,
           'العملة': s.currency || 'SAR',
-          'الحالة': s.status || 'نشط'
+          'حالة الموقع': s.status || 'نشط'
         }));
       } else if (type === 'workers') {
-        data = AppData.workers.map(w => ({
-          'كود العامل': w.id,
-          'الاسم': w.name,
-          'المسمى الوظيفي': w.role,
-          'رقم الهوية / الإقامة': w.nationalId,
-          'الجوال': w.phone,
-          'الأجر اليومي': w.dailyWage,
-          'الحالة': w.status
-        }));
-      } else if (type === 'attendance') {
-        data = AppData.attendance.map(a => ({
-          'التاريخ': a.date,
-          'كود العامل': a.workerId,
-          'كود الموقع': a.siteId,
-          'وقت الحضور': a.checkInTime,
-          'وقت الانصراف': a.checkOutTime,
-          'ساعات العمل': a.hoursWorked,
-          'الحالة': a.status,
-          'ملاحظات': a.notes
-        }));
-      } else if (type === 'inventory') {
-        data = AppData.inventory.map(i => {
-          const site = i.siteId ? AppData.sites.find(s => s.id === i.siteId) : null;
-          const siteName = site ? site.name : (i.siteName || (i.siteId ? 'موقع مخصص' : 'مستودع عام'));
+        data = AppData.workers.map((w, idx) => {
+          const site = AppData.sites.find(s => s.id === w.assignedSiteId);
           return {
-            'كود الصنف': i.id,
-            'اسم المادة': i.name,
-            'موقع العمل المخصص': siteName,
-            'التصنيف': i.category,
-            'الوحدة': i.unit,
-            'الرصيد الحالي': i.currentStock,
-            'الحد الأدنى': i.minThreshold,
-            'تكلفة الوحدة': i.costPerUnit,
-            'إجمالي القيمة': (Number(i.currentStock)||0) * (Number(i.costPerUnit)||0)
+            'م': idx + 1,
+            'اسم العامل': w.name,
+            'المسمى الوظيفي': w.role || 'عامل',
+            'رقم الهوية / الإقامة': w.nationalId || '-',
+            'رقم الهاتف': w.phone || '-',
+            'الأجر اليومي (ر.س)': w.dailyWage || 0,
+            'موقع العمل المسند': site ? site.name : 'غير محدد',
+            'الحالة': w.status || 'على رأس العمل'
           };
         });
-      } else if (type === 'invoices') {
-        data = AppData.invoices.map(i => ({
-          'رقم الفاتورة': i.invoiceNumber,
-          'العميل': i.clientName,
-          'تاريخ الإصدار': i.issueDate,
-          'تاريخ الاستحقاق': i.dueDate,
-          'المبلغ الإجمالي': i.totalAmount,
-          'المدفوع': i.paidAmount,
-          'الحالة': i.status
-        }));
-      } else if (type === 'expenses') {
-        data = AppData.expenses.map(e => ({
-          'التاريخ': e.date,
-          'البند': e.category,
-          'المبلغ': e.amount,
-          'البيان': e.description,
-          'طريقة الدفع': e.paymentMethod,
-          'رقم الفاتورة': e.invoiceNumber
-        }));
+      } else if (type === 'attendance') {
+        data = AppData.attendance.map((a, idx) => {
+          const w = AppData.workers.find(worker => worker.id === a.workerId);
+          const s = AppData.sites.find(site => site.id === a.siteId);
+          const shiftLabel = a.shiftType === 'EVENING_12H' ? 'مسائي 12س' : (a.shiftType === 'COMBINED_24H' ? 'وردية مدمجة 24س' : 'صباحي 12س');
+          return {
+            'م': idx + 1,
+            'التاريخ': a.date,
+            'اسم الموظف/العامل': w ? w.name : 'غير محدد',
+            'المسمى الوظيفي': w ? w.role : 'عامل',
+            'موقع العمل': s ? s.name : 'غير محدد',
+            'نوع الوردية': shiftLabel,
+            'وقت الحضور': a.checkInTime || '-',
+            'وقت الانصراف': a.checkOutTime || '-',
+            'حالة الحضور': a.status === 'إجازة' ? 'خاص' : (a.status || 'حاضر'),
+            'ساعات الوردية': a.hoursWorked || 12,
+            'ساعات إضافية': a.overtimeHours || 0,
+            'اعتماد الإضافي (الإدارة)': a.isOvertimeApproved ? 'معتمد من الإدارة' : 'قيد مراجعة الإدارة',
+            'اعتماد الحضور (المشرف)': a.isSupervisorApproved ? 'معتمد من المشرف' : 'قيد التدقيق',
+            'ملاحظات': a.notes || ''
+          };
+        });
+      } else if (type === 'inventory') {
+        data = AppData.inventory.map((i, idx) => {
+          const site = i.siteId ? AppData.sites.find(s => s.id === i.siteId) : null;
+          const siteName = site ? site.name : (i.siteName || (i.siteId ? 'موقع مخصص' : 'المخزن الرئيسي العام'));
+          const totalValue = (Number(i.currentStock) || 0) * (Number(i.costPerUnit) || 0);
+          return {
+            'م': idx + 1,
+            'اسم الصنف/المادة': i.name,
+            'الموقع المخصص': siteName,
+            'التصنيف': i.category || 'مواد نظافة',
+            'الوحدة': i.unit || 'حبة',
+            'الرصيد الحالي': i.currentStock || 0,
+            'حد إعادة الطلب': i.minThreshold || 5,
+            'تكلفة الوحدة (ر.س)': i.costPerUnit || 0,
+            'إجمالي القيمة التقديرية (ر.س)': totalValue,
+            'حالة المخزون': (i.currentStock || 0) <= (i.minThreshold || 5) ? 'رصيد منخفض (تحذير)' : 'متوفر كافي'
+          };
+        });
+      } else if (type === 'invoices' || type === 'expenses') {
+        let rowNum = 1;
+        const invRows = AppData.invoices.map(inv => {
+          const s = AppData.sites.find(site => site.id === inv.siteId);
+          return {
+            'م': rowNum++,
+            'نوع المعاملة': 'فاتورة عميل (إيراد)',
+            'رقم الفاتورة/السند': inv.invoiceNumber || '-',
+            'التاريخ': inv.issueDate || '-',
+            'موقع العمل': s ? s.name : 'الموقع الرئيسي',
+            'الطرف (العميل/بند المصروف)': inv.clientName || 'عميل',
+            'المبلغ الإجمالي': inv.totalAmount || 0,
+            'المسدد': inv.paidAmount || 0,
+            'المتبقي': inv.remainingAmount || 0,
+            'العملة': inv.currency || 'SAR',
+            'طريقة الدفع/الحالة': inv.status || 'معلق',
+            'البيان والملاحظات': inv.notes || ''
+          };
+        });
+        const expRows = AppData.expenses.map(exp => {
+          const s = AppData.sites.find(site => site.id === exp.siteId);
+          return {
+            'م': rowNum++,
+            'نوع المعاملة': 'مصروف تشغيلي',
+            'رقم الفاتورة/السند': exp.invoiceNumber || '-',
+            'التاريخ': exp.date || '-',
+            'موقع العمل': s ? s.name : 'مصروف تشغيلي عام',
+            'الطرف (العميل/بند المصروف)': exp.category || 'مصروفات',
+            'المبلغ الإجمالي': exp.amount || 0,
+            'المسدد': exp.amount || 0,
+            'المتبقي': 0,
+            'العملة': exp.currency || 'SAR',
+            'طريقة الدفع/الحالة': exp.paymentMethod || 'نقدي',
+            'البيان والملاحظات': exp.description || ''
+          };
+        });
+        data = [...invRows, ...expRows];
+        filename = 'CleanOps_Finances_And_Profitability.xlsx';
       }
 
       if (!data.length) {
@@ -7244,27 +7280,34 @@
         showToast("لا توجد بيانات مسير رواتب للتصدير!", "warning");
         return;
       }
-      const data = AppData.workers.map(w => {
+      const data = AppData.workers.map((w, idx) => {
         const site = AppData.sites.find(s => s.id === w.assignedSiteId);
         const saved = AppData.payroll.find(p => p.workerId === w.id && p.month === currentPayrollMonth);
-        const days = saved ? saved.daysWorked : 30;
-        const wage = saved ? saved.dailyWage : (w.dailyWage || 100);
-        const otBonus = saved ? saved.overtimeBonus : 0;
-        const deductions = saved ? saved.deductions : 0;
-        const net = saved ? saved.netSalary : (days * wage + otBonus - deductions);
+        const baseSalary = saved ? (saved.daysWorked * saved.dailyWage) : ((w.dailyWage || 100) * 30.0);
+        const otHours = saved ? (saved.overtimeHours || 0) : 0.0;
+        const hourlyRate = baseSalary > 0 ? (baseSalary / (30.0 * 12.0)) * 1.5 : 15.0;
+        const otPay = otHours * hourlyRate;
+        const bonuses = saved ? (saved.overtimeBonus || 0) : 0.0;
+        const deductions = saved ? (saved.deductions || 0) : 0.0;
+        const advances = 0.0;
+        const net = saved ? saved.netSalary : (baseSalary + otPay + bonuses - deductions - advances);
         return {
-          "كود العامل": w.id,
-          "اسم العامل": w.name,
-          "المسمى": w.role || "عامل",
-          "الموقع": site ? site.name : "غير محدد",
-          "شهر المسير": currentPayrollMonth,
-          "أيام العمل": days,
-          "الأجر اليومي": wage,
-          "الأساسي": days * wage,
-          "مكافأة الإضافي": otBonus,
-          "الخصومات والسلف": deductions,
-          "صافي الراتب": net,
-          "الحالة": saved ? saved.status : "معتمد ومسير"
+          "م": idx + 1,
+          "اسم الموظف": w.name,
+          "موقع العمل": site ? site.name : "الموقع الرئيسي",
+          "المسمى الوظيفي": w.role || "عامل",
+          "رقم الهاتف": w.phone || "-",
+          "الراتب الأساسي": Number(baseSalary.toFixed(2)),
+          "ساعات الإضافي": Number(otHours.toFixed(1)),
+          "أجر الساعة": Number(hourlyRate.toFixed(2)),
+          "قيمة الإضافي": Number(otPay.toFixed(2)),
+          "المكافآت": Number(bonuses.toFixed(2)),
+          "الخصومات": Number(deductions.toFixed(2)),
+          "السلف المستردة": Number(advances.toFixed(2)),
+          "صافي الراتب المستحق": Number(net.toFixed(2)),
+          "العملة": w.currency || "SAR",
+          "حالة المسير": saved ? saved.status : "معتمد ومسير",
+          "ملاحظات": saved ? (saved.notes || "") : ""
         };
       });
 
@@ -7386,15 +7429,21 @@
         showToast("لا توجد سلف نقدية للتصدير!", "warning");
         return;
       }
-      const data = AppData.advances.map(a => ({
-        "كود السلفة": a.id,
-        "اسم العامل": a.workerName || "-",
-        "المبلغ (ر.س)": a.amount,
-        "تاريخ المنح": a.date,
-        "شهر الاستقطاع": a.deductionMonth,
-        "السبب": a.reason || "-",
-        "الحالة": a.status
-      }));
+      const data = AppData.advances.map((a, idx) => {
+        const worker = AppData.workers.find(w => w.id === a.workerId);
+        return {
+          "م": idx + 1,
+          "اسم العامل": a.workerName || (worker ? worker.name : "-"),
+          "رقم الهاتف": worker ? (worker.phone || "-") : "-",
+          "المبلغ": a.amount || 0,
+          "العملة": a.currency || "SAR",
+          "تاريخ المنح": a.date || "-",
+          "شهر الخصم المجدول": a.deductionMonth || currentPayrollMonth,
+          "حالة السداد": a.status || "غير مسددة",
+          "المعتمد": a.approvedBy || "الإدارة",
+          "ملاحظات": a.reason || a.notes || ""
+        };
+      });
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "سلف_العمالة");
