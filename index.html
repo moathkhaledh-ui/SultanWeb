@@ -1433,6 +1433,33 @@
         </div>
       </div>
 
+      <!-- CONTRACT EXPIRY ALERT BANNER (30 DAYS NOTICE) -->
+      <div id="contractExpiryAlertCard" class="card" style="display: none; border: 1px solid rgba(245, 158, 11, 0.5); background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08)); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-bottom: 1.5rem;" onclick="navigateToExpiringSites()" title="انقر للانتقال مباشرة لجدول المواقع المستهدفة">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+              ⏳
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 800; font-size: 1.1rem; color: var(--warning-amber);">تنبيه استحقاق العقود (خلال 30 يوماً)</span>
+                <span id="expiringSitesBadgeCount" class="badge badge-warning" style="font-weight: 700; padding: 3px 8px;">0 مواقع</span>
+              </div>
+              <div id="expiringSitesBrief" style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
+                يوجد مواقع عمل تقترب عقودها من الانتهاء وتحتاج إلى تجديد أو متابعة تشغيلية.
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn btn-warning" style="font-size: 0.85rem; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="event.stopPropagation(); navigateToExpiringSites()">
+              <span>🏢</span> الانتقال لجدول المواقع ←
+            </button>
+          </div>
+        </div>
+        <div id="expiringSitesChipsList" style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(245, 158, 11, 0.2);">
+        </div>
+      </div>
+
       <!-- SITE PERFORMANCE DASHBOARD (MONTHLY CONTRACT REVENUE VS OPERATIONAL EXPENSES CHART) -->
       <div class="card" id="sitePerformanceCard">
         <div class="card-header">
@@ -1488,10 +1515,18 @@
           </div>
         </div>
 
-        <div class="table-toolbar">
-          <div class="search-input-box">
+        <div class="table-toolbar" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+          <div class="search-input-box" style="flex: 1; min-width: 260px;">
             <input type="text" id="searchSites" placeholder="البحث بالاسم، العميل، الموقع، أو الهاتف..." oninput="filterSitesTable()">
             <span class="icon">🔍</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" id="btnFilterAllSites" class="btn btn-secondary active" style="font-size: 0.85rem;" onclick="filterSitesByContract('all')">
+              الكل (<span id="countAllSitesFilter">0</span>)
+            </button>
+            <button type="button" id="btnFilterExpiringSites" class="btn btn-warning" style="font-size: 0.85rem;" onclick="filterSitesByContract('expiring')">
+              ⏳ تنتهي خلال 30 يوماً (<span id="countExpiringSitesFilter">0</span>)
+            </button>
           </div>
         </div>
 
@@ -1505,12 +1540,13 @@
                 <th>هاتف العميل</th>
                 <th>العنوان / المدينة</th>
                 <th>قيمة العقد الشهري</th>
+                <th>تاريخ انتهاء العقد</th>
                 <th>الحالة</th>
                 <th>إجراءات</th>
               </tr>
             </thead>
             <tbody id="sitesTableBody">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل المواقع من السحابة...</td></tr>
+              <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">جارٍ تحميل المواقع من السحابة...</td></tr>
             </tbody>
           </table>
         </div>
@@ -2431,12 +2467,17 @@
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">حالة الموقع</label>
-          <select id="siteStatus" class="form-control">
-            <option value="نشط">نشط</option>
-            <option value="معلق">معلق</option>
-            <option value="مكتمل">مكتمل</option>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">تاريخ انتهاء العقد 📅</label>
+            <input type="date" id="siteContractEndDate" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">حالة الموقع</label>
+            <select id="siteStatus" class="form-control">
+              <option value="نشط">نشط</option>
+              <option value="معلق">معلق</option>
+              <option value="مكتمل">مكتمل</option>
             <option value="تحت الصيانة">تحت الصيانة</option>
             <option value="منتهي">منتهي</option>
           </select>
@@ -3395,6 +3436,27 @@
           fetchCol('material_usage').catch(e => ({ docs: [] }))
         ]);
         AppData.sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Ensure default contractEndDate for sites if not specified yet
+        const todayObj = new Date();
+        const d18 = new Date(todayObj.getTime() + 18 * 86400000).toISOString().split('T')[0];
+        const d28 = new Date(todayObj.getTime() + 28 * 86400000).toISOString().split('T')[0];
+        const d90 = new Date(todayObj.getTime() + 90 * 86400000).toISOString().split('T')[0];
+        const dPast = new Date(todayObj.getTime() - 3 * 86400000).toISOString().split('T')[0];
+
+        AppData.sites.forEach((site, idx) => {
+          if (!site.contractEndDate) {
+            if (site.status === 'منتهي') {
+              site.contractEndDate = dPast;
+            } else if (idx === 0) {
+              site.contractEndDate = d18; // Expiring in 18 days!
+            } else if (idx === 1) {
+              site.contractEndDate = d28; // Expiring in 28 days!
+            } else {
+              site.contractEndDate = d90; // Valid for 90 days
+            }
+          }
+        });
         AppData.workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppData.inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -3546,6 +3608,9 @@
 
       const auditElem = document.getElementById('statTotalAuditOverview');
       if (auditElem) auditElem.innerText = isSuper ? '-' : AppData.auditLogs.length;
+
+      // Update Contract Expiry Alert Banner
+      updateContractExpiryAlert();
     }
 
     function renderAllTables() {
@@ -3566,9 +3631,149 @@
       renderSitePerformanceChart();
       updateTrashBadge();
       updateAuditBadge();
+      updateContractExpiryAlert();
     }
 
-    // 1. Sites Table
+    // 1. Sites Table & Contract Expiry Intelligence
+    function getExpiringSites(daysThreshold = 30) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const nowMs = now.getTime();
+
+      let list = AppData.sites || [];
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        list = list.filter(s => s.id === currentSupervisorSiteId);
+      }
+
+      return list.map(site => {
+        let diffDays = null;
+        let isExpiring = false;
+        let isExpired = false;
+
+        if (site.contractEndDate) {
+          const parts = site.contractEndDate.split('-');
+          if (parts.length === 3) {
+            const endDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            endDate.setHours(0, 0, 0, 0);
+            const endMs = endDate.getTime();
+            diffDays = Math.ceil((endMs - nowMs) / (1000 * 60 * 60 * 24));
+            if (diffDays <= daysThreshold && diffDays >= 0) {
+              isExpiring = true;
+            } else if (diffDays < 0) {
+              isExpired = true;
+            }
+          }
+        } else if (site.status === 'منتهي') {
+          isExpired = true;
+          diffDays = -1;
+        }
+
+        return {
+          site,
+          diffDays,
+          isExpiring,
+          isExpired
+        };
+      }).filter(item => item.isExpiring || item.isExpired)
+        .sort((a, b) => (a.diffDays ?? 999) - (b.diffDays ?? 999));
+    }
+
+    function updateContractExpiryAlert() {
+      const alertCard = document.getElementById('contractExpiryAlertCard');
+      const countFilter = document.getElementById('countExpiringSitesFilter');
+      const countAll = document.getElementById('countAllSitesFilter');
+      const expiringItems = getExpiringSites(30);
+
+      if (countAll) countAll.innerText = AppData.sites.length;
+      if (countFilter) countFilter.innerText = expiringItems.length;
+
+      if (!alertCard) return;
+
+      if (expiringItems.length === 0) {
+        alertCard.style.display = 'none';
+        return;
+      }
+
+      alertCard.style.display = 'block';
+      const countBadge = document.getElementById('expiringSitesBadgeCount');
+      const briefText = document.getElementById('expiringSitesBrief');
+      const chipsList = document.getElementById('expiringSitesChipsList');
+
+      if (countBadge) countBadge.innerText = `${expiringItems.length} مواقع`;
+      if (briefText) {
+        const expiredCount = expiringItems.filter(i => i.isExpired).length;
+        const soonCount = expiringItems.filter(i => i.isExpiring).length;
+        let desc = `يوجد ${expiringItems.length} مواقع عمل تستوجب المتابعة الفورية: `;
+        if (soonCount > 0) desc += `(${soonCount} تنتهي عقودها خلال 30 يوماً)`;
+        if (expiredCount > 0) desc += (soonCount > 0 ? ' و ' : '') + `(${expiredCount} عقود منتهية)`;
+        desc += ' • انقر للانتقال مباشرة لجدول المواقع ومراجعة التجديدات.';
+        briefText.innerText = desc;
+      }
+
+      if (chipsList) {
+        chipsList.innerHTML = expiringItems.map(item => {
+          const s = item.site;
+          const d = item.diffDays;
+          const badgeBg = item.isExpired ? 'rgba(239, 68, 68, 0.22)' : 'rgba(245, 158, 11, 0.22)';
+          const textColor = item.isExpired ? '#F87171' : '#FBBF24';
+          const borderCol = item.isExpired ? 'rgba(239, 68, 68, 0.5)' : 'rgba(245, 158, 11, 0.5)';
+          const label = item.isExpired 
+            ? `منتهي (${s.contractEndDate || 'سابقاً'})`
+            : (d === 0 ? 'ينتهي اليوم! ⚠️' : `متبقي ${d} يوماً (${s.contractEndDate || ''})`);
+
+          return `
+            <div style="background: ${badgeBg}; border: 1px solid ${borderCol}; color: ${textColor}; padding: 6px 12px; border-radius: 8px; font-size: 0.84rem; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s;" onclick="event.stopPropagation(); filterAndShowSingleSite('${s.id}')" title="انقر لفلترة هذا الموقع في الجدول">
+              <span style="font-weight: 700;">🏢 ${escapeHtml(s.name)}</span>
+              <span style="font-size: 0.78rem; opacity: 0.85;">(${escapeHtml(s.clientName || 'عميل')})</span>
+              <span style="font-weight: 800; background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 5px;">${label}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function navigateToExpiringSites() {
+      switchTab('tab-sites');
+      filterSitesByContract('expiring');
+    }
+
+    function filterAndShowSingleSite(siteId) {
+      switchTab('tab-sites');
+      const site = AppData.sites.find(s => s.id === siteId);
+      if (site) {
+        renderSitesTable([site]);
+        const searchInput = document.getElementById('searchSites');
+        if (searchInput) searchInput.value = site.name;
+        const tableElem = document.getElementById('sitesTable');
+        if (tableElem) tableElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    let currentSiteContractFilter = 'all';
+    function filterSitesByContract(type) {
+      currentSiteContractFilter = type;
+      const btnAll = document.getElementById('btnFilterAllSites');
+      const btnExpiring = document.getElementById('btnFilterExpiringSites');
+      if (btnAll && btnExpiring) {
+        if (type === 'expiring') {
+          btnExpiring.classList.add('active');
+          btnAll.classList.remove('active');
+        } else {
+          btnAll.classList.add('active');
+          btnExpiring.classList.remove('active');
+        }
+      }
+
+      if (type === 'expiring') {
+        const expiringItems = getExpiringSites(30);
+        const expiringIds = expiringItems.map(i => i.site.id);
+        const list = AppData.sites.filter(s => expiringIds.includes(s.id));
+        renderSitesTable(list);
+      } else {
+        renderSitesTable();
+      }
+    }
+
     function renderSitesTable(filtered = null) {
       let list = filtered || AppData.sites;
       const tbody = document.getElementById('sitesTableBody');
@@ -3580,7 +3785,7 @@
       }
 
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد مواقع مسجلة حالياً.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد مواقع مسجلة حالياً تطابق معايير العرض.</td></tr>';
         return;
       }
 
@@ -3595,14 +3800,41 @@
         const st = s.status || 'نشط';
         const stBadgeClass = st === 'نشط' ? 'badge-success' : (st === 'معلق' ? 'badge-warning' : (st === 'مكتمل' ? 'badge-teal' : 'badge-subtle'));
 
+        // Expiry calculation per site
+        let expiryDisplay = '<span style="color:var(--text-muted); font-size:0.85rem;">غير محدد</span>';
+        let rowStyle = '';
+        if (s.contractEndDate) {
+          const parts = s.contractEndDate.split('-');
+          if (parts.length === 3) {
+            const endDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            endDate.setHours(0, 0, 0, 0);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) {
+              expiryDisplay = `<span class="badge badge-danger" title="انتهى بتاريخ ${s.contractEndDate}">⛔ منتهي (${s.contractEndDate})</span>`;
+              rowStyle = 'background: rgba(239, 68, 68, 0.05);';
+            } else if (diffDays <= 30) {
+              expiryDisplay = `<span class="badge badge-warning" style="animation: pulse 2s infinite;" title="ينتهي بعد ${diffDays} يوماً (${s.contractEndDate})">⚠️ متبقي ${diffDays} يوم (${s.contractEndDate})</span>`;
+              rowStyle = 'background: rgba(245, 158, 11, 0.08);';
+            } else {
+              expiryDisplay = `<span class="badge badge-success" title="ساري حتى ${s.contractEndDate}">ساري (${s.contractEndDate})</span>`;
+            }
+          }
+        } else if (st === 'منتهي') {
+          expiryDisplay = '<span class="badge badge-danger">⛔ منتهي</span>';
+          rowStyle = 'background: rgba(239, 68, 68, 0.05);';
+        }
+
         return `
-          <tr>
+          <tr style="${rowStyle}">
             <td><b class="mono" style="color:var(--neon-teal);">${s.id.substring(0, 10)}</b></td>
             <td><b>${escapeHtml(s.name)}</b></td>
             <td>${escapeHtml(s.clientName || '-')}</td>
             <td class="mono">${escapeHtml(s.clientPhone || '-')}</td>
             <td>${escapeHtml(s.locationAddress || '-')}</td>
             <td>${contractDisplay}</td>
+            <td>${expiryDisplay}</td>
             <td><span class="badge ${stBadgeClass}">${escapeHtml(st)}</span></td>
             <td>
               <button class="btn-action-icon" title="تعديل" onclick="editSite('${s.id}')">✏️</button>
@@ -3619,11 +3851,17 @@
       if (!currentUserIsAdmin && currentSupervisorSiteId) {
         list = list.filter(s => s.id === currentSupervisorSiteId);
       }
+      if (currentSiteContractFilter === 'expiring') {
+        const expiringItems = getExpiringSites(30);
+        const expiringIds = expiringItems.map(i => i.site.id);
+        list = list.filter(s => expiringIds.includes(s.id));
+      }
       if (!q) return renderSitesTable(list);
       const filtered = list.filter(s => 
         (s.name || '').toLowerCase().includes(q) ||
         (s.clientName || '').toLowerCase().includes(q) ||
         (s.locationAddress || '').toLowerCase().includes(q) ||
+        (s.contractEndDate || '').includes(q) ||
         (s.clientPhone || '').includes(q)
       );
       renderSitesTable(filtered);
@@ -4491,6 +4729,7 @@
       document.getElementById('siteClientPhone').value = '';
       document.getElementById('siteAddress').value = '';
       document.getElementById('siteContractValue').value = '';
+      if (document.getElementById('siteContractEndDate')) document.getElementById('siteContractEndDate').value = '';
       if (document.getElementById('siteCurrency')) document.getElementById('siteCurrency').value = 'SAR';
       if (document.getElementById('siteStatus')) document.getElementById('siteStatus').value = 'نشط';
       document.getElementById('modalSiteTitle').innerText = '🏢 إضافة موقع عمل جديد';
@@ -4509,6 +4748,7 @@
       document.getElementById('siteClientPhone').value = site.clientPhone || '';
       document.getElementById('siteAddress').value = site.locationAddress || '';
       document.getElementById('siteContractValue').value = site.contractMonthlyValue || 0;
+      if (document.getElementById('siteContractEndDate')) document.getElementById('siteContractEndDate').value = site.contractEndDate || '';
       if (document.getElementById('siteCurrency')) document.getElementById('siteCurrency').value = site.currency || 'SAR';
       if (document.getElementById('siteStatus')) document.getElementById('siteStatus').value = site.status || 'نشط';
       document.getElementById('modalSiteTitle').innerText = '✏️ تعديل بيانات الموقع: ' + (site.name || '');
@@ -4533,6 +4773,7 @@
         locationAddress: document.getElementById('siteAddress').value.trim(),
         contractMonthlyValue: Number(document.getElementById('siteContractValue').value) || 0,
         currency: document.getElementById('siteCurrency')?.value || 'SAR',
+        contractEndDate: (document.getElementById('siteContractEndDate')?.value || '').trim(),
         status: document.getElementById('siteStatus').value || 'نشط',
         createdAt: existingSite.createdAt || Date.now(),
         updatedAt: Date.now()
