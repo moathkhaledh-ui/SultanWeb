@@ -1260,7 +1260,7 @@
 
       <div class="auth-footer-notice">
         🔒 محمي بواسطة Google Identity و Firebase Security Rules.<br>
-        المدير العام المعتمد: <code>moath.khaled.h@gmail.com</code> / <code>moath.halid.h@gmail.com</code>
+        المالك الأساسي والمدير العام: <code>moath.khaled.h@gmail.com</code> / <code>sultanshamsan2020@gmail.com</code> (سلطان محمد حمود)
       </div>
     </div>
   </div>
@@ -1288,6 +1288,11 @@
       <!-- Quick Sync Button -->
       <button class="btn-header" onclick="syncAllFromFirestore(true)" title="سحب وتحديث كافة البيانات فوراً من Firestore">
         <span>🔄</span> تحديث ومزامنة
+      </button>
+
+      <!-- AI Assistant Button -->
+      <button class="btn-header" onclick="openAiAssistantModal()" title="المساعد الذكي لإدارة المشروع" style="background: rgba(45, 212, 191, 0.15); border: 1.5px solid var(--neon-teal); color: var(--neon-teal); font-weight: 700;">
+        <span>✨</span> المساعد الذكي
       </button>
 
       <!-- PWA Install Button -->
@@ -3064,6 +3069,56 @@
     </div>
   </div>
 
+  <!-- Modal: AI Assistant Dialog -->
+  <div id="modalAiAssistant" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 760px; height: 82vh; display: flex; flex-direction: column; padding: 1.25rem;">
+      <!-- Title & Mode switcher -->
+      <div class="modal-title" style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--glass-border);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--neon-teal-secondary), var(--neon-teal-dark)); display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);">
+            ✨
+          </div>
+          <div>
+            <div style="font-weight: 800; font-size: 1.05rem; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+              <span>مساعد النظافة والعمليات الذكي</span>
+              <button type="button" id="aiWebModeBadge" onclick="toggleWebAiMode()" style="background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.5); color: #34D399; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; cursor: pointer; font-weight: 700;">
+                سحابي 🌐
+              </button>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">استشارات تشغيلية، مالية، الحضور، والمخزون مدعومة بالبيانات المباشرة</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button type="button" class="btn-action-icon" onclick="clearAiChat()" title="مسح المحادثة" style="font-size: 1rem;">🗑️</button>
+          <button type="button" class="btn-action-icon" onclick="closeModal('modalAiAssistant')">✕</button>
+        </div>
+      </div>
+
+      <!-- Quick prompts bar -->
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); flex-shrink: 0;">
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('📊 ملخص أرباح ومصاريف المشروع')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">📊 ملخص الأرباح والمصاريف</button>
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('👥 من هم الغائبون والمتأخرون اليوم؟')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">👥 الغائبون والمتأخرون اليوم</button>
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('⚠️ ما هي المواد التي قاربت على النفاد بالمخزون؟')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">⚠️ نواقص المخزون</button>
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('🏢 قائمة مواقع العمل وقيمة العقود')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">🏢 مواقع العمل والعقود</button>
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('💡 نصائح لترشيد استهلاك مواد النظافة')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">💡 نصائح ترشيد المواد</button>
+        <button type="button" class="btn btn-secondary" onclick="sendQuickAiQuery('📋 طريقة تسجيل وتصدير الحضور لإكسل')" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap;">📋 تصدير الحضور Excel</button>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="aiChatBody" style="flex: 1; overflow-y: auto; padding: 0.75rem; background: rgba(6, 14, 18, 0.7); border: 1px solid var(--glass-border); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 12px; margin-bottom: 0.75rem;">
+        <!-- Initial assistant greeting -->
+      </div>
+
+      <!-- Input and Send bar -->
+      <form id="aiChatForm" onsubmit="handleSendAiMessage(event)" style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+        <input type="text" id="aiUserInput" class="form-control" placeholder="اكتب استفسارك هنا (مثال: من الغائب اليوم؟ أو كم أرباح الشهر؟)..." style="flex: 1;" autocomplete="off">
+        <button type="submit" id="btnSendAi" class="btn btn-primary" style="padding: 0 18px; height: 42px; display: flex; align-items: center; gap: 6px;">
+          <span>إرسال</span> ✈️
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toastContainer"></div>
 
@@ -3106,7 +3161,7 @@
     // Fixed SuperAdmin Whitelist (Permanent Full Access)
     const SUPERADMIN_EMAILS = [
       'moath.khaled.h@gmail.com',
-      'moath.halid.h@gmail.com'
+      'sultanshamsan2020@gmail.com'
     ];
 
     /* ─────────────────────────────────────────────────────────────────
@@ -6454,7 +6509,7 @@
 
     function renderAdminsTable() {
       const tbody = document.getElementById('adminsTableBody');
-      const fixedRow = `
+      const fixedRows = `
         <tr>
           <td><b class="mono" style="color: var(--neon-teal);">moath.khaled.h@gmail.com</b></td>
           <td>معاذ خالد (المدير العام)</td>
@@ -6463,9 +6518,19 @@
           <td><span class="badge badge-success">نشط ومعتمد</span></td>
           <td><span style="color: var(--text-muted); font-size: 0.8rem;">حساب أساسي غير قابل للحذف</span></td>
         </tr>
+        <tr>
+          <td><b class="mono" style="color: var(--neon-teal);">sultanshamsan2020@gmail.com</b></td>
+          <td>سلطان محمد حمود</td>
+          <td><span class="badge badge-teal">Super Admin</span></td>
+          <td>المالك</td>
+          <td><span class="badge badge-success">نشط ومعتمد</span></td>
+          <td><span style="color: var(--text-muted); font-size: 0.8rem;">حساب أساسي غير قابل للحذف</span></td>
+        </tr>
       `;
 
-      const otherRows = AppData.admins.map(a => `
+      const otherRows = (AppData.admins || [])
+        .filter(a => !['moath.khaled.h@gmail.com', 'sultanshamsan2020@gmail.com'].includes(a.email?.toLowerCase()))
+        .map(a => `
         <tr>
           <td><b class="mono">${escapeHtml(a.email)}</b></td>
           <td>${escapeHtml(a.name || '-')}</td>
@@ -6478,7 +6543,7 @@
         </tr>
       `).join('');
 
-      tbody.innerHTML = fixedRow + otherRows;
+      tbody.innerHTML = fixedRows + otherRows;
     }
 
     async function handleAddAuthorizedAdmin(e) {
@@ -7619,6 +7684,275 @@
       XLSX.utils.book_append_sheet(wb, ws, "التقرير_اليومي");
       XLSX.writeFile(wb, `تقرير_العمليات_اليومي_${date}.xlsx`);
       showToast("تم تصدير التقرير اليومي إلى Excel!", "success");
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    // AI ASSISTANT WEB ENGINE (NEVER-FAIL SMART CLIENT & GEMINI FALLBACK)
+    // ═════════════════════════════════════════════════════════════════
+    let aiWebMode = "cloud"; // "cloud" or "local"
+    let aiChatHistory = [];
+
+    function openAiAssistantModal() {
+      openModal('modalAiAssistant');
+      if (aiChatHistory.length === 0) {
+        initAiWelcomeMessage();
+      }
+      setTimeout(() => {
+        document.getElementById('aiUserInput')?.focus();
+      }, 150);
+    }
+
+    function toggleWebAiMode() {
+      aiWebMode = (aiWebMode === "cloud") ? "local" : "cloud";
+      const badge = document.getElementById('aiWebModeBadge');
+      if (badge) {
+        if (aiWebMode === "cloud") {
+          badge.textContent = "سحابي 🌐";
+          badge.style.background = "rgba(16, 185, 129, 0.18)";
+          badge.style.borderColor = "rgba(16, 185, 129, 0.5)";
+          badge.style.color = "#34D399";
+        } else {
+          badge.textContent = "محلي ⚡";
+          badge.style.background = "rgba(45, 212, 191, 0.18)";
+          badge.style.borderColor = "rgba(45, 212, 191, 0.5)";
+          badge.style.color = "var(--neon-teal)";
+        }
+      }
+      showToast(`تم التبديل إلى وضع الذكاء الاصطناعي: ${aiWebMode === 'cloud' ? 'السحابي 🌐' : 'المحلي السريع ⚡'}`, "info");
+    }
+
+    function initAiWelcomeMessage() {
+      const activeSites = (AppData.sites || []).filter(s => s.status !== "منتهي").length;
+      const totalWorkers = (AppData.workers || []).length;
+      const lowStock = (AppData.inventory || []).filter(i => (i.currentStock || 0) <= (i.minThreshold || 5)).length;
+      const today = new Date().toISOString().split("T")[0];
+      const todayAtt = (AppData.attendance || []).filter(a => a.date === today);
+      const presentCount = todayAtt.filter(a => a.status === "حاضر").length;
+
+      const welcomeText = `👋 **أهلاً بك! أنا مساعدك الذكي لإدارة مشاريع خدمات النظافة والعمليات التشغيلية.**\n\n📊 **ملخص تشغيلي سريع لليوم:**\n• مواقع العمل النشطة: ${activeSites} موقع\n• القوى العاملة الإجمالية: ${totalWorkers} كادر\n• الحاضرون اليوم (${today}): ${presentCount} عامل\n${lowStock > 0 ? `• ⚠️ هناك ${lowStock} أصناف مواد بحاجة لإعادة طلب بالمخزن!\n` : '• ✅ المخزون في حالة ممتازة.\n'}\nيمكنك النقر على أحد الأسئلة السريعة أعلاه أو سؤالي عن الحضور، الغياب، المخزون، أو نصائح ترشيد التكاليف!`;
+
+      aiChatHistory.push({ sender: "assistant", text: welcomeText });
+      renderAiChat();
+    }
+
+    function clearAiChat() {
+      aiChatHistory = [];
+      initAiWelcomeMessage();
+      showToast("تم مسح محادثة المساعد الذكي", "info");
+    }
+
+    function sendQuickAiQuery(queryText) {
+      const input = document.getElementById('aiUserInput');
+      if (input) {
+        input.value = queryText;
+        handleSendAiMessage();
+      }
+    }
+
+    function renderAiChat() {
+      const chatBody = document.getElementById('aiChatBody');
+      if (!chatBody) return;
+
+      chatBody.innerHTML = aiChatHistory.map(msg => {
+        const isUser = msg.sender === "user";
+        const formatted = escapeHtml(msg.text)
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br>');
+
+        return `
+          <div style="display: flex; justify-content: ${isUser ? 'flex-start' : 'flex-end'}; width: 100%;">
+            <div style="max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; line-height: 1.6; ${
+              isUser
+                ? 'background: rgba(45, 212, 191, 0.18); border: 1px solid rgba(45, 212, 191, 0.35); color: #FFF;'
+                : 'background: rgba(16, 34, 43, 0.9); border: 1px solid var(--glass-border); color: #E2E8F0;'
+            }">
+              <div style="font-size: 0.75rem; font-weight: 700; color: ${isUser ? 'var(--neon-teal)' : '#34D399'}; margin-bottom: 4px;">
+                ${isUser ? '👤 أنت' : '✨ مساعد النظافة الذكي'}
+              </div>
+              <div>${formatted}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function handleSendAiMessage(event) {
+      if (event) event.preventDefault();
+      const input = document.getElementById('aiUserInput');
+      const text = input ? input.value.trim() : "";
+      if (!text) return;
+
+      input.value = "";
+      aiChatHistory.push({ sender: "user", text: text });
+      renderAiChat();
+
+      // Show thinking bubble
+      const chatBody = document.getElementById('aiChatBody');
+      const thinkingId = "aiThinking_" + Date.now();
+      if (chatBody) {
+        const div = document.createElement("div");
+        div.id = thinkingId;
+        div.style.cssText = "display: flex; justify-content: flex-end; width: 100%;";
+        div.innerHTML = `
+          <div style="max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; background: rgba(16, 34, 43, 0.9); border: 1px solid var(--glass-border); color: var(--neon-teal); display: flex; align-items: center; gap: 8px;">
+            <span>✨ جارٍ التحليل والبحث في بيانات المشروع...</span>
+          </div>
+        `;
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      // Generate response (with cloud attempt or smart local fallback)
+      let replyText = "";
+      try {
+        if (aiWebMode === "cloud") {
+          replyText = await callWebGeminiOrFallback(text);
+        } else {
+          replyText = generateWebSmartAiResponse(text);
+        }
+      } catch (e) {
+        replyText = generateWebSmartAiResponse(text);
+      }
+
+      // Remove thinking
+      const thinkingElem = document.getElementById(thinkingId);
+      if (thinkingElem) thinkingElem.remove();
+
+      aiChatHistory.push({ sender: "assistant", text: replyText });
+      renderAiChat();
+    }
+
+    async function callWebGeminiOrFallback(userPrompt) {
+      const cfgKey = document.getElementById('cfgApiKey')?.value || "";
+      if (cfgKey && cfgKey.startsWith("AIzaSy")) {
+        try {
+          const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.0-flash", "gemini-1.5-flash"];
+          const contextPrompt = `بيانات المشروع: مواقع النشطة=${(AppData.sites||[]).length}, عمال=${(AppData.workers||[]).length}, أصناف المخزون=${(AppData.inventory||[]).length}. أجب بإيجاز واحترافية باللغة العربية.\nسؤال: ${userPrompt}`;
+
+          for (const m of models) {
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${cfgKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: contextPrompt }] }]
+              })
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) return text.trim();
+            }
+          }
+        } catch (err) {
+          console.warn("Cloud Gemini failed, falling back to local business intelligence engine:", err);
+        }
+      }
+      // Never throw error to user; provide rich data-driven answer instantly!
+      return generateWebSmartAiResponse(userPrompt);
+    }
+
+    function generateWebSmartAiResponse(prompt) {
+      const p = prompt.toLowerCase();
+      const today = new Date().toISOString().split("T")[0];
+
+      // 1. Attendance queries
+      if (p.includes("حضور") || p.includes("غياب") || p.includes("متأخر") || p.includes("تأخير") || p.includes("من حضر")) {
+        const todayAtt = (AppData.attendance || []).filter(a => a.date === today);
+        const present = todayAtt.filter(a => a.status === "حاضر");
+        const late = todayAtt.filter(a => a.status === "تأخير");
+        const absent = todayAtt.filter(a => a.status === "غائب");
+
+        let res = `📋 **تقرير الحضور والانصراف لتاريخ اليوم (${today}):**\n\n`;
+        res += `• إجمالي العمالة: ${(AppData.workers || []).length} عامل\n`;
+        res += `• ✅ الحاضرون: ${present.length} عامل\n`;
+        res += `• ⏳ المتأخرون: ${late.length} عامل\n`;
+        res += `• ❌ الغائبون: ${absent.length} عامل\n\n`;
+
+        if (late.length > 0) {
+          res += `⚠️ **المتأخرون:**\n`;
+          late.forEach(l => {
+            const w = (AppData.workers || []).find(wk => wk.id === l.workerId);
+            res += `  - ${w ? w.name : 'عامل'} (${w ? w.role : '-'})\n`;
+          });
+          res += `\n`;
+        }
+
+        if (absent.length > 0) {
+          res += `🚨 **أبرز الغائبين:**\n`;
+          absent.slice(0, 6).forEach(ab => {
+            const w = (AppData.workers || []).find(wk => wk.id === ab.workerId);
+            res += `  - ${w ? w.name : 'عامل'}\n`;
+          });
+        }
+        res += `\n💡 يمكنك مراجعة وتعديل السجلات بالانتقال إلى تبويب **الحضور والانصراف**.`;
+        return res;
+      }
+
+      // 2. Inventory & stock
+      if (p.includes("مخزون") || p.includes("مواد") || p.includes("منظف") || p.includes("نقص") || p.includes("نفاد") || p.includes("صرف")) {
+        const lowStock = (AppData.inventory || []).filter(i => (i.currentStock || 0) <= (i.minThreshold || 5));
+        let res = `📦 **تقرير مخزون المواد والمستلزمات:**\n\n`;
+        res += `• إجمالي الأصناف بالمستودع: ${(AppData.inventory || []).length} صنف\n`;
+        res += `• أصناف تحت الحد الأدنى: ${lowStock.length} صنف\n\n`;
+
+        if (lowStock.length > 0) {
+          res += `⚠️ **المواد التي قاربت على النفاد وتحتاج إعادة طلب فورية:**\n`;
+          lowStock.forEach(item => {
+            res += `  - **${item.name}**: المتبقي ${item.currentStock || 0} ${item.unit || 'حبة'} (الحد الأدنى: ${item.minThreshold || 5})\n`;
+          });
+          res += `\n💡 يمكنك تسجيل طلب صرف أو توريد من تبويب **المخزون والمواد**.`;
+        } else {
+          res += `✅ جميع مواد النظافة متوفرة بكميات كافية وآمنة!`;
+        }
+        return res;
+      }
+
+      // 3. Financial & Invoices & Profit
+      if (p.includes("مالي") || p.includes("ربح") || p.includes("مصروف") || p.includes("فاتورة") || p.includes("فواتير") || p.includes("أرباح") || p.includes("دخل")) {
+        const totalInvoiced = (AppData.invoices || []).reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0);
+        const totalExpenses = (AppData.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+        const netProfit = totalInvoiced - totalExpenses;
+
+        let res = `💰 **الملخص المالي والربحية للمشروع:**\n\n`;
+        res += `• إجمالي الفواتير الصادرة: ${totalInvoiced.toLocaleString('ar-SA')} ر.س\n`;
+        res += `• إجمالي المصروفات التشغيلية: ${totalExpenses.toLocaleString('ar-SA')} ر.س\n`;
+        res += `• 📈 صافي الأرباح التشغيلية: ${netProfit.toLocaleString('ar-SA')} ر.س\n\n`;
+
+        const unpaid = (AppData.invoices || []).filter(i => i.status !== "مدفوعة بالكامل");
+        if (unpaid.length > 0) {
+          res += `⚠️ **فواتير معلقة بانتظار التحصيل:** ${unpaid.length} فاتورة.\n`;
+        } else {
+          res += `✅ لا توجد فواتير متأخرة التحصيل!`;
+        }
+        return res;
+      }
+
+      // 4. Sites & Contracts
+      if (p.includes("موقع") || p.includes("مواقع") || p.includes("عقد") || p.includes("عقود")) {
+        const totalMonthly = (AppData.sites || []).reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
+        let res = `🏢 **دليل مواقع العمل الميدانية:**\n\n`;
+        res += `• عدد مواقع العمل: ${(AppData.sites || []).length} موقع\n`;
+        res += `• إجمالي قيمة العقود الشهرية: ${totalMonthly.toLocaleString('ar-SA')} ر.س / شهرياً\n\n`;
+        (AppData.sites || []).slice(0, 5).forEach(site => {
+          res += `📍 **${site.name}** (العميل: ${site.clientName || 'غير محدد'})\n`;
+          res += `  - قيمة العقد: ${(Number(site.contractMonthlyValue) || 0).toLocaleString('ar-SA')} ر.س | الحالة: ${site.status || 'نشط'}\n`;
+        });
+        if ((AppData.sites || []).length > 5) {
+          res += `  - وغيرها ${(AppData.sites || []).length - 5} مواقع...\n`;
+        }
+        return res;
+      }
+
+      // 5. Operational tips
+      if (p.includes("نصائح") || p.includes("توفير") || p.includes("ترشيد") || p.includes("تطوير")) {
+        return `💡 **إرشادات تشغيلية ذكية لإدارة أعمال النظافة بكفاءة:**\n\n1. **معايرة المنظفات المركزة:** التوجيه الصارم لعمال النظافة بنسب التخفيف المحددة لكل جالون ماء يوفر حتى 25% من تكاليف المواد.\n2. **جدولة الشفتات:** توزيع العمال وفق ساعات الذروة في المواقع يضمن أعلى درجات النظافة بأقل إجهاد للعمالة.\n3. **الصيانة الوقائية لمعدات النظافة:** الفحص الأسبوعي لماكينات جلي الأرضيات والمكانس الصناعية يطيل عمرها الافتراضي.\n4. **المطابقة اليومية للحضور:** اعتماد الحضور والانصراف يومياً يمنع أي أخطاء في مسيرات الرواتب الشهرية.`;
+      }
+
+      // Default smart overview
+      const activeSites = (AppData.sites || []).filter(s => s.status !== "منتهي").length;
+      return `📊 **معلومات عامة عن النظام والمشروع:**\n• مواقع العمل: ${activeSites} نشطة\n• الكوادر البشرية: ${(AppData.workers || []).length} عامل وموظف\n• أصناف المستودع: ${(AppData.inventory || []).length} صنف\n\n💡 يمكنك سؤالي بالتفصيل عن الحضور والغياب، المواد الناقصة بالمخزن، أو الأداء المالي والفواتير.`;
     }
 
     function installPwaDesktop() {
