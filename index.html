@@ -1136,6 +1136,8 @@
     /* Responsive */
     @media (max-width: 900px) {
       header { padding: 0.75rem 1rem; }
+      header { flex-direction: column; gap: 10px; }
+      .header-actions { flex-wrap: wrap; justify-content: center; }
       main { padding: 1rem; }
       nav.app-tabs { padding: 0.4rem 1rem; top: 62px; }
       .metrics-grid { grid-template-columns: 1fr 1fr; }
@@ -1293,6 +1295,11 @@
       <!-- AI Assistant Button -->
       <button class="btn-header" onclick="openAiAssistantModal()" title="المساعد الذكي لإدارة المشروع" style="background: rgba(45, 212, 191, 0.15); border: 1.5px solid var(--neon-teal); color: var(--neon-teal); font-weight: 700;">
         <span>✨</span> المساعد الذكي
+      </button>
+
+      <!-- Financial Numbers Toggle Button -->
+      <button id="btnToggleFinancialVisibility" class="btn-header" onclick="toggleFinancialVisibility()" title="إخفاء أو إظهار كافة الأرقام المالية في النظام" style="background: rgba(245, 158, 11, 0.15); border: 1.5px solid var(--warning-amber); color: var(--warning-amber); font-weight: 700;">
+        🙈 إخفاء الأرقام المالية
       </button>
 
       <!-- PWA Install Button -->
@@ -1494,10 +1501,10 @@
           </div>
           <div class="toolbar-actions">
             <button type="button" class="btn btn-primary" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع</button>
-            <button type="button" class="btn btn-secondary" onclick="openModal('modalWorker')"><span>➕</span> إضافة عامل</button>
-            <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')"><span>⏱️</span> تسجيل حضور</button>
+            <button type="button" class="btn btn-secondary" onclick="openAddWorkerModal()"><span>➕</span> إضافة عامل</button>
+            <button type="button" class="btn btn-secondary" onclick="openAddAttendanceModal()"><span>⏱️</span> تسجيل حضور</button>
             <button type="button" class="btn btn-secondary" onclick="openAddInventoryModal()"><span>📦</span> إضافة مادة</button>
-            <button type="button" class="btn btn-secondary" onclick="openModal('modalAddAdmin')"><span>🔐</span> إضافة مسؤول إداري</button>
+            <button type="button" class="btn btn-secondary" onclick="openAddAdminModal()"><span>🔐</span> إضافة مسؤول إداري</button>
             <button type="button" class="btn btn-secondary" onclick="switchTab('tab-trash')"><span>🗑️</span> سلة المحذوفات</button>
             <button type="button" class="btn btn-secondary" onclick="switchTab('tab-audit')"><span>📜</span> سجل العمليات</button>
             <button type="button" class="btn btn-excel" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
@@ -1564,7 +1571,8 @@
         <div class="card-header">
           <div class="card-title"><span>👥</span> سجل الكوادر والعمالة والمشرفين</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalWorker')"><span>➕</span> تسجيل عامل جديد</button>
+            <button class="btn btn-primary" onclick="openAddWorkerModal()"><span>➕</span> تسجيل عامل جديد</button>
+            <button id="btnToggleWorkerWage" class="btn btn-secondary" onclick="toggleWorkerDailyWageVisibility()" style="font-size: 0.85rem;">🙈 إخفاء الأجر اليومي</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('workers')"><span>📊</span> تصدير Excel</button>
           </div>
         </div>
@@ -1611,7 +1619,7 @@
             <button type="button" class="btn btn-primary" onclick="bulkApproveAttendanceToday()">
               <span>✅</span> اعتماد كل عمال اليوم (حاضر 12س)
             </button>
-            <button type="button" class="btn btn-secondary" onclick="openModal('modalAttendance')">
+            <button type="button" class="btn btn-secondary" onclick="openAddAttendanceModal()">
               <span>➕</span> تسجيل حضور مخصص
             </button>
             <button type="button" class="btn btn-excel" onclick="exportDailyAttendanceToExcel()">
@@ -1854,7 +1862,7 @@
         <div class="card-header">
           <div class="card-title"><span>🧾</span> فواتير العملاء والتحصيل</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalInvoice')"><span>➕</span> إنشاء فاتورة</button>
+            <button class="btn btn-primary" onclick="openAddInvoiceModal()"><span>➕</span> إنشاء فاتورة</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('invoices')"><span>📊</span> تصدير الفواتير</button>
           </div>
         </div>
@@ -1885,7 +1893,7 @@
         <div class="card-header">
           <div class="card-title"><span>💸</span> المصروفات التشغيلية ومشتريات المواد</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openModal('modalExpense')"><span>➕</span> تسجيل مصروف</button>
+            <button class="btn btn-primary" onclick="openAddExpenseModal()"><span>➕</span> تسجيل مصروف</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('expenses')"><span>📊</span> تصدير المصروفات</button>
           </div>
         </div>
@@ -1975,7 +1983,7 @@
         <div class="card-header">
           <div class="card-title"><span>📋</span> جدول مسير رواتب الشهر المحدد</div>
           <div class="toolbar-actions">
-            <button type="button" class="btn btn-primary" onclick="openModal('modalPayroll')"><span>➕</span> إضافة / احتساب راتب عامل</button>
+            <button type="button" class="btn btn-primary" onclick="openAddPayrollModal()"><span>➕</span> إضافة / احتساب راتب عامل</button>
             <button type="button" class="btn btn-excel" onclick="exportPayrollToExcel()"><span>📊</span> تصدير مسير الرواتب Excel</button>
           </div>
         </div>
@@ -2010,7 +2018,7 @@
         <div class="card-header">
           <div class="card-title"><span>💸</span> سجل السلف النقدية للعمالة (Cash Advances Ledger)</div>
           <div class="toolbar-actions">
-            <button type="button" class="btn btn-primary" onclick="openModal('modalCashAdvance')"><span>➕</span> تسجيل سلفة نقدية</button>
+            <button type="button" class="btn btn-primary" onclick="openAddCashAdvanceModal()"><span>➕</span> تسجيل سلفة نقدية</button>
             <button type="button" class="btn btn-excel" onclick="exportAdvancesToExcel()"><span>📊</span> تصدير السلف Excel</button>
           </div>
         </div>
@@ -2328,7 +2336,7 @@
         <div class="card-header">
           <div class="card-title"><span>🔐</span> إدارة مدراء النظام والمسؤولين المصرح لهم (Google Accounts Whitelist)</div>
           <div class="toolbar-actions">
-            <button type="button" id="btnAddAdmin" class="btn btn-primary" onclick="openModal('modalAddAdmin')"><span>➕</span> إضافة مسؤول إداري مصرح له</button>
+            <button type="button" id="btnAddAdmin" class="btn btn-primary" onclick="openAddAdminModal()"><span>➕</span> إضافة مسؤول إداري مصرح له</button>
           </div>
         </div>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;">
@@ -6969,11 +6977,111 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    let financialNumbersHidden = false;
+    let workerDailyWageHidden = false;
+
+    function toggleFinancialVisibility() {
+      financialNumbersHidden = !financialNumbersHidden;
+      const btn = document.getElementById('btnToggleFinancialVisibility');
+      if (btn) {
+        btn.innerHTML = financialNumbersHidden ? '👁️ إظهار الأرقام المالية' : '🙈 إخفاء الأرقام المالية';
+      }
+      if (typeof updateDashboardMetrics === 'function') updateDashboardMetrics();
+      if (typeof renderSitesTable === 'function') renderSitesTable();
+      if (typeof renderInvoicesTable === 'function') renderInvoicesTable();
+      if (typeof renderExpensesTable === 'function') renderExpensesTable();
+      if (typeof renderPayrollTable === 'function') renderPayrollTable();
+      if (typeof renderAdvancesTable === 'function') renderAdvancesTable();
+      if (typeof renderSitePerformanceChart === 'function') renderSitePerformanceChart();
+    }
+
+    function toggleWorkerDailyWageVisibility() {
+      workerDailyWageHidden = !workerDailyWageHidden;
+      const btn = document.getElementById('btnToggleWorkerWage');
+      if (btn) {
+        btn.innerHTML = workerDailyWageHidden ? '👁️ إظهار الأجر اليومي' : '🙈 إخفاء الأجر اليومي';
+      }
+      if (typeof renderWorkersTable === 'function') renderWorkersTable();
+    }
+
+    function formatMoney(amount, currency = 'ر.س') {
+      if (financialNumbersHidden) {
+        return '•••••• ' + currency;
+      }
+      const num = Number(amount) || 0;
+      return num.toLocaleString('ar-SA') + ' ' + currency;
+    }
+
+    function formatWage(wage) {
+      if (workerDailyWageHidden) {
+        return '•••••• ر.س / يوم';
+      }
+      const num = Number(wage) || 0;
+      return num.toLocaleString('ar-SA') + ' ر.س / يوم';
+    }
+
+    function openAddWorkerModal() {
+      const editId = document.getElementById('workerEditId');
+      if (editId) editId.value = '';
+      const form = document.getElementById('formWorker');
+      if (form) form.reset();
+      const title = document.getElementById('modalWorkerTitle');
+      if (title) title.innerText = '👤 تسجيل عامل جديد';
+      openModal('modalWorker');
+    }
+
+    function openAddAttendanceModal() {
+      const form = document.getElementById('formAttendance');
+      if (form) form.reset();
+      openModal('modalAttendance');
+    }
+
+    function openAddExpenseModal() {
+      const editId = document.getElementById('expenseEditId');
+      if (editId) editId.value = '';
+      const form = document.getElementById('formExpense');
+      if (form) form.reset();
+      openModal('modalExpense');
+    }
+
+    function openAddInvoiceModal() {
+      const editId = document.getElementById('invoiceEditId');
+      if (editId) editId.value = '';
+      const form = document.getElementById('formInvoice');
+      if (form) form.reset();
+      openModal('modalInvoice');
+    }
+
+    function openAddPayrollModal() {
+      const editId = document.getElementById('payrollEditId');
+      if (editId) editId.value = '';
+      const form = document.getElementById('formPayroll');
+      if (form) form.reset();
+      const title = document.getElementById('modalPayrollTitle');
+      if (title) title.innerText = '💵 احتساب وتعديل مسير راتب عامل';
+      openModal('modalPayroll');
+    }
+
+    function openAddCashAdvanceModal() {
+      const form = document.getElementById('formCashAdvance');
+      if (form) form.reset();
+      openModal('modalCashAdvance');
+    }
+
+    function openAddAdminModal() {
+      const form = document.getElementById('formAddAdmin');
+      if (form) form.reset();
+      openModal('modalAddAdmin');
+    }
+
     function openModal(modalId) {
+      console.log("Opening modal:", modalId);
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.add('active');
         modal.style.display = 'flex';
+      } else {
+        console.error("Modal not found:", modalId);
       }
     }
 
@@ -7742,6 +7850,7 @@
     let aiChatHistory = [];
 
     function openAiAssistantModal() {
+      console.log("Attempting to open AI Assistant modal");
       openModal('modalAiAssistant');
       if (aiChatHistory.length === 0) {
         initAiWelcomeMessage();
