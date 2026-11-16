@@ -82,6 +82,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       background: radial-gradient(circle at 50% 0%, var(--bg-dark-center) 0%, var(--bg-dark-start) 65%, var(--bg-dark-end) 100%);
       background-attachment: fixed;
@@ -90,6 +95,14 @@
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+    }
+
+    /* Strict UI lock until authentication & authorization succeed */
+    body:not(.auth-verified) > header,
+    body:not(.auth-verified) > nav.app-tabs,
+    body:not(.auth-verified) > main,
+    body:not(.auth-verified) > .modal-backdrop {
+      display: none !important;
     }
 
     code, pre, .mono {
@@ -813,12 +826,17 @@
     #authOverlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 30%, #0c202a 0%, #060e12 80%);
-      z-index: 9999;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      background: #060E12;
+      z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .auth-card {
@@ -1135,17 +1153,24 @@
 
     /* Responsive */
     @media (max-width: 900px) {
-      header { padding: 0.75rem 1rem; }
-      header { flex-direction: column; gap: 10px; }
+      header { padding: 0.75rem 1rem; flex-direction: column; gap: 10px; position: static; }
       .header-actions { flex-wrap: wrap; justify-content: center; }
       main { padding: 1rem; }
-      nav.app-tabs { padding: 0.4rem 1rem; top: 62px; }
+      nav.app-tabs { padding: 0.4rem 1rem; position: static; top: auto; }
+      .card { padding: 1.1rem; }
+      .card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .toolbar-actions { flex-wrap: wrap; width: 100%; }
+      .search-input-box { min-width: 0; width: 100%; max-width: 100%; }
       .metrics-grid { grid-template-columns: 1fr 1fr; }
       .form-row { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
       .metrics-grid { grid-template-columns: 1fr; }
       .brand-text p { display: none; }
+      .auth-card { padding: 1.5rem 1.15rem; }
+      .auth-footer-notice code { word-break: break-all; }
+      #toastContainer { left: 12px; right: 12px; bottom: 12px; }
+      .toast-msg { min-width: 0; width: 100%; }
     }
   
     /* Print Styles for Daily Operations Report and Clean Export */
@@ -1298,7 +1323,7 @@
       </button>
 
       <!-- Financial Numbers Toggle Button -->
-      <button id="btnToggleFinancialVisibility" class="btn-header" onclick="toggleFinancialVisibility()" title="إخفاء أو إظهار كافة الأرقام المالية في النظام" style="background: rgba(245, 158, 11, 0.15); border: 1.5px solid var(--warning-amber); color: var(--warning-amber); font-weight: 700;">
+      <button id="btnToggleFinancialVisibility" class="btn-header admin-only-action" onclick="toggleFinancialVisibility()" title="إخفاء أو إظهار كافة الأرقام المالية في النظام" style="background: rgba(245, 158, 11, 0.15); border: 1.5px solid var(--warning-amber); color: var(--warning-amber); font-weight: 700;">
         🙈 إخفاء الأرقام المالية
       </button>
 
@@ -1323,8 +1348,7 @@
 
   <!-- ═════════════════════════════════════════════════════════════════
        APP NAVIGATION TABS
-       ═════════════════════════════════════════════════════════════════ */
-  -->
+       ═════════════════════════════════════════════════════════════════ -->
   <nav class="app-tabs">
     <button class="tab-btn active" onclick="switchTab('tab-overview')">
       <span>📊</span> المؤشرات العامة
@@ -1500,14 +1524,14 @@
             <span>⚡</span> مركز الأوامر والعمليات السريعة للحواسيب
           </div>
           <div class="toolbar-actions">
-            <button type="button" class="btn btn-primary" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع</button>
-            <button type="button" class="btn btn-secondary" onclick="openAddWorkerModal()"><span>➕</span> إضافة عامل</button>
+            <button type="button" class="btn btn-primary admin-only-action" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع</button>
+            <button type="button" class="btn btn-secondary admin-only-action" onclick="openAddWorkerModal()"><span>➕</span> إضافة عامل</button>
             <button type="button" class="btn btn-secondary" onclick="openAddAttendanceModal()"><span>⏱️</span> تسجيل حضور</button>
-            <button type="button" class="btn btn-secondary" onclick="openAddInventoryModal()"><span>📦</span> إضافة مادة</button>
-            <button type="button" class="btn btn-secondary" onclick="openAddAdminModal()"><span>🔐</span> إضافة مسؤول إداري</button>
-            <button type="button" class="btn btn-secondary" onclick="switchTab('tab-trash')"><span>🗑️</span> سلة المحذوفات</button>
-            <button type="button" class="btn btn-secondary" onclick="switchTab('tab-audit')"><span>📜</span> سجل العمليات</button>
-            <button type="button" class="btn btn-excel" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
+            <button type="button" class="btn btn-secondary admin-only-action" onclick="openAddInventoryModal()"><span>📦</span> إضافة مادة</button>
+            <button type="button" class="btn btn-secondary admin-only-action" onclick="openAddAdminModal()"><span>🔐</span> إضافة مسؤول إداري</button>
+            <button type="button" class="btn btn-secondary admin-only-action" onclick="switchTab('tab-trash')"><span>🗑️</span> سلة المحذوفات</button>
+            <button type="button" class="btn btn-secondary admin-only-action" onclick="switchTab('tab-audit')"><span>📜</span> سجل العمليات</button>
+            <button type="button" class="btn btn-excel admin-only-action" onclick="exportCompleteSystemToExcel()"><span>📊</span> تصدير كل النظام إلى Excel</button>
           </div>
         </div>
         <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
@@ -1522,7 +1546,7 @@
         <div class="card-header">
           <div class="card-title"><span>🏢</span> مواقع العمل وعقود النظافة التشغيلية</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع جديد</button>
+            <button class="btn btn-primary admin-only-action" onclick="openAddSiteModal()"><span>➕</span> إضافة موقع جديد</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('sites')"><span>📊</span> تصدير Excel</button>
           </div>
         </div>
@@ -1571,8 +1595,8 @@
         <div class="card-header">
           <div class="card-title"><span>👥</span> سجل الكوادر والعمالة والمشرفين</div>
           <div class="toolbar-actions">
-            <button class="btn btn-primary" onclick="openAddWorkerModal()"><span>➕</span> تسجيل عامل جديد</button>
-            <button id="btnToggleWorkerWage" class="btn btn-secondary" onclick="toggleWorkerDailyWageVisibility()" style="font-size: 0.85rem;">🙈 إخفاء الأجر اليومي</button>
+            <button class="btn btn-primary admin-only-action" onclick="openAddWorkerModal()"><span>➕</span> تسجيل عامل جديد</button>
+            <button id="btnToggleWorkerWage" class="btn btn-secondary admin-only-action" onclick="toggleWorkerDailyWageVisibility()" style="font-size: 0.85rem;">🙈 إخفاء الأجر اليومي</button>
             <button class="btn btn-excel" onclick="exportTableToExcel('workers')"><span>📊</span> تصدير Excel</button>
           </div>
         </div>
@@ -1801,7 +1825,7 @@
         <div class="card-header">
           <div class="card-title"><span>📦</span> مستودع أدوات ومواد النظافة والمطهرات المخصصة للمواقع</div>
           <div class="toolbar-actions">
-            <button type="button" class="btn btn-primary" onclick="openAddInventoryModal()"><span>➕</span> إضافة صنف مادة</button>
+            <button type="button" class="btn btn-primary admin-only-action" onclick="openAddInventoryModal()"><span>➕</span> إضافة صنف مادة</button>
             <button type="button" class="btn btn-secondary" onclick="openModal('modalMaterialUsage')"><span>🧴</span> صرف / استهلاك لموقع</button>
             <button type="button" class="btn btn-excel" onclick="exportTableToExcel('inventory')"><span>📊</span> تصدير Excel</button>
           </div>
@@ -2491,9 +2515,10 @@
               <option value="نشط">نشط</option>
               <option value="معلق">معلق</option>
               <option value="مكتمل">مكتمل</option>
-            <option value="تحت الصيانة">تحت الصيانة</option>
-            <option value="منتهي">منتهي</option>
-          </select>
+              <option value="تحت الصيانة">تحت الصيانة</option>
+              <option value="منتهي">منتهي</option>
+            </select>
+          </div>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeModal('modalSite')">إلغاء</button>
@@ -2696,6 +2721,7 @@
         <button class="btn-action-icon" onclick="closeModal('modalExpense')">✕</button>
       </div>
       <form id="formExpense" onsubmit="handleSaveExpense(event)">
+        <input type="hidden" id="expenseEditId">
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">المبلغ (ر.س) *</label>
@@ -2756,6 +2782,7 @@
         <button class="btn-action-icon" onclick="closeModal('modalInvoice')">✕</button>
       </div>
       <form id="formInvoice" onsubmit="handleSaveInvoice(event)">
+        <input type="hidden" id="invoiceEditId">
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">رقم الفاتورة *</label>
@@ -3340,33 +3367,87 @@
       });
     }
 
+    const GOOGLE_SIGNIN_BTN_HTML = `
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      تسجيل الدخول عبر حساب Google
+    `;
+
+    function requireAuth(actionLabel = 'هذا الإجراء') {
+      if (!currentUser || !document.body.classList.contains('auth-verified')) {
+        showToast(`يرجى تسجيل الدخول بحساب مصرح له أولاً لتنفيذ (${actionLabel}).`, "warning");
+        return false;
+      }
+      return true;
+    }
+
+    function requireAdmin(actionLabel = 'هذا الإجراء') {
+      if (!requireAuth(actionLabel)) return false;
+      if (!currentUserIsAdmin) {
+        showToast(`عفواً، صلاحية (${actionLabel}) مخصصة للمدير العام فقط.`, "error");
+        return false;
+      }
+      return true;
+    }
+
+    function clearSensitiveDashboardState() {
+      currentUser = null;
+      isSuperAdmin = false;
+      currentUserIsAdmin = false;
+      currentSupervisorSiteId = null;
+      currentSupervisorData = null;
+      StagedImportData = null;
+      if (typeof aiChatHistory !== 'undefined') aiChatHistory = [];
+      Object.keys(AppData).forEach(k => { AppData[k] = []; });
+      document.querySelectorAll('.modal-backdrop.active').forEach(m => closeModal(m.id));
+      const chatBody = document.getElementById('aiChatBody');
+      if (chatBody) chatBody.innerHTML = '';
+      const diagBox = document.getElementById('diagnosticsResultBox');
+      if (diagBox) { diagBox.style.display = 'none'; diagBox.innerHTML = ''; }
+      if (typeof renderAllTables === 'function') renderAllTables();
+      if (typeof updateDashboardMetrics === 'function') updateDashboardMetrics();
+      if (typeof populateDropdowns === 'function') populateDropdowns();
+    }
+
     async function handleAuthStateChanged(user) {
       const overlay = document.getElementById('authOverlay');
       const profileBadge = document.getElementById('userProfileBadge');
       const unauthBox = document.getElementById('unauthorizedBox');
+      const domainBox = document.getElementById('unauthorizedDomainBox');
       const btn = document.getElementById('btnGoogleSignIn');
 
       if (!user) {
-        currentUser = null;
-        currentUserIsAdmin = false;
+        document.body.classList.remove('auth-verified');
+        clearSensitiveDashboardState();
         overlay.style.display = 'flex';
         profileBadge.style.display = 'none';
         btn.disabled = false;
+        btn.innerHTML = GOOGLE_SIGNIN_BTN_HTML;
         return;
       }
 
+      isSuperAdmin = false;
+      currentUserIsAdmin = false;
+      currentSupervisorSiteId = null;
+      currentSupervisorData = null;
+
       const email = (user.email || '').toLowerCase().trim();
+      const emailVerified = user.emailVerified !== false;
 
       let authorized = false;
       let isAdmin = false;
       let userRoleTitle = "مسؤول معتمد ✓";
 
-      if (SUPERADMIN_EMAILS.includes(email)) {
+      if (emailVerified && SUPERADMIN_EMAILS.includes(email)) {
         authorized = true;
         isAdmin = true;
         isSuperAdmin = true;
         userRoleTitle = "المدير العام (Super Admin)";
-      } else {
+      } else if (emailVerified && email) {
         try {
           const adminDoc = await db.collection('authorized_admins').doc(email).get();
           if (adminDoc.exists && adminDoc.data().active !== false) {
@@ -3394,6 +3475,9 @@
       if (authorized) {
         currentUser = user;
         currentUserIsAdmin = isAdmin;
+        document.body.classList.add('auth-verified');
+        if (unauthBox) unauthBox.style.display = 'none';
+        if (domainBox) domainBox.style.display = 'none';
         overlay.style.display = 'none';
         profileBadge.style.display = 'flex';
         document.getElementById('userName').innerText = user.displayName || email.split('@')[0];
@@ -3405,14 +3489,16 @@
         applyUserRoleRestrictions(isAdmin);
 
         showToast(`مرحباً بك ${user.displayName || ''}، تم التحقق من الصلاحيات بنجاح!`, "success");
-        // Load All Cloud Data
         syncAllFromFirestore();
         if (isAdmin) {
           loadAuthorizedAdmins();
         }
       } else {
-        // Reject and show clear guidance
-        document.getElementById('rejectedEmail').innerText = email;
+        document.body.classList.remove('auth-verified');
+        clearSensitiveDashboardState();
+        overlay.style.display = 'flex';
+        profileBadge.style.display = 'none';
+        document.getElementById('rejectedEmail').innerText = email || 'غير متوفر';
         unauthBox.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = '🔄 تسجيل الدخول بحساب Google آخر';
@@ -3440,9 +3526,8 @@
       }
 
       if (!isAdmin) {
-        // If supervisor is on a restricted tab, switch to overview or attendance
         const activeTab = document.querySelector('.section-view.active');
-        if (activeTab && ['tab-finance', 'tab-payroll', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'].includes(activeTab.id)) {
+        if (activeTab && ['tab-finance', 'tab-payroll', 'tab-daily-report', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'].includes(activeTab.id)) {
           switchTab('tab-attendance');
         }
       }
@@ -3454,6 +3539,8 @@
 
     async function logoutGoogle() {
       if (confirm("هل تريد بالتأكيد تسجيل الخروج من لوحة التحكم؟")) {
+        document.body.classList.remove('auth-verified');
+        clearSensitiveDashboardState();
         await auth.signOut();
         location.reload();
       }
@@ -3463,6 +3550,11 @@
        3. FIRESTORE SYNC & DATA FETCHING
        ───────────────────────────────────────────────────────────────── */
     async function syncAllFromFirestore(isManual = false) {
+      if (!currentUser || !document.body.classList.contains('auth-verified')) {
+        updateCloudStatusBadge('offline', 'بانتظار تسجيل الدخول');
+        return;
+      }
+
       const dot = document.getElementById('headerStatusDot');
       const text = document.getElementById('headerStatusText');
       const latSpan = document.getElementById('headerLatency');
@@ -3481,61 +3573,60 @@
             new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout fetching ${name}`)), 12000))
           ]);
         };
+        const emptySnap = { docs: [] };
+        const fetchAdminCol = (name) => currentUserIsAdmin ? fetchCol(name).catch(() => emptySnap) : Promise.resolve(emptySnap);
 
-                const [sitesSnap, workersSnap, attSnap, invSnap, transSnap, expSnap, invoicesSnap, trashSnap, auditSnap, adminsSnap, supervisorsSnap, payrollSnap, advancesSnap, usageSnap] = await Promise.all([
-          fetchCol('cleaning_sites').catch(e => ({ docs: [] })),
-          fetchCol('workers').catch(e => ({ docs: [] })),
-          fetchCol('attendance_records').catch(e => ({ docs: [] })),
-          fetchCol('inventory_items').catch(e => ({ docs: [] })),
-          fetchCol('inventory_transactions').catch(e => ({ docs: [] })),
-          fetchCol('expenses').catch(e => ({ docs: [] })),
-          fetchCol('invoices').catch(e => ({ docs: [] })),
-          fetchCol('recycle_bin').catch(e => ({ docs: [] })),
-          fetchCol('audit_logs').catch(e => ({ docs: [] })),
-          fetchCol('authorized_admins').catch(e => ({ docs: [] })),
-          fetchCol('supervisors').catch(e => ({ docs: [] })),
-          fetchCol('payroll_records').catch(e => ({ docs: [] })),
-          fetchCol('cash_advances').catch(e => ({ docs: [] })),
-          fetchCol('material_usage').catch(e => ({ docs: [] }))
+        const [sitesSnap, workersSnap, attSnap, invSnap, transSnap, expSnap, invoicesSnap, trashSnap, auditSnap, adminsSnap, supervisorsSnap, payrollSnap, advancesSnap, usageSnap] = await Promise.all([
+          fetchCol('cleaning_sites').catch(() => emptySnap),
+          fetchCol('workers').catch(() => emptySnap),
+          fetchCol('attendance_records').catch(() => emptySnap),
+          fetchCol('inventory_items').catch(() => emptySnap),
+          fetchCol('inventory_transactions').catch(() => emptySnap),
+          fetchAdminCol('expenses'),
+          fetchAdminCol('invoices'),
+          fetchAdminCol('recycle_bin'),
+          fetchAdminCol('audit_logs'),
+          fetchAdminCol('authorized_admins'),
+          fetchAdminCol('supervisors'),
+          fetchAdminCol('payroll_records'),
+          fetchAdminCol('cash_advances'),
+          fetchCol('material_usage').catch(() => emptySnap)
         ]);
-        AppData.sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        // Ensure default contractEndDate for sites if not specified yet
-        const todayObj = new Date();
-        const d18 = new Date(todayObj.getTime() + 18 * 86400000).toISOString().split('T')[0];
-        const d28 = new Date(todayObj.getTime() + 28 * 86400000).toISOString().split('T')[0];
-        const d90 = new Date(todayObj.getTime() + 90 * 86400000).toISOString().split('T')[0];
-        const dPast = new Date(todayObj.getTime() - 3 * 86400000).toISOString().split('T')[0];
+        let sites = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let transactions = transSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+        let materialUsage = usageSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        AppData.sites.forEach((site, idx) => {
-          if (!site.contractEndDate) {
-            if (site.status === 'منتهي') {
-              site.contractEndDate = dPast;
-            } else if (idx === 0) {
-              site.contractEndDate = d18; // Expiring in 18 days!
-            } else if (idx === 1) {
-              site.contractEndDate = d28; // Expiring in 28 days!
-            } else {
-              site.contractEndDate = d90; // Valid for 90 days
-            }
-          }
-        });
-        AppData.workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.attendance = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.inventory = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.transactions = transSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-        AppData.expenses = expSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.invoices = invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.trash = trashSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.deletedAt||0) - (a.deletedAt||0));
-        AppData.auditLogs = auditSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-        AppData.admins = adminsSnap.docs.map(d => ({ email: d.id, ...d.data() }));
-        AppData.supervisors = supervisorsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.payroll = payrollSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.advances = advancesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        AppData.materialUsage = usageSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (!currentUserIsAdmin && currentSupervisorSiteId) {
+          sites = sites.filter(s => s.id === currentSupervisorSiteId).map(s => ({ ...s, contractMonthlyValue: 0 }));
+          workers = workers.filter(w => w.assignedSiteId === currentSupervisorSiteId).map(w => ({ ...w, dailyWage: 0 }));
+          const allowedWorkerIds = new Set(workers.map(w => w.id));
+          attendance = attendance.filter(a => a.siteId === currentSupervisorSiteId || allowedWorkerIds.has(a.workerId));
+          inventory = inventory.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId).map(i => ({ ...i, costPerUnit: 0 }));
+          materialUsage = materialUsage.filter(u => u.siteId === currentSupervisorSiteId);
+          transactions = transactions.filter(t => !t.siteId || t.siteId === currentSupervisorSiteId);
+        }
 
-        // Initial Seeding for Audit Logs if Firestore is currently empty
-        if (AppData.auditLogs.length === 0) {
+        AppData.sites = sites;
+        AppData.workers = workers;
+        AppData.attendance = attendance;
+        AppData.inventory = inventory;
+        AppData.transactions = transactions;
+        AppData.materialUsage = materialUsage;
+        AppData.expenses = currentUserIsAdmin ? expSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+        AppData.invoices = currentUserIsAdmin ? invoicesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+        AppData.trash = currentUserIsAdmin ? trashSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.deletedAt||0) - (a.deletedAt||0)) : [];
+        AppData.auditLogs = currentUserIsAdmin ? auditSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0)) : [];
+        AppData.admins = currentUserIsAdmin ? adminsSnap.docs.map(d => ({ email: d.id, ...d.data() })) : [];
+        AppData.supervisors = currentUserIsAdmin ? supervisorsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+        AppData.payroll = currentUserIsAdmin ? payrollSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+        AppData.advances = currentUserIsAdmin ? advancesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+
+        // Initial Seeding for Audit Logs (Admins only)
+        if (currentUserIsAdmin && AppData.auditLogs.length === 0) {
           const now = Date.now();
           const initLogs = [
             {
@@ -3576,7 +3667,7 @@
             }
           ];
           AppData.auditLogs = initLogs;
-          initLogs.forEach(l => db.collection('audit_logs').doc(l.id).set(l).catch(e => {}));
+          initLogs.forEach(l => db.collection('audit_logs').doc(l.id).set(l).catch(() => {}));
         }
 
         const latency = Math.round(performance.now() - t0);
@@ -3585,13 +3676,12 @@
         text.innerText = 'متصل بالسحابة';
         latSpan.innerText = `${latency}ms`;
 
-        // Render everything
         renderAllTables();
         updateDashboardMetrics();
         populateDropdowns();
 
         if (isManual) {
-          showToast(`تمت المزامنة بنجاح! تم جلب (${AppData.sites.length} موقع، ${AppData.workers.length} عامل، ${AppData.inventory.length} صنف، ${AppData.supervisors.length} مشرف).`, "success");
+          showToast(`تمت المزامنة بنجاح! تم جلب (${AppData.sites.length} موقع، ${AppData.workers.length} عامل، ${AppData.inventory.length} صنف).`, "success");
         }
       } catch (err) {
         console.error("Firestore Sync Error:", err);
@@ -3608,15 +3698,17 @@
     function updateDashboardMetrics() {
       const isSuper = !currentUserIsAdmin;
 
-      // Sites
       let sitesList = AppData.sites;
       let workersList = AppData.workers;
       let attendanceList = AppData.attendance;
+      let inventoryList = AppData.inventory;
 
       if (isSuper && currentSupervisorSiteId) {
         sitesList = sitesList.filter(s => s.id === currentSupervisorSiteId);
         workersList = workersList.filter(w => w.assignedSiteId === currentSupervisorSiteId);
-        attendanceList = attendanceList.filter(a => a.siteId === currentSupervisorSiteId);
+        const allowedW = new Set(workersList.map(w => w.id));
+        attendanceList = attendanceList.filter(a => a.siteId === currentSupervisorSiteId || allowedW.has(a.workerId));
+        inventoryList = inventoryList.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId);
       }
 
       document.getElementById('statTotalSites').innerText = sitesList.length;
@@ -3626,16 +3718,14 @@
         document.getElementById('statSitesMonthly').innerHTML = '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted); font-size:0.8rem;">🔒 سري (إدارة)</span>';
       } else {
         const totalMonthlyVal = AppData.sites.reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
-        document.getElementById('statSitesMonthly').innerText = totalMonthlyVal.toLocaleString('ar-SA') + ' ر.س شهرياً';
+        document.getElementById('statSitesMonthly').innerText = formatMoney(totalMonthlyVal, 'ر.س شهرياً');
       }
 
-      // Workers
       document.getElementById('statTotalWorkers').innerText = workersList.length;
       document.getElementById('badgeWorkersCount').innerText = workersList.length;
       const activeWorkers = workersList.filter(w => (w.status || '').includes('رأس العمل')).length;
       document.getElementById('statActiveWorkers').innerText = `${activeWorkers} على رأس العمل`;
 
-      // Attendance Today
       const todayStr = new Date().toISOString().split('T')[0];
       const todayRecords = attendanceList.filter(a => a.date === todayStr);
       const todayPresent = todayRecords.filter(a => (a.status || '').includes('حاضر') || (a.status || '').includes('متأخر')).length;
@@ -3644,13 +3734,11 @@
       const ratio = workersList.length ? Math.round((todayPresent / workersList.length) * 100) : 0;
       document.getElementById('statTodayRatio').innerText = `نسبة الحضور ${ratio}%`;
 
-      // Inventory
-      document.getElementById('statTotalItems').innerText = AppData.inventory.length;
-      document.getElementById('badgeInventoryCount').innerText = AppData.inventory.length;
-      const lowStockCount = AppData.inventory.filter(i => (Number(i.currentStock) || 0) <= (Number(i.minThreshold) || 5)).length;
+      document.getElementById('statTotalItems').innerText = inventoryList.length;
+      document.getElementById('badgeInventoryCount').innerText = inventoryList.length;
+      const lowStockCount = inventoryList.filter(i => (Number(i.currentStock) || 0) <= (Number(i.minThreshold) || 5)).length;
       document.getElementById('statLowStock').innerText = `${lowStockCount} بحاجة لإعادة طلب`;
 
-      // Finance (strictly hidden/masked for supervisor)
       if (isSuper) {
         document.getElementById('statTotalInvoices').innerHTML = '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted); font-size:0.8rem;">🔒 سري</span>';
         document.getElementById('statUnpaidInvoices').innerText = 'صلاحية مدير عام';
@@ -3658,21 +3746,19 @@
       } else {
         const totalInvVal = AppData.invoices.reduce((sum, i) => sum + (Number(i.totalAmount) || 0), 0);
         const unpaidCount = AppData.invoices.filter(i => (i.status || '').includes('غير مدفوعة')).length;
-        document.getElementById('statTotalInvoices').innerText = totalInvVal.toLocaleString('ar-SA');
+        document.getElementById('statTotalInvoices').innerText = formatMoney(totalInvVal);
         document.getElementById('statUnpaidInvoices').innerText = `${unpaidCount} غير مدفوعة`;
         const totalExpVal = AppData.expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-        document.getElementById('statTotalExpenses').innerText = totalExpVal.toLocaleString('ar-SA');
+        document.getElementById('statTotalExpenses').innerText = formatMoney(totalExpVal);
       }
-      document.getElementById('badgeFinanceCount').innerText = AppData.invoices.length + AppData.expenses.length;
+      document.getElementById('badgeFinanceCount').innerText = isSuper ? 0 : (AppData.invoices.length + AppData.expenses.length);
 
-      // Trash & Audit Counters
       const trashElem = document.getElementById('statTotalTrashOverview');
       if (trashElem) trashElem.innerText = isSuper ? '-' : AppData.trash.length;
 
       const auditElem = document.getElementById('statTotalAuditOverview');
       if (auditElem) auditElem.innerText = isSuper ? '-' : AppData.auditLogs.length;
 
-      // Update Contract Expiry Alert Banner
       updateContractExpiryAlert();
     }
 
@@ -3858,12 +3944,11 @@
         const curSym = s.currency === 'USD' ? '$' : (s.currency === 'YER' ? 'ر.ي' : 'ر.س');
         const contractDisplay = isSuper 
           ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري (إدارة)</span>'
-          : `<b class="mono">${(Number(s.contractMonthlyValue) || 0).toLocaleString()} ${curSym}</b>`;
+          : `<b class="mono">${formatMoney(s.contractMonthlyValue, curSym)}</b>`;
 
         const st = s.status || 'نشط';
         const stBadgeClass = st === 'نشط' ? 'badge-success' : (st === 'معلق' ? 'badge-warning' : (st === 'مكتمل' ? 'badge-teal' : 'badge-subtle'));
 
-        // Expiry calculation per site
         let expiryDisplay = '<span style="color:var(--text-muted); font-size:0.85rem;">غير محدد</span>';
         let rowStyle = '';
         if (s.contractEndDate) {
@@ -3900,8 +3985,10 @@
             <td>${expiryDisplay}</td>
             <td><span class="badge ${stBadgeClass}">${escapeHtml(st)}</span></td>
             <td>
-              <button class="btn-action-icon" title="تعديل" onclick="editSite('${s.id}')">✏️</button>
-              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('cleaning_sites', '${s.id}')">🗑️</button>` : ''}
+              ${!isSuper ? `
+                <button class="btn-action-icon" title="تعديل" onclick="editSite('${s.id}')">✏️</button>
+                <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('cleaning_sites', '${s.id}')">🗑️</button>
+              ` : '<span class="badge badge-subtle">للعرض فقط</span>'}
             </td>
           </tr>
         `;
@@ -3936,7 +4023,6 @@
       const tbody = document.getElementById('workersTableBody');
       if (!tbody) return;
 
-      // Scoped security: if supervisor, show only workers assigned to their site
       if (!currentUserIsAdmin && currentSupervisorSiteId) {
         list = list.filter(w => w.assignedSiteId === currentSupervisorSiteId);
       }
@@ -3953,7 +4039,7 @@
         const siteName = site ? site.name : 'غير محدد';
         const wageDisplay = isSuper
           ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>'
-          : `<span class="mono">${(Number(w.dailyWage) || 0).toLocaleString()} ر.س</span>`;
+          : `<span class="mono">${formatWage(w.dailyWage)}</span>`;
 
         return `
           <tr>
@@ -3966,8 +4052,10 @@
             <td>${wageDisplay}</td>
             <td><span class="badge ${(w.status || '').includes('رأس العمل') ? 'badge-success' : 'badge-danger'}">${escapeHtml(w.status || 'على رأس العمل')}</span></td>
             <td>
-              <button class="btn-action-icon" title="تعديل" onclick="editWorker('${w.id}')">✏️</button>
-              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('workers', '${w.id}')">🗑️</button>` : ''}
+              ${!isSuper ? `
+                <button class="btn-action-icon" title="تعديل" onclick="editWorker('${w.id}')">✏️</button>
+                <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('workers', '${w.id}')">🗑️</button>
+              ` : '<span class="badge badge-subtle">للعرض فقط</span>'}
             </td>
           </tr>
         `;
@@ -4060,33 +4148,40 @@
       const tbody = document.getElementById('dailyAttendanceTableBody');
       if (!tbody) return;
 
+      const isSup = !currentUserIsAdmin && !!currentSupervisorSiteId;
+
       const inputDate = document.getElementById('attDailyDate');
       if (inputDate && !inputDate.value) {
         inputDate.value = currentAttendanceDate;
       }
       updateSelectedDateArabicDisplay();
 
-      // Populate site filter if needed
+      const scopedSites = isSup ? AppData.sites.filter(s => s.id === currentSupervisorSiteId) : AppData.sites;
       const siteFilterSelect = document.getElementById('attDailySiteFilter');
-      if (siteFilterSelect && siteFilterSelect.children.length <= 1 && AppData.sites.length) {
+      if (siteFilterSelect) {
         const currentVal = siteFilterSelect.value;
-        siteFilterSelect.innerHTML = '<option value="">🏢 جميع مواقع العمل</option>' + 
-          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-        siteFilterSelect.value = currentVal;
+        siteFilterSelect.innerHTML = (isSup ? '' : '<option value="">🏢 جميع مواقع العمل</option>') +
+          scopedSites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        siteFilterSelect.value = isSup ? currentSupervisorSiteId : (scopedSites.some(s => s.id === currentVal) ? currentVal : '');
       }
 
-      const selectedSiteId = document.getElementById('attDailySiteFilter')?.value || '';
+      const selectedSiteId = isSup ? currentSupervisorSiteId : (document.getElementById('attDailySiteFilter')?.value || '');
       const selectedStatus = document.getElementById('attDailyStatusFilter')?.value || '';
       const searchQ = (document.getElementById('searchDailyWorker')?.value || '').toLowerCase().trim();
 
-      // Filter workers list
-      let workersList = AppData.workers;
+      let scopedWorkers = isSup ? AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId) : AppData.workers;
+      const allowedWorkerIds = new Set(scopedWorkers.map(w => w.id));
+      let scopedAttendance = isSup
+        ? AppData.attendance.filter(a => a.siteId === currentSupervisorSiteId || allowedWorkerIds.has(a.workerId))
+        : AppData.attendance;
+
+      let workersList = scopedWorkers;
       if (selectedSiteId) {
         workersList = workersList.filter(w => w.assignedSiteId === selectedSiteId);
       }
       if (searchQ) {
         workersList = workersList.filter(w => {
-          const site = AppData.sites.find(s => s.id === w.assignedSiteId);
+          const site = scopedSites.find(s => s.id === w.assignedSiteId);
           const siteName = site ? site.name.toLowerCase() : '';
           return (w.name || '').toLowerCase().includes(searchQ) ||
                  (w.role || '').toLowerCase().includes(searchQ) ||
@@ -4095,10 +4190,8 @@
         });
       }
 
-      // Attendance records for current selected date
-      const recordsForDate = AppData.attendance.filter(a => a.date === currentAttendanceDate);
+      const recordsForDate = scopedAttendance.filter(a => a.date === currentAttendanceDate);
 
-      // Compute stats for current date
       let presentCount = 0;
       let lateCount = 0;
       let absentCount = 0;
@@ -4111,7 +4204,7 @@
         else if (r.status === 'خاص') specialCount++;
       });
 
-      const totalWorkers = AppData.workers.length;
+      const totalWorkers = scopedWorkers.length;
       const rate = totalWorkers > 0 ? Math.round(((presentCount + lateCount) / totalWorkers) * 100) : 0;
 
       const elTotal = document.getElementById('statAttTotalWorkers');
@@ -4127,7 +4220,6 @@
       const elRate = document.getElementById('statAttRatePercent');
       if (elRate) elRate.innerText = `${rate}%`;
 
-      // Filter by status if requested
       if (selectedStatus) {
         workersList = workersList.filter(w => {
           const rec = recordsForDate.find(r => r.workerId === w.id);
@@ -4145,9 +4237,8 @@
         return;
       }
 
-      // Pre-calculate historical attendance counts per worker:
       const workerStatsMap = {};
-      AppData.attendance.forEach(a => {
+      scopedAttendance.forEach(a => {
         if (!a.workerId) return;
         if (!workerStatsMap[a.workerId]) {
           workerStatsMap[a.workerId] = { present: 0, absent: 0, late: 0, special: 0 };
@@ -4165,7 +4256,6 @@
 
         const currentStatus = record ? record.status : 'unregistered';
         const currentShift = record?.shiftType || 'MORNING_12H';
-        const hours = record ? (record.hoursWorked || 12) : 12;
         const isApproved = record?.isSupervisorApproved === true;
 
         const stats = workerStatsMap[w.id] || { present: 0, absent: 0, late: 0, special: 0 };
@@ -4225,7 +4315,7 @@
               <div style="display: flex; gap: 4px; align-items: center;">
                 ${record ? `
                   <button type="button" class="btn-action-icon" title="تعديل السجل" onclick="editAttendanceRecord('${record.id}')">✏️</button>
-                  <button type="button" class="btn-action-icon danger" title="حذف السجل" onclick="deleteRecord('attendance_records', '${record.id}')">🗑️</button>
+                  ${currentUserIsAdmin ? `<button type="button" class="btn-action-icon danger" title="حذف السجل" onclick="deleteRecord('attendance_records', '${record.id}')">🗑️</button>` : ''}
                 ` : `
                   <button type="button" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.75rem;" onclick="quickSetWorkerStatus('${w.id}', 'حاضر')">تسجيل</button>
                 `}
@@ -4237,8 +4327,17 @@
     }
 
     async function quickSetWorkerStatus(workerId, newStatus) {
+      if (!requireAuth('تسجيل الحضور')) return;
+      if (!currentUserIsAdmin && currentSupervisorData?.canTakeAttendance === false) {
+        showToast("عذراً، صلاحية تسجيل الحضور معطلة لحسابك.", "error");
+        return;
+      }
       const worker = AppData.workers.find(w => w.id === workerId);
       if (!worker) return;
+      if (!currentUserIsAdmin && currentSupervisorSiteId && worker.assignedSiteId !== currentSupervisorSiteId) {
+        showToast("لا يمكنك تعديل حضور عامل غير تابع لموقعك.", "error");
+        return;
+      }
 
       const date = currentAttendanceDate;
       let record = AppData.attendance.find(a => a.workerId === workerId && a.date === date);
@@ -4264,7 +4363,6 @@
       });
       if (isNew) attData.createdAt = Date.now();
 
-      // Optimistic update
       if (record) {
         Object.assign(record, attData);
       } else {
@@ -4294,8 +4392,17 @@
     }
 
     async function quickSetWorkerShift(workerId, newShift) {
+      if (!requireAuth('تعديل الوردية')) return;
+      if (!currentUserIsAdmin && currentSupervisorData?.canTakeAttendance === false) {
+        showToast("عذراً، صلاحية تسجيل الحضور معطلة لحسابك.", "error");
+        return;
+      }
       const worker = AppData.workers.find(w => w.id === workerId);
       if (!worker) return;
+      if (!currentUserIsAdmin && currentSupervisorSiteId && worker.assignedSiteId !== currentSupervisorSiteId) {
+        showToast("لا يمكنك تعديل وردية عامل غير تابع لموقعك.", "error");
+        return;
+      }
 
       const date = currentAttendanceDate;
       let record = AppData.attendance.find(a => a.workerId === workerId && a.date === date);
@@ -4338,7 +4445,21 @@
     }
 
     async function bulkApproveAttendanceToday() {
-      if (!confirm(`هل تريد بالتأكيد اعتماد جميع العمال كـ "حاضر (12س)" لتاريخ اليوم (${currentAttendanceDate})؟`)) {
+      if (!requireAuth('الاعتماد الجماعي للحضور')) return;
+      if (!currentUserIsAdmin && currentSupervisorData?.canTakeAttendance === false) {
+        showToast("عذراً، صلاحية تسجيل الحضور معطلة لحسابك.", "error");
+        return;
+      }
+      const targetWorkers = (!currentUserIsAdmin && currentSupervisorSiteId)
+        ? AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId)
+        : AppData.workers;
+
+      if (!targetWorkers.length) {
+        showToast("لا يوجد عمال ضمن نطاق صلاحيتك لاعتمادهم.", "warning");
+        return;
+      }
+
+      if (!confirm(`هل تريد بالتأكيد اعتماد جميع العمال (${targetWorkers.length}) كـ "حاضر (12س)" لتاريخ اليوم (${currentAttendanceDate})؟`)) {
         return;
       }
 
@@ -4347,7 +4468,7 @@
       const batch = db.batch();
       let count = 0;
 
-      for (const w of AppData.workers) {
+      for (const w of targetWorkers) {
         let rec = AppData.attendance.find(a => a.workerId === w.id && a.date === date);
         const id = rec ? rec.id : ('att_' + Date.now() + '_' + w.id.substring(0, 6));
 
@@ -4393,14 +4514,18 @@
     }
 
     function exportDailyAttendanceToExcel() {
-      const recordsForDate = AppData.attendance.filter(a => a.date === currentAttendanceDate);
-      if (!AppData.workers.length) {
+      if (!requireAuth('تصدير كشف الحضور اليومي')) return;
+      const isSup = !currentUserIsAdmin && !!currentSupervisorSiteId;
+      const targetWorkers = isSup ? AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId) : AppData.workers;
+      const scopedAtt = isSup ? AppData.attendance.filter(a => a.siteId === currentSupervisorSiteId) : AppData.attendance;
+      const recordsForDate = scopedAtt.filter(a => a.date === currentAttendanceDate);
+      if (!targetWorkers.length) {
         showToast("لا توجد عمالة لتصدير كشف الحضور!", "warning");
         return;
       }
 
       const workerStatsMap = {};
-      AppData.attendance.forEach(a => {
+      scopedAtt.forEach(a => {
         if (!a.workerId) return;
         if (!workerStatsMap[a.workerId]) workerStatsMap[a.workerId] = { present: 0, absent: 0, late: 0 };
         if (a.status === 'حاضر') workerStatsMap[a.workerId].present++;
@@ -4408,7 +4533,7 @@
         else if (a.status === 'تأخير' || a.status === 'متأخر') workerStatsMap[a.workerId].late++;
       });
 
-      const rows = AppData.workers.map(w => {
+      const rows = targetWorkers.map(w => {
         const site = AppData.sites.find(s => s.id === w.assignedSiteId);
         const rec = recordsForDate.find(r => r.workerId === w.id);
         const stats = workerStatsMap[w.id] || { present: 0, absent: 0, late: 0 };
@@ -4439,7 +4564,11 @@
 
     // Historical Attendance Archive Table
     function renderAttendanceTable(filtered = null) {
-      const list = filtered || AppData.attendance;
+      let list = filtered || AppData.attendance;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        const allowedW = new Set(AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId).map(w => w.id));
+        list = list.filter(a => a.siteId === currentSupervisorSiteId || allowedW.has(a.workerId));
+      }
       const tbody = document.getElementById('attendanceTableBody');
       if (!tbody) return;
 
@@ -4473,7 +4602,7 @@
             <td>
               <div style="display: flex; gap: 4px; align-items: center;">
                 <button class="btn-action-icon" title="تعديل السجل" onclick="editAttendanceRecord('${a.id}')">✏️</button>
-                <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('attendance_records', '${a.id}')">🗑️</button>
+                ${currentUserIsAdmin ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('attendance_records', '${a.id}')">🗑️</button>` : ''}
               </div>
             </td>
           </tr>
@@ -4486,6 +4615,10 @@
       const dateVal = document.getElementById('archiveFilterDate')?.value || '';
 
       let list = AppData.attendance;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        const allowedW = new Set(AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId).map(w => w.id));
+        list = list.filter(a => a.siteId === currentSupervisorSiteId || allowedW.has(a.workerId));
+      }
       if (dateVal) {
         list = list.filter(a => a.date === dateVal);
       }
@@ -4515,8 +4648,13 @@
     }
 
     function editAttendanceRecord(id) {
+      if (!requireAuth('تعديل سجل الحضور')) return;
       const record = AppData.attendance.find(a => a.id === id);
       if (!record) return;
+      if (!currentUserIsAdmin && currentSupervisorSiteId && record.siteId !== currentSupervisorSiteId) {
+        showToast("لا يمكنك تعديل سجل حضور لموقع آخر.", "error");
+        return;
+      }
       openModal('modalAttendance');
       document.getElementById('attWorkerId').value = record.workerId || '';
       document.getElementById('attSiteId').value = record.siteId || '';
@@ -4536,6 +4674,9 @@
       if (!tbody) return;
 
       const isSuper = !currentUserIsAdmin;
+      if (isSuper && currentSupervisorSiteId) {
+        list = list.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId);
+      }
 
       if (!list.length) {
         tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد أصناف مواد مطابقة في المستودع.</td></tr>';
@@ -4549,17 +4690,16 @@
         const totalVal = stock * cost;
         const isLow = stock <= min;
 
-        // Resolve site link
         const site = item.siteId ? AppData.sites.find(s => s.id === item.siteId) : null;
         const siteLabel = site ? site.name : (item.siteName || (item.siteId ? 'موقع مخصص' : '🏬 مستودع عام'));
         const isAssigned = !!(item.siteId || item.siteName);
 
         const costDisplay = isSuper 
           ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>' 
-          : `<span class="mono">${cost.toLocaleString()} ر.س</span>`;
+          : `<span class="mono">${formatMoney(cost)}</span>`;
         const totalDisplay = isSuper 
           ? '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒 سري</span>' 
-          : `<b class="mono">${totalVal.toLocaleString()} ر.س</b>`;
+          : `<b class="mono">${formatMoney(totalVal)}</b>`;
 
         return `
           <tr>
@@ -4579,8 +4719,10 @@
             <td><span class="badge ${isLow ? 'badge-danger' : 'badge-success'}">${isLow ? '⚠️ منخفض - اطلب' : 'متوفر ومناسب'}</span></td>
             <td>
               <button class="btn-action-icon" title="صرف / استهلاك سريع لموقع" onclick="quickConsumeItem('${item.id}')">🧴</button>
-              <button class="btn-action-icon" title="تعديل" onclick="editInventory('${item.id}')">✏️</button>
-              ${!isSuper ? `<button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('inventory_items', '${item.id}')">🗑️</button>` : ''}
+              ${!isSuper ? `
+                <button class="btn-action-icon" title="تعديل" onclick="editInventory('${item.id}')">✏️</button>
+                <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('inventory_items', '${item.id}')">🗑️</button>
+              ` : ''}
             </td>
           </tr>
         `;
@@ -4588,11 +4730,19 @@
     }
 
     function quickConsumeItem(itemId) {
+      if (!requireAuth('صرف مواد')) return;
       const item = AppData.inventory.find(i => i.id === itemId);
       if (!item) return;
+      if (!currentUserIsAdmin && currentSupervisorSiteId && item.siteId && item.siteId !== currentSupervisorSiteId) {
+        showToast("لا يمكنك صرف مادة مخصصة لموقع آخر.", "error");
+        return;
+      }
       openModal('modalMaterialUsage');
       const itemSelect = document.getElementById('usageItemId');
       if (itemSelect) itemSelect.value = item.id;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const usageDate = document.getElementById('usageDate');
+      if (usageDate && !usageDate.value) usageDate.value = todayStr;
       if (item.siteId) {
         const siteSelect = document.getElementById('usageSiteId');
         if (siteSelect) siteSelect.value = item.siteId;
@@ -4608,6 +4758,9 @@
       const siteFilter = document.getElementById('filterInventorySite')?.value || '';
 
       let filtered = AppData.inventory;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        filtered = filtered.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId);
+      }
 
       if (q) {
         filtered = filtered.filter(i => {
@@ -4637,7 +4790,8 @@
     // 5. Invoices Table
     function renderInvoicesTable() {
       const tbody = document.getElementById('invoicesTableBody');
-      if (!AppData.invoices.length) {
+      if (!tbody) return;
+      if (!currentUserIsAdmin || !AppData.invoices.length) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد فواتير مسجلة.</td></tr>';
         return;
       }
@@ -4651,9 +4805,9 @@
             <td><b>${escapeHtml(inv.clientName || '-')}</b></td>
             <td class="mono">${escapeHtml(inv.issueDate || '-')}</td>
             <td class="mono">${escapeHtml(inv.dueDate || '-')}</td>
-            <td class="mono"><b>${total.toLocaleString()} ر.س</b></td>
-            <td class="mono" style="color:#34D399;">${paid.toLocaleString()} ر.س</td>
-            <td class="mono" style="color:${remain > 0 ? '#F87171' : '#94A3B8'};"><b>${remain.toLocaleString()} ر.س</b></td>
+            <td class="mono"><b>${formatMoney(total)}</b></td>
+            <td class="mono" style="color:#34D399;">${formatMoney(paid)}</td>
+            <td class="mono" style="color:${remain > 0 ? '#F87171' : '#94A3B8'};"><b>${formatMoney(remain)}</b></td>
             <td><span class="badge ${inv.status === 'مدفوعة بالكامل' ? 'badge-success' : 'badge-danger'}">${escapeHtml(inv.status || 'غير مدفوعة')}</span></td>
             <td>
               <button class="btn-action-icon danger" title="حذف" onclick="deleteRecord('invoices', '${inv.id}')">🗑️</button>
@@ -4666,7 +4820,8 @@
     // 6. Expenses Table
     function renderExpensesTable() {
       const tbody = document.getElementById('expensesTableBody');
-      if (!AppData.expenses.length) {
+      if (!tbody) return;
+      if (!currentUserIsAdmin || !AppData.expenses.length) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد مصروفات مسجلة.</td></tr>';
         return;
       }
@@ -4674,7 +4829,7 @@
         <tr>
           <td class="mono">${escapeHtml(exp.date || '-')}</td>
           <td><span class="badge badge-teal">${escapeHtml(exp.category || 'عام')}</span></td>
-          <td class="mono"><b style="color:#F87171;">${(Number(exp.amount) || 0).toLocaleString()} ر.س</b></td>
+          <td class="mono"><b style="color:#F87171;">${formatMoney(exp.amount)}</b></td>
           <td>${escapeHtml(exp.description || '-')}</td>
           <td>${escapeHtml(exp.paymentMethod || 'نقدي')}</td>
           <td class="mono">${escapeHtml(exp.invoiceNumber || '-')}</td>
@@ -4686,47 +4841,47 @@
     }
 
     function populateDropdowns() {
-      // Sites in workers form
+      const isSup = !currentUserIsAdmin && !!currentSupervisorSiteId;
+      const scopedSites = isSup ? AppData.sites.filter(s => s.id === currentSupervisorSiteId) : AppData.sites;
+      const scopedWorkers = isSup ? AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId) : AppData.workers;
+      const scopedInventory = isSup ? AppData.inventory.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId) : AppData.inventory;
+
       const workerSiteSelect = document.getElementById('workerAssignedSiteId');
       if (workerSiteSelect) {
         workerSiteSelect.innerHTML = '<option value="">بدون تعيين حالياً</option>' + 
-          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+          scopedSites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       }
 
-      // Sites & Workers in attendance
       const attWorkerSelect = document.getElementById('attWorkerId');
       if (attWorkerSelect) {
-        attWorkerSelect.innerHTML = AppData.workers.map(w => `<option value="${w.id}">${escapeHtml(w.name)} (${escapeHtml(w.role || 'عامل')})</option>`).join('');
+        attWorkerSelect.innerHTML = scopedWorkers.map(w => `<option value="${w.id}">${escapeHtml(w.name)} (${escapeHtml(w.role || 'عامل')})</option>`).join('');
       }
 
       const attSiteSelect = document.getElementById('attSiteId');
       if (attSiteSelect) {
-        attSiteSelect.innerHTML = AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        attSiteSelect.innerHTML = scopedSites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       }
 
-      // Sites in invoice & expense
       const invoiceSiteSelect = document.getElementById('invoiceSiteId');
       if (invoiceSiteSelect) {
         invoiceSiteSelect.innerHTML = '<option value="">اختر الموقع / العميل</option>' + 
           AppData.sites.map(s => `<option value="${s.id}" data-client="${escapeHtml(s.clientName || '')}" data-value="${s.contractMonthlyValue || 0}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || '')})</option>`).join('');
       }
 
-      // Sites in inventory modal (dedicated to a site or general warehouse)
       const invSiteSelect = document.getElementById('inventorySiteId');
       if (invSiteSelect) {
         const curInvSite = invSiteSelect.value;
         invSiteSelect.innerHTML = '<option value="">🏬 مستودع عام (غير مخصص لموقع محدد)</option>' + 
-          AppData.sites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)} (${escapeHtml(s.clientName || '')})</option>`).join('');
+          scopedSites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)} (${escapeHtml(s.clientName || '')})</option>`).join('');
         if (curInvSite) invSiteSelect.value = curInvSite;
       }
 
-      // Sites in inventory filter toolbar
       const filterSiteSelect = document.getElementById('filterInventorySite');
       if (filterSiteSelect) {
         const curFilter = filterSiteSelect.value;
         filterSiteSelect.innerHTML = '<option value="">🏢 جميع المواقع والمستودع</option>' + 
           '<option value="general">🏬 مستودع عام (غير مخصص)</option>' + 
-          AppData.sites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)}</option>`).join('');
+          scopedSites.map(s => `<option value="${s.id}">🏢 ${escapeHtml(s.name)}</option>`).join('');
         if (curFilter) filterSiteSelect.value = curFilter;
       }
 
@@ -4736,7 +4891,6 @@
           AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       }
 
-      // Payroll & Cash Advances worker select
       const payWorkerSelect = document.getElementById('payWorkerId');
       if (payWorkerSelect) {
         payWorkerSelect.innerHTML = '<option value="">اختر العامل...</option>' + 
@@ -4749,23 +4903,23 @@
           AppData.workers.map(w => `<option value="${w.id}">${escapeHtml(w.name)} (${escapeHtml(w.role || 'عامل')})</option>`).join('');
       }
 
-      // Material Usage selects
       const usageSiteSelect = document.getElementById('usageSiteId');
       if (usageSiteSelect) {
-        usageSiteSelect.innerHTML = '<option value="">اختر الموقع المستهلك...</option>' + 
-          AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        usageSiteSelect.innerHTML = (isSup ? '' : '<option value="">اختر الموقع المستهلك...</option>') + 
+          scopedSites.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       }
 
       const usageItemSelect = document.getElementById('usageItemId');
       if (usageItemSelect) {
         usageItemSelect.innerHTML = '<option value="">اختر المادة من المخزن...</option>' + 
-          AppData.inventory.map(i => `<option value="${i.id}">${escapeHtml(i.name)} (المتوفر: ${i.currentStock} ${i.unit || 'عبوة'})</option>`).join('');
+          scopedInventory.map(i => `<option value="${i.id}">${escapeHtml(i.name)} (المتوفر: ${i.currentStock} ${i.unit || 'عبوة'})</option>`).join('');
       }
 
-      // Daily Operations Report site selector
       const reportSiteSelect = document.getElementById('dailyReportSiteSelect');
-      if (reportSiteSelect && (!reportSiteSelect.children.length || reportSiteSelect.children.length === 1)) {
-        reportSiteSelect.innerHTML = AppData.sites.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || 'عميل')})</option>`).join('');
+      if (reportSiteSelect) {
+        const curRep = reportSiteSelect.value;
+        reportSiteSelect.innerHTML = scopedSites.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.clientName || 'عميل')})</option>`).join('');
+        if (curRep && scopedSites.some(s => s.id === curRep)) reportSiteSelect.value = curRep;
       }
     }
 
@@ -4782,10 +4936,7 @@
        5. CRUD ACTIONS & FIRESTORE WRITES
        ───────────────────────────────────────────────────────────────── */
     function openAddSiteModal() {
-      if (!currentUserIsAdmin) {
-        showToast("صلاحية إضافة موقع جديد مخصصة للمدير العام فقط.", "warning");
-        return;
-      }
+      if (!requireAdmin('إضافة موقع جديد')) return;
       document.getElementById('siteEditId').value = '';
       document.getElementById('siteName').value = '';
       document.getElementById('siteClientName').value = '';
@@ -4800,6 +4951,7 @@
     }
 
     function editSite(id) {
+      if (!requireAdmin('تعديل بيانات الموقع')) return;
       const site = AppData.sites.find(s => s.id === id);
       if (!site) {
         showToast("لم يتم العثور على بيانات الموقع", "error");
@@ -4820,6 +4972,7 @@
 
     async function handleSaveSite(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('حفظ بيانات الموقع')) return;
       const submitBtn = document.getElementById('btnSaveSite') || e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ في السحابة...'; }
 
@@ -4842,7 +4995,6 @@
         updatedAt: Date.now()
       });
 
-      // 1. Optimistic instant local update
       const idx = AppData.sites.findIndex(s => s.id === id);
       if (idx >= 0) {
         AppData.sites[idx] = { ...AppData.sites[idx], ...siteData };
@@ -4860,7 +5012,6 @@
       closeModal('modalSite');
       showToast(isEdit ? "تم تعديل بيانات الموقع بنجاح!" : "تمت إضافة الموقع بنجاح!", "success");
 
-      // 2. Persist to Firestore & Audit Log
       try {
         if (!db) initFirebaseCore();
         await db.collection('cleaning_sites').doc(id).set(siteData, { merge: true });
@@ -4883,6 +5034,7 @@
 
     async function handleSaveWorker(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('حفظ بيانات العامل')) return;
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
@@ -4934,6 +5086,7 @@
     }
 
     function editWorker(id) {
+      if (!requireAdmin('تعديل بيانات العامل')) return;
       const w = AppData.workers.find(item => item.id === id);
       if (!w) return;
       document.getElementById('workerEditId').value = w.id;
@@ -4950,14 +5103,32 @@
 
     async function handleSaveAttendance(e) {
       if (e) e.preventDefault();
+      if (!requireAuth('تسجيل الحضور')) return;
+      if (!currentUserIsAdmin && currentSupervisorData?.canTakeAttendance === false) {
+        showToast("عذراً، صلاحية تسجيل الحضور معطلة لحسابك.", "error");
+        return;
+      }
+
+      const workerId = document.getElementById('attWorkerId').value;
+      const siteId = (!currentUserIsAdmin && currentSupervisorSiteId)
+        ? currentSupervisorSiteId
+        : document.getElementById('attSiteId').value;
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        const w = AppData.workers.find(wk => wk.id === workerId);
+        if (w && w.assignedSiteId && w.assignedSiteId !== currentSupervisorSiteId) {
+          showToast("لا يمكنك تسجيل حضور لعامل غير تابع لموقعك.", "error");
+          return;
+        }
+      }
+
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ التسجيل...'; }
 
       const id = 'att_' + Date.now();
       const attData = sanitizeForFirestore({
         id: id,
-        workerId: document.getElementById('attWorkerId').value,
-        siteId: document.getElementById('attSiteId').value,
+        workerId: workerId,
+        siteId: siteId,
         date: document.getElementById('attDate').value,
         status: document.getElementById('attStatus').value,
         checkInTime: document.getElementById('attCheckIn').value,
@@ -4988,6 +5159,7 @@
         );
 
         AppData.attendance.unshift(attData);
+        renderDailyAttendanceSheet();
         renderAttendanceTable();
         updateDashboardMetrics();
 
@@ -5002,6 +5174,7 @@
     }
 
     function openAddInventoryModal() {
+      if (!requireAdmin('إضافة صنف مخزون')) return;
       document.getElementById('inventoryEditId').value = '';
       document.getElementById('invName').value = '';
       document.getElementById('invCategory').value = 'منظفات ومطهرات';
@@ -5020,6 +5193,7 @@
     }
 
     function editInventory(id) {
+      if (!requireAdmin('تعديل صنف مخزون')) return;
       const item = AppData.inventory.find(i => i.id === id);
       if (!item) {
         showToast("لم يتم العثور على الصنف في المخزون", "error");
@@ -5044,6 +5218,7 @@
 
     async function handleSaveInventory(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('حفظ بيانات المخزون')) return;
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
@@ -5070,7 +5245,6 @@
         updatedAt: Date.now()
       });
 
-      // 1. Optimistic Instant Update
       const idx = AppData.inventory.findIndex(i => i.id === id);
       if (idx >= 0) {
         AppData.inventory[idx] = { ...AppData.inventory[idx], ...invData };
@@ -5085,7 +5259,6 @@
       closeModal('modalInventory');
       showToast(isEdit ? `تم تعديل الصنف (${invData.name}) بنجاح!` : `تمت إضافة الصنف (${invData.name}) وربطه بالمستودع بنجاح!`, "success");
 
-      // 2. Persist to Firestore & Audit Log
       try {
         if (!db) initFirebaseCore();
         await db.collection('inventory_items').doc(id).set(invData, { merge: true });
@@ -5110,10 +5283,12 @@
 
     async function handleSaveExpense(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('تسجيل المصروف')) return;
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ...'; }
 
-      const id = 'exp_' + Date.now();
+      const editId = (document.getElementById('expenseEditId')?.value || '').trim();
+      const id = editId || ('exp_' + Date.now());
       const expData = sanitizeForFirestore({
         id: id,
         amount: Number(document.getElementById('expAmount').value) || 0,
@@ -5129,12 +5304,12 @@
       try {
         if (!db) initFirebaseCore();
         await Promise.race([
-          db.collection('expenses').doc(id).set(expData),
+          db.collection('expenses').doc(id).set(expData, { merge: true }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
         ]);
 
         await logAuditEvent(
-          'CREATE',
+          editId ? 'UPDATE' : 'CREATE',
           `تسجيل مصروف: ${expData.amount} ر.س`,
           'expenses',
           id,
@@ -5143,7 +5318,8 @@
           expData
         );
 
-        AppData.expenses.unshift(expData);
+        const idx = AppData.expenses.findIndex(x => x.id === id);
+        if (idx >= 0) AppData.expenses[idx] = expData; else AppData.expenses.unshift(expData);
         renderExpensesTable();
         updateDashboardMetrics();
 
@@ -5159,17 +5335,20 @@
 
     async function handleSaveInvoice(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('إصدار فاتورة')) return;
       const submitBtn = e?.target?.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ إصدار الفاتورة...'; }
 
-      const id = 'inv_' + Date.now();
-      const siteSelect = document.getElementById('invSiteId');
-      const clientName = siteSelect.options[siteSelect.selectedIndex]?.dataset?.client || '';
+      const editId = (document.getElementById('invoiceEditId')?.value || '').trim();
+      const id = editId || ('inv_' + Date.now());
+      const siteSelect = document.getElementById('invoiceSiteId');
+      const selectedOpt = siteSelect && siteSelect.selectedIndex >= 0 ? siteSelect.options[siteSelect.selectedIndex] : null;
+      const clientName = selectedOpt?.dataset?.client || '';
 
       const invData = sanitizeForFirestore({
         id: id,
         invoiceNumber: document.getElementById('invNum').value.trim(),
-        siteId: siteSelect.value,
+        siteId: siteSelect ? siteSelect.value : '',
         clientName: clientName,
         issueDate: document.getElementById('invIssueDate').value,
         dueDate: document.getElementById('invDueDate').value,
@@ -5182,12 +5361,12 @@
       try {
         if (!db) initFirebaseCore();
         await Promise.race([
-          db.collection('invoices').doc(id).set(invData),
+          db.collection('invoices').doc(id).set(invData, { merge: true }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ")), 10000))
         ]);
 
         await logAuditEvent(
-          'CREATE',
+          editId ? 'UPDATE' : 'CREATE',
           `إصدار فاتورة: ${invData.invoiceNumber}`,
           'invoices',
           id,
@@ -5196,7 +5375,8 @@
           invData
         );
 
-        AppData.invoices.unshift(invData);
+        const idx = AppData.invoices.findIndex(x => x.id === id);
+        if (idx >= 0) AppData.invoices[idx] = invData; else AppData.invoices.unshift(invData);
         renderInvoicesTable();
         updateDashboardMetrics();
 
@@ -5463,6 +5643,7 @@
     }
 
     async function restoreFromTrash(trashId) {
+      if (!requireAdmin('استعادة سجل من سلة المحذوفات')) return;
       const item = AppData.trash.find(t => t.id === trashId);
       if (!item) {
         showToast("العنصر غير موجود في سلة المحذوفات!", "error");
@@ -5513,6 +5694,7 @@
     }
 
     async function permanentDeleteTrashItem(trashId) {
+      if (!requireAdmin('الحذف النهائي من سلة المحذوفات')) return;
       const item = AppData.trash.find(t => t.id === trashId);
       const title = item ? item.title : trashId;
 
@@ -5543,6 +5725,7 @@
     }
 
     async function emptyRecycleBin() {
+      if (!requireAdmin('إفراغ سلة المحذوفات')) return;
       if (!AppData.trash.length) {
         showToast("سلة المحذوفات فارغة بالفعل!", "info");
         return;
@@ -5581,6 +5764,7 @@
     }
 
     function exportTrashToExcel() {
+      if (!requireAdmin('تصدير سلة المحذوفات')) return;
       if (!AppData.trash.length) {
         showToast("لا توجد سجلات في سلة المحذوفات لتصديرها!", "warning");
         return;
@@ -5756,6 +5940,7 @@
     }
 
     async function restoreFromAuditSnapshot(logId) {
+      if (!requireAdmin('استعادة نسخة من سجل التدقيق')) return;
       const log = AppData.auditLogs.find(l => l.id === logId);
       if (!log || !log.snapshot) {
         showToast("لا توجد نسخة صالحة للاستعادة في هذا السجل!", "error");
@@ -5803,6 +5988,7 @@
     }
 
     function exportAuditToExcel() {
+      if (!requireAdmin('تصدير سجل التدقيق')) return;
       if (!AppData.auditLogs.length) {
         showToast("لا توجد عمليات مسجلة في سجل التدقيق لتصديرها!", "warning");
         return;
@@ -5850,6 +6036,7 @@
     }
 
     async function processSelectedFile(file) {
+      if (!requireAdmin('استيراد ملفات البيانات')) return;
       const ext = file.name.split('.').pop().toLowerCase();
       document.getElementById('importFileName').innerText = `${file.name} (${Math.round(file.size / 1024)} KB)`;
 
@@ -6175,6 +6362,7 @@
 
     // Write staged data to Firestore in batched operations with fallback & timeout protection
     async function commitImportToFirestore() {
+      if (!requireAdmin('اعتماد ومزامنة الاستيراد السحابي')) return;
       if (!StagedImportData) return;
       if (!db) initFirebaseCore();
 
@@ -6315,6 +6503,7 @@
        7. SYSTEM EXPORTS (SQL, EXCEL, JSON)
        ───────────────────────────────────────────────────────────────── */
     function exportCompleteSystemToSqlDump() {
+      if (!requireAdmin('تصدير قاعدة بيانات SQL الكاملة')) return;
       const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
       let sql = `-- =============================================\n`;
       sql += `-- نسخة احتياطية لقاعدة بيانات مشروع خدمات النظافة\n`;
@@ -6374,6 +6563,7 @@
     }
 
     function exportCompleteSystemToJson() {
+      if (!requireAdmin('تصدير النسخة الاحتياطية JSON')) return;
       const dump = {
         meta: {
           exportedAt: new Date().toISOString(),
@@ -6392,22 +6582,31 @@
     }
 
     function exportTableToExcel(type) {
+      if (!requireAuth('تصدير البيانات إلى Excel')) return;
+      const isSup = !currentUserIsAdmin && !!currentSupervisorSiteId;
+
+      if ((type === 'invoices' || type === 'expenses') && !requireAdmin('تصدير البيانات المالية')) {
+        return;
+      }
+
       let data = [];
       let filename = `CleanOps_${type}.xlsx`;
 
       if (type === 'sites') {
-        data = AppData.sites.map((s, idx) => ({
+        const list = isSup ? AppData.sites.filter(s => s.id === currentSupervisorSiteId) : AppData.sites;
+        data = list.map((s, idx) => ({
           'م': idx + 1,
           'اسم الموقع': s.name,
           'العميل': s.clientName,
           'الهاتف': s.clientPhone,
           'العنوان': s.locationAddress,
-          'قيمة العقد الشهري': s.contractMonthlyValue,
+          'قيمة العقد الشهري': currentUserIsAdmin ? s.contractMonthlyValue : 'سري (إدارة)',
           'العملة': s.currency || 'SAR',
           'حالة الموقع': s.status || 'نشط'
         }));
       } else if (type === 'workers') {
-        data = AppData.workers.map((w, idx) => {
+        const list = isSup ? AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId) : AppData.workers;
+        data = list.map((w, idx) => {
           const site = AppData.sites.find(s => s.id === w.assignedSiteId);
           return {
             'م': idx + 1,
@@ -6415,13 +6614,15 @@
             'المسمى الوظيفي': w.role || 'عامل',
             'رقم الهوية / الإقامة': w.nationalId || '-',
             'رقم الهاتف': w.phone || '-',
-            'الأجر اليومي (ر.س)': w.dailyWage || 0,
+            'الأجر اليومي (ر.س)': currentUserIsAdmin ? (w.dailyWage || 0) : 'سري (إدارة)',
             'موقع العمل المسند': site ? site.name : 'غير محدد',
             'الحالة': w.status || 'على رأس العمل'
           };
         });
       } else if (type === 'attendance') {
-        data = AppData.attendance.map((a, idx) => {
+        const allowedW = isSup ? new Set(AppData.workers.filter(w => w.assignedSiteId === currentSupervisorSiteId).map(w => w.id)) : null;
+        const list = isSup ? AppData.attendance.filter(a => a.siteId === currentSupervisorSiteId || allowedW.has(a.workerId)) : AppData.attendance;
+        data = list.map((a, idx) => {
           const w = AppData.workers.find(worker => worker.id === a.workerId);
           const s = AppData.sites.find(site => site.id === a.siteId);
           const shiftLabel = a.shiftType === 'EVENING_12H' ? 'مسائي 12س' : (a.shiftType === 'COMBINED_24H' ? 'وردية مدمجة 24س' : 'صباحي 12س');
@@ -6443,7 +6644,8 @@
           };
         });
       } else if (type === 'inventory') {
-        data = AppData.inventory.map((i, idx) => {
+        const list = isSup ? AppData.inventory.filter(i => !i.siteId || i.siteId === currentSupervisorSiteId) : AppData.inventory;
+        data = list.map((i, idx) => {
           const site = i.siteId ? AppData.sites.find(s => s.id === i.siteId) : null;
           const siteName = site ? site.name : (i.siteName || (i.siteId ? 'موقع مخصص' : 'المخزن الرئيسي العام'));
           const totalValue = (Number(i.currentStock) || 0) * (Number(i.costPerUnit) || 0);
@@ -6455,8 +6657,8 @@
             'الوحدة': i.unit || 'حبة',
             'الرصيد الحالي': i.currentStock || 0,
             'حد إعادة الطلب': i.minThreshold || 5,
-            'تكلفة الوحدة (ر.س)': i.costPerUnit || 0,
-            'إجمالي القيمة التقديرية (ر.س)': totalValue,
+            'تكلفة الوحدة (ر.س)': currentUserIsAdmin ? (i.costPerUnit || 0) : 'سري (إدارة)',
+            'إجمالي القيمة التقديرية (ر.س)': currentUserIsAdmin ? totalValue : 'سري (إدارة)',
             'حالة المخزون': (i.currentStock || 0) <= (i.minThreshold || 5) ? 'رصيد منخفض (تحذير)' : 'متوفر كافي'
           };
         });
@@ -6513,6 +6715,7 @@
     }
 
     function exportCompleteSystemToExcel() {
+      if (!requireAdmin('تصدير النظام بالكامل إلى Excel')) return;
       const wb = XLSX.utils.book_new();
 
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(AppData.sites), "مواقع العمل");
@@ -6542,6 +6745,7 @@
        8. AUTHORIZED ADMINS MANAGEMENT (GOOGLE ACCOUNTS)
        ───────────────────────────────────────────────────────────────── */
     async function loadAuthorizedAdmins() {
+      if (!currentUser || !currentUserIsAdmin) return;
       try {
         const snap = await db.collection('authorized_admins').get();
         AppData.admins = snap.docs.map(d => ({ email: d.id, ...d.data() }));
@@ -6553,6 +6757,7 @@
 
     function renderAdminsTable() {
       const tbody = document.getElementById('adminsTableBody');
+      if (!tbody) return;
       const fixedRows = `
         <tr>
           <td><b class="mono" style="color: var(--neon-teal);">moath.khaled.h@gmail.com</b></td>
@@ -6582,7 +6787,7 @@
           <td>${a.addedAt ? new Date(a.addedAt).toLocaleDateString('ar-SA') : '-'}</td>
           <td><span class="badge badge-success">معتمد ومصرح</span></td>
           <td>
-            <button class="btn-action-icon danger" title="إلغاء الصلاحية" onclick="removeAuthorizedAdmin('${a.email}')">🗑️</button>
+            <button type="button" class="btn-action-icon danger" title="إلغاء الصلاحية" onclick="removeAuthorizedAdmin(decodeURIComponent('${encodeURIComponent(a.email || '')}'))">🗑️</button>
           </td>
         </tr>
       `).join('');
@@ -6592,23 +6797,21 @@
 
     async function handleAddAuthorizedAdmin(e) {
       if (e) e.preventDefault();
-      const submitBtn = document.querySelector('#modalAddAdmin button[type="submit"]');
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = '⏳ جارٍ الاعتماد والحفظ...';
-      }
+      if (!requireAdmin('إضافة مسؤول إداري')) return;
 
       const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
       const name = document.getElementById('newAdminName').value.trim();
       const role = document.getElementById('newAdminRole').value;
 
-      if (!email || !email.includes('@')) {
-        alert("يرجى إدخال بريد Google إلكتروني صحيح");
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = 'إضافة واعتماد';
-        }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("يرجى إدخال بريد Google إلكتروني صحيح", "warning");
         return;
+      }
+
+      const submitBtn = document.querySelector('#modalAddAdmin button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = '⏳ جارٍ الاعتماد والحفظ...';
       }
 
       const adminObj = {
@@ -6629,8 +6832,8 @@
           new Promise((_, reject) => setTimeout(() => reject(new Error("انتهت مهلة الحفظ (Timeout)")), 10000))
         ]);
 
-        // Immediate local cache update
-        const existingIdx = AppData.admins.findIndex(a => a.email === email);
+        // Immediate local cache update after verified cloud save
+        const existingIdx = AppData.admins.findIndex(a => a.email?.toLowerCase() === email);
         if (existingIdx >= 0) {
           AppData.admins[existingIdx] = adminObj;
         } else {
@@ -6644,17 +6847,7 @@
         loadAuthorizedAdmins();
       } catch (err) {
         console.error("Add Admin Error:", err);
-        // Fallback update to local list so user is not blocked
-        const existingIdx = AppData.admins.findIndex(a => a.email === email);
-        if (existingIdx >= 0) {
-          AppData.admins[existingIdx] = adminObj;
-        } else {
-          AppData.admins.push(adminObj);
-        }
-        renderAdminsTable();
-        closeModal('modalAddAdmin');
-        showToast(`تم اعتماد المسؤول محلياً (${email}): ` + err.message, "warning");
-        await logAuditEvent('ADMIN', `إضافة مسؤول إداري (محلياً): ${email}`, 'authorized_admins', email, name, `تم اعتماد المسؤول محلياً: ${err.message}`, adminObj);
+        showToast(`فشل حفظ المسؤول في السحابة (${email}): ${err.message}`, "error");
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -6664,21 +6857,24 @@
     }
 
     async function removeAuthorizedAdmin(email) {
-      if (SUPERADMIN_EMAILS.includes(email.toLowerCase())) {
-        alert("لا يمكن حذف حساب المدير العام الأساسي!");
+      if (!requireAdmin('إلغاء صلاحية مسؤول')) return;
+      const normalizedEmail = (email || '').trim().toLowerCase();
+      if (!normalizedEmail) return;
+      if (SUPERADMIN_EMAILS.includes(normalizedEmail)) {
+        showToast("لا يمكن حذف حساب المدير العام أو المالك الأساسي!", "warning");
         return;
       }
-      if (confirm(`هل أنت متأكد من إلغاء صلاحية المسؤول لحساب ${email}؟`)) {
+      if (confirm(`هل أنت متأكد من إلغاء صلاحية المسؤول لحساب ${normalizedEmail}؟`)) {
         try {
           if (!db) initFirebaseCore();
           await Promise.race([
             db.collection('authorized_admins').doc(email).delete(),
             new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000))
           ]);
-          AppData.admins = AppData.admins.filter(a => a.email !== email);
+          AppData.admins = AppData.admins.filter(a => a.email?.toLowerCase() !== normalizedEmail);
           renderAdminsTable();
-          await logAuditEvent('ADMIN', `إلغاء صلاحية مسؤول: ${email}`, 'authorized_admins', email, email, `تم إلغاء صلاحية المسؤول وحذفه من القائمة المعتمدة`);
-          showToast(`تم إلغاء صلاحية ${email}`, "success");
+          await logAuditEvent('ADMIN', `إلغاء صلاحية مسؤول: ${normalizedEmail}`, 'authorized_admins', normalizedEmail, normalizedEmail, `تم إلغاء صلاحية المسؤول وحذفه من القائمة المعتمدة`);
+          showToast(`تم إلغاء صلاحية ${normalizedEmail}`, "success");
         } catch (err) {
           showToast("فشل الحذف: " + err.message, "error");
         }
@@ -6731,6 +6927,7 @@
     }
 
     function openAddSupervisorModal() {
+      if (!requireAdmin('إضافة مشرف موقع')) return;
       const select = document.getElementById('supAssignedSiteId');
       if (select) {
         select.innerHTML = '<option value="">اختر الموقع المراد ربطه...</option>' + 
@@ -6748,12 +6945,19 @@
 
     async function handleSaveSupervisor(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('حفظ بيانات مشرف الموقع')) return;
+
+      const email = document.getElementById('supEmail').value.trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("يرجى إدخال بريد إلكتروني صحيح للمشرف", "warning");
+        return;
+      }
+
       const submitBtn = document.querySelector('#modalAddSupervisor button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '⏳ جارٍ الحفظ والتفعيل...'; }
 
       const isEdit = !!document.getElementById('supervisorEditId').value;
       const id = document.getElementById('supervisorEditId').value || ('sup_' + Date.now());
-      const email = document.getElementById('supEmail').value.trim().toLowerCase();
       const siteId = document.getElementById('supAssignedSiteId').value;
 
       const supData = sanitizeForFirestore({
@@ -6804,6 +7008,7 @@
     }
 
     function editSupervisor(id) {
+      if (!requireAdmin('تعديل بيانات مشرف الموقع')) return;
       const s = AppData.supervisors.find(sup => sup.id === id);
       if (!s) return;
       openAddSupervisorModal();
@@ -6818,6 +7023,7 @@
     }
 
     async function toggleSupervisorApproval(id, newApprovedState) {
+      if (!requireAdmin('تغيير حالة اعتماد المشرف')) return;
       const s = AppData.supervisors.find(sup => sup.id === id);
       if (!s) return;
 
@@ -6836,6 +7042,7 @@
     }
 
     async function deleteSupervisor(id) {
+      if (!requireAdmin('حذف حساب مشرف الموقع')) return;
       const s = AppData.supervisors.find(sup => sup.id === id);
       const name = s ? s.name : id;
       if (!confirm(`هل أنت متأكد من حذف حساب المشرف "${name}" وإلغاء ربطه؟`)) return;
@@ -6853,6 +7060,7 @@
     }
 
     async function seedDemoTrashItem() {
+      if (!requireAdmin('إنشاء سجل تجريبي في السلة')) return;
       try {
         if (!db) initFirebaseCore();
         const trashId = 'trash_demo_' + Date.now();
@@ -6888,6 +7096,7 @@
        9. SETTINGS & DIAGNOSTICS
        ───────────────────────────────────────────────────────────────── */
     function saveFirebaseSettings() {
+      if (!requireAdmin('تعديل إعدادات الاتصال السحابي')) return;
       const pId = document.getElementById('cfgProjectId').value.trim();
       const dbId = document.getElementById('cfgDatabaseId').value.trim();
       const aKey = document.getElementById('cfgApiKey').value.trim();
@@ -6901,6 +7110,7 @@
     }
 
     async function runConnectionDiagnostics() {
+      if (!requireAdmin('تشخيص الاتصال بالسحابة')) return;
       const box = document.getElementById('diagnosticsResultBox');
       box.style.display = 'block';
       box.style.background = 'rgba(16, 36, 46, 0.8)';
@@ -6924,13 +7134,13 @@
           ✅ <b>الاتصال بالسحابة سليم وفعال 100%!</b><br>
           • تمت القراءة والكتابة بنجاح.<br>
           • زمن الاستجابة (Latency): <b>${latency} مللي ثانية</b>.<br>
-          • قاعدة البيانات النشطة: <code>${localStorage.getItem('fb_database_id') || 'ai-studio-android-6b8f0e12-aea7-469a-9f94-664300ca80cb'}</code><br>
+          • قاعدة البيانات النشطة: <code>${escapeHtml(localStorage.getItem('fb_database_id') || 'ai-studio-android-6b8f0e12-aea7-469a-9f94-664300ca80cb')}</code><br>
           • عدد المواقع بالسحابة: <b>${AppData.sites.length}</b> | العمالة: <b>${AppData.workers.length}</b> | المخزون: <b>${AppData.inventory.length}</b> | المشرفين: <b>${AppData.supervisors.length}</b>
         `;
       } catch (err) {
         box.style.background = 'rgba(239, 68, 68, 0.15)';
         box.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-        box.innerHTML = `❌ <b>فشل فحص الاتصال:</b> ${err.message}`;
+        box.innerHTML = `❌ <b>فشل فحص الاتصال:</b> ${escapeHtml(err.message)}`;
       }
     }
 
@@ -6938,6 +7148,7 @@
        10. UI HELPERS & NAVIGATION
        ───────────────────────────────────────────────────────────────── */
     function switchTab(tabId) {
+      if (!requireAuth('التنقل بين أقسام النظام')) return;
       const adminOnlyTabs = ['tab-finance', 'tab-payroll', 'tab-daily-report', 'tab-importer', 'tab-trash', 'tab-audit', 'tab-settings'];
       if (!currentUserIsAdmin && adminOnlyTabs.includes(tabId)) {
         showToast("عذراً، هذه الصفحة مخصصة لمدراء النظام والمسؤولين فقط!", "warning");
@@ -6981,6 +7192,7 @@
     let workerDailyWageHidden = false;
 
     function toggleFinancialVisibility() {
+      if (!requireAdmin('إظهار أو إخفاء الأرقام المالية')) return;
       financialNumbersHidden = !financialNumbersHidden;
       const btn = document.getElementById('btnToggleFinancialVisibility');
       if (btn) {
@@ -6988,6 +7200,8 @@
       }
       if (typeof updateDashboardMetrics === 'function') updateDashboardMetrics();
       if (typeof renderSitesTable === 'function') renderSitesTable();
+      if (typeof renderWorkersTable === 'function') renderWorkersTable();
+      if (typeof renderInventoryTable === 'function') renderInventoryTable();
       if (typeof renderInvoicesTable === 'function') renderInvoicesTable();
       if (typeof renderExpensesTable === 'function') renderExpensesTable();
       if (typeof renderPayrollTable === 'function') renderPayrollTable();
@@ -6996,6 +7210,7 @@
     }
 
     function toggleWorkerDailyWageVisibility() {
+      if (!requireAdmin('إظهار أو إخفاء الأجر اليومي')) return;
       workerDailyWageHidden = !workerDailyWageHidden;
       const btn = document.getElementById('btnToggleWorkerWage');
       if (btn) {
@@ -7013,7 +7228,7 @@
     }
 
     function formatWage(wage) {
-      if (workerDailyWageHidden) {
+      if (workerDailyWageHidden || financialNumbersHidden) {
         return '•••••• ر.س / يوم';
       }
       const num = Number(wage) || 0;
@@ -7021,6 +7236,7 @@
     }
 
     function openAddWorkerModal() {
+      if (!requireAdmin('تسجيل عامل جديد')) return;
       const editId = document.getElementById('workerEditId');
       if (editId) editId.value = '';
       const form = document.getElementById('formWorker');
@@ -7031,57 +7247,88 @@
     }
 
     function openAddAttendanceModal() {
+      if (!requireAuth('تسجيل الحضور والانصراف')) return;
       const form = document.getElementById('formAttendance');
       if (form) form.reset();
+      const attDateEl = document.getElementById('attDate');
+      if (attDateEl) attDateEl.value = new Date().toISOString().split('T')[0];
+      if (!currentUserIsAdmin && currentSupervisorSiteId) {
+        const attSiteEl = document.getElementById('attSiteId');
+        if (attSiteEl) attSiteEl.value = currentSupervisorSiteId;
+      }
       openModal('modalAttendance');
     }
 
     function openAddExpenseModal() {
+      if (!requireAdmin('تسجيل مصروف تشغيلي')) return;
       const editId = document.getElementById('expenseEditId');
       if (editId) editId.value = '';
       const form = document.getElementById('formExpense');
       if (form) form.reset();
+      const expDateEl = document.getElementById('expDate');
+      if (expDateEl) expDateEl.value = new Date().toISOString().split('T')[0];
       openModal('modalExpense');
     }
 
     function openAddInvoiceModal() {
+      if (!requireAdmin('إصدار فاتورة جديدة')) return;
       const editId = document.getElementById('invoiceEditId');
       if (editId) editId.value = '';
       const form = document.getElementById('formInvoice');
       if (form) form.reset();
+      const issueEl = document.getElementById('invIssueDate');
+      if (issueEl) issueEl.value = new Date().toISOString().split('T')[0];
+      const dueEl = document.getElementById('invDueDate');
+      if (dueEl) dueEl.value = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
       openModal('modalInvoice');
     }
 
     function openAddPayrollModal() {
+      if (!requireAdmin('احتساب مسير الرواتب')) return;
       const editId = document.getElementById('payrollEditId');
       if (editId) editId.value = '';
       const form = document.getElementById('formPayroll');
       if (form) form.reset();
+      const payMonthEl = document.getElementById('payMonth');
+      if (payMonthEl) payMonthEl.value = currentPayrollMonth;
       const title = document.getElementById('modalPayrollTitle');
       if (title) title.innerText = '💵 احتساب وتعديل مسير راتب عامل';
+      calculatePayrollNet();
       openModal('modalPayroll');
     }
 
     function openAddCashAdvanceModal() {
+      if (!requireAdmin('تسجيل سلفة نقدية')) return;
       const form = document.getElementById('formCashAdvance');
       if (form) form.reset();
+      const advDateEl = document.getElementById('advanceDate');
+      if (advDateEl) advDateEl.value = new Date().toISOString().split('T')[0];
+      const advMonthEl = document.getElementById('advanceDeductionMonth');
+      if (advMonthEl) advMonthEl.value = currentPayrollMonth;
       openModal('modalCashAdvance');
     }
 
     function openAddAdminModal() {
+      if (!requireAdmin('إضافة مسؤول إداري')) return;
       const form = document.getElementById('formAddAdmin');
       if (form) form.reset();
       openModal('modalAddAdmin');
     }
 
     function openModal(modalId) {
-      console.log("Opening modal:", modalId);
+      if (!requireAuth('فتح النافذة')) return;
       const modal = document.getElementById(modalId);
       if (modal) {
+        if (modalId === 'modalMaterialUsage') {
+          const usageDateEl = document.getElementById('usageDate');
+          if (usageDateEl && !usageDateEl.value) usageDateEl.value = new Date().toISOString().split('T')[0];
+          if (!currentUserIsAdmin && currentSupervisorSiteId) {
+            const usageSiteEl = document.getElementById('usageSiteId');
+            if (usageSiteEl) usageSiteEl.value = currentSupervisorSiteId;
+          }
+        }
         modal.classList.add('active');
         modal.style.display = 'flex';
-      } else {
-        console.error("Modal not found:", modalId);
       }
     }
 
@@ -7182,16 +7429,16 @@
                 </span>
               </div>
               <div style="display: flex; gap: 16px; font-size: 0.85rem;" class="mono">
-                <span style="color: var(--neon-teal);">الإيراد التعاقدي: <b>${monthlyVal.toLocaleString()} ر.س</b></span>
-                <span style="color: #F87171;">المصروفات التشغيلية: <b>${siteExpenses.toLocaleString()} ر.س</b></span>
-                <span style="color: ${badgeColor}; font-weight: 700;">الصافي: <b>${netProfit.toLocaleString()} ر.س</b></span>
+                <span style="color: var(--neon-teal);">الإيراد التعاقدي: <b>${formatMoney(monthlyVal)}</b></span>
+                <span style="color: #F87171;">المصروفات التشغيلية: <b>${formatMoney(siteExpenses)}</b></span>
+                <span style="color: ${badgeColor}; font-weight: 700;">الصافي: <b>${formatMoney(netProfit)}</b></span>
               </div>
             </div>
 
             <!-- Visual Progress bar -->
             <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 5px; overflow: hidden; display: flex; position: relative;">
-              <div style="width: ${expRatio}%; height: 100%; background: #EF4444; transition: width 0.5s ease;" title="المصروفات: ${siteExpenses.toLocaleString()} ر.س"></div>
-              <div style="width: ${Math.max(0, 100 - expRatio)}%; height: 100%; background: var(--neon-teal); transition: width 0.5s ease;" title="الصافي: ${Math.max(0, netProfit).toLocaleString()} ر.س"></div>
+              <div style="width: ${expRatio}%; height: 100%; background: #EF4444; transition: width 0.5s ease;" title="المصروفات: ${formatMoney(siteExpenses)}"></div>
+              <div style="width: ${Math.max(0, 100 - expRatio)}%; height: 100%; background: var(--neon-teal); transition: width 0.5s ease;" title="الصافي: ${formatMoney(Math.max(0, netProfit))}"></div>
             </div>
           </div>
         `;
@@ -7204,6 +7451,7 @@
        9.1 MONTHLY PAYROLL & CASH ADVANCES
        ───────────────────────────────────────────────────────────────── */
     function navigatePayrollMonth(delta) {
+      if (!requireAdmin('استعراض مسير الرواتب')) return;
       const parts = (currentPayrollMonth || "2026-11").split("-");
       let year = parseInt(parts[0], 10);
       let month = parseInt(parts[1], 10) + delta;
@@ -7222,6 +7470,10 @@
     function renderPayrollTable() {
       const tbody = document.getElementById("payrollTableBody");
       if (!tbody) return;
+      if (!currentUserIsAdmin) {
+        tbody.innerHTML = '';
+        return;
+      }
 
       const disp = document.getElementById("currentPayrollMonthDisplay");
       if (disp) disp.innerText = currentPayrollMonth;
@@ -7280,14 +7532,14 @@
             <td><span class="badge badge-teal">${escapeHtml(w.role || "عامل")}</span></td>
             <td>${escapeHtml(siteName)}</td>
             <td class="mono"><b>${days}</b> يوم</td>
-            <td class="mono">${wage.toLocaleString()} ر.س</td>
-            <td class="mono">${base.toLocaleString()} ر.س</td>
-            <td class="mono" style="color:#4ADE80;">+${otBonus.toLocaleString()} ر.س (${otHours} س)</td>
-            <td class="mono" style="color:#F87171;">-${deductions.toLocaleString()} ر.س</td>
-            <td class="mono"><b style="color:var(--neon-teal); font-size:1.05rem;">${net.toLocaleString()} ر.س</b></td>
+            <td class="mono">${formatMoney(wage)}</td>
+            <td class="mono">${formatMoney(base)}</td>
+            <td class="mono" style="color:#4ADE80;">+${formatMoney(otBonus)} (${otHours} س)</td>
+            <td class="mono" style="color:#F87171;">-${formatMoney(deductions)}</td>
+            <td class="mono"><b style="color:var(--neon-teal); font-size:1.05rem;">${formatMoney(net)}</b></td>
             <td><span class="badge ${statusBadge}">${escapeHtml(status)}</span></td>
             <td>
-              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="editPayrollForWorker('${w.id}', ${days}, ${wage}, ${otHours}, ${otBonus}, ${deductions}, '${status}')">
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="editPayrollForWorker('${w.id}', ${days}, ${wage}, ${otHours}, ${otBonus}, ${deductions}, '${escapeHtml(status)}')">
                 ✏️ تعديل
               </button>
             </td>
@@ -7298,15 +7550,16 @@
       tbody.innerHTML = rows;
 
       // Update counters
-      document.getElementById("statPayrollBaseWages").innerText = totalBaseWages.toLocaleString("ar-SA") + " ر.س";
-      document.getElementById("statPayrollOvertime").innerText = totalOvertimeBonus.toLocaleString("ar-SA") + " ر.س";
-      document.getElementById("statPayrollDeductions").innerText = totalDeductions.toLocaleString("ar-SA") + " ر.س";
-      document.getElementById("statPayrollNetTotal").innerText = netTotal.toLocaleString("ar-SA") + " ر.س";
+      document.getElementById("statPayrollBaseWages").innerText = formatMoney(totalBaseWages);
+      document.getElementById("statPayrollOvertime").innerText = formatMoney(totalOvertimeBonus);
+      document.getElementById("statPayrollDeductions").innerText = formatMoney(totalDeductions);
+      document.getElementById("statPayrollNetTotal").innerText = formatMoney(netTotal);
       const badge = document.getElementById("badgePayrollCount");
       if (badge) badge.innerText = AppData.workers.length;
     }
 
     function editPayrollForWorker(workerId, days, wage, otHours, otBonus, deductions, status) {
+      if (!requireAdmin('تعديل مسير راتب عامل')) return;
       const select = document.getElementById("payWorkerId");
       if (select) select.value = workerId;
       document.getElementById("payMonth").value = currentPayrollMonth;
@@ -7340,6 +7593,7 @@
 
     async function handleSavePayroll(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('حفظ مسير الراتب')) return;
       const submitBtn = document.querySelector("#modalPayroll button[type='submit']");
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ الحفظ..."; }
 
@@ -7384,6 +7638,7 @@
     }
 
     function exportPayrollToExcel() {
+      if (!requireAdmin('تصدير مسير الرواتب')) return;
       if (!AppData.workers.length) {
         showToast("لا توجد بيانات مسير رواتب للتصدير!", "warning");
         return;
@@ -7432,6 +7687,10 @@
     function renderAdvancesTable() {
       const tbody = document.getElementById("advancesTableBody");
       if (!tbody) return;
+      if (!currentUserIsAdmin) {
+        tbody.innerHTML = '';
+        return;
+      }
 
       if (!AppData.advances.length) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">لا توجد سلف نقدية مسجلة حالياً.</td></tr>`;
@@ -7447,14 +7706,14 @@
           <tr>
             <td><b class="mono" style="color:var(--neon-teal);">${adv.id.substring(0, 10)}</b></td>
             <td><b>${escapeHtml(wName)}</b></td>
-            <td class="mono"><b style="color:#F87171;">${(Number(adv.amount) || 0).toLocaleString()} ر.س</b></td>
+            <td class="mono"><b style="color:#F87171;">${formatMoney(Number(adv.amount) || 0)}</b></td>
             <td class="mono">${escapeHtml(adv.date || "-")}</td>
             <td class="mono"><b>${escapeHtml(adv.deductionMonth || "-")}</b></td>
             <td>${escapeHtml(adv.reason || "سلفة نقدية")}</td>
             <td><span class="badge ${isPaid ? "badge-success" : "badge-danger"}">${escapeHtml(adv.status || "غير مسددة")}</span></td>
             <td>
               <div style="display:flex; gap:6px; align-items:center;">
-                <button type="button" class="btn ${isPaid ? "btn-secondary" : "btn-primary"}" style="padding: 4px 8px; font-size: 0.78rem;" onclick="toggleAdvanceStatus('${adv.id}', '${adv.status}')">
+                <button type="button" class="btn ${isPaid ? "btn-secondary" : "btn-primary"}" style="padding: 4px 8px; font-size: 0.78rem;" onclick="toggleAdvanceStatus('${adv.id}', '${escapeHtml(adv.status || '')}')">
                   ${isPaid ? "إلغاء الخصم" : "تم الخصم والسداد"}
                 </button>
                 <button type="button" class="btn-action-icon danger" onclick="deleteCashAdvance('${adv.id}')" title="حذف">🗑️</button>
@@ -7467,6 +7726,7 @@
 
     async function handleSaveCashAdvance(e) {
       if (e) e.preventDefault();
+      if (!requireAdmin('تسجيل سلفة نقدية')) return;
       const submitBtn = document.querySelector("#modalCashAdvance button[type='submit']");
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ الحفظ..."; }
 
@@ -7504,6 +7764,7 @@
     }
 
     async function toggleAdvanceStatus(id, currentStatus) {
+      if (!requireAdmin('تحديث حالة السلفة')) return;
       const nextStatus = currentStatus === "مسددة ومخصومة" ? "غير مسددة" : "مسددة ومخصومة";
       try {
         if (!db) initFirebaseCore();
@@ -7519,6 +7780,7 @@
     }
 
     async function deleteCashAdvance(id) {
+      if (!requireAdmin('حذف سلفة نقدية')) return;
       if (!confirm("هل أنت متأكد من حذف هذه السلفة؟")) return;
       try {
         if (!db) initFirebaseCore();
@@ -7533,6 +7795,7 @@
     }
 
     function exportAdvancesToExcel() {
+      if (!requireAdmin('تصدير سجل السلف')) return;
       if (!AppData.advances.length) {
         showToast("لا توجد سلف نقدية للتصدير!", "warning");
         return;
@@ -7564,10 +7827,17 @@
        ───────────────────────────────────────────────────────────────── */
     async function handleSaveMaterialUsage(e) {
       if (e) e.preventDefault();
+      if (!requireAuth('تسجيل استهلاك المواد')) return;
+
+      const siteId = document.getElementById("usageSiteId").value;
+      if (!currentUserIsAdmin && currentSupervisorSiteId && siteId !== currentSupervisorSiteId) {
+        showToast("عذراً، يمكنك تسجيل استهلاك المواد للموقع المكلف به فقط!", "warning");
+        return;
+      }
+
       const submitBtn = document.querySelector("#modalMaterialUsage button[type='submit']");
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "⏳ جارٍ التسجيل..."; }
 
-      const siteId = document.getElementById("usageSiteId").value;
       const itemId = document.getElementById("usageItemId").value;
       const qty = Number(document.getElementById("usageQuantity").value) || 1;
       const date = document.getElementById("usageDate").value || new Date().toISOString().split("T")[0];
@@ -7609,7 +7879,7 @@
         closeModal("modalMaterialUsage");
         showToast(`تم تسجيل استهلاك (${qty} ${usageData.unit}) من (${usageData.itemName}) لموقع (${usageData.siteName}) وخصم الرصيد بنجاح!`, "success");
         await logAuditEvent("UPDATE", `استهلاك مخزون: ${usageData.itemName}`, "inventory_items", itemId, usageData.itemName, `تم صرف ${qty} ${usageData.unit} لصالح موقع [${usageData.siteName}]`, usageData);
-        generateDailyOperationsReport();
+        if (currentUserIsAdmin) generateDailyOperationsReport();
       } catch (err) {
         showToast("خطأ في تسجيل استهلاك المواد: " + err.message, "error");
       } finally {
@@ -7623,6 +7893,10 @@
     function generateDailyOperationsReport() {
       const container = document.getElementById("dailyReportContainer");
       if (!container) return;
+      if (!currentUserIsAdmin) {
+        container.innerHTML = '';
+        return;
+      }
 
       const siteSelect = document.getElementById("dailyReportSiteSelect");
       const datePicker = document.getElementById("dailyReportDatePicker");
@@ -7810,10 +8084,13 @@
     }
 
     function printDailyOperationsReport() {
+      if (!requireAdmin('طباعة تقرير العمليات اليومية')) return;
+      generateDailyOperationsReport();
       window.print();
     }
 
     function exportDailyReportToExcel() {
+      if (!requireAdmin('تصدير تقرير العمليات اليومية')) return;
       const siteSelect = document.getElementById("dailyReportSiteSelect");
       const datePicker = document.getElementById("dailyReportDatePicker");
       const siteId = siteSelect?.value;
@@ -7821,7 +8098,6 @@
       const site = AppData.sites.find(s => s.id === siteId);
 
       const siteAttRecords = AppData.attendance.filter(a => a.siteId === siteId && a.date === date);
-      const siteMaterials = AppData.materialUsage.filter(u => u.siteId === siteId && u.date === date);
 
       const rows = siteAttRecords.map(a => {
         const w = AppData.workers.find(wk => wk.id === a.workerId);
@@ -7849,8 +8125,18 @@
     let aiWebMode = "cloud"; // "cloud" or "local"
     let aiChatHistory = [];
 
+    function getScopedOperationalData() {
+      const isAll = currentUserIsAdmin || !currentSupervisorSiteId;
+      const sites = isAll ? (AppData.sites || []) : (AppData.sites || []).filter(s => s.id === currentSupervisorSiteId);
+      const workers = isAll ? (AppData.workers || []) : (AppData.workers || []).filter(w => w.assignedSiteId === currentSupervisorSiteId);
+      const workerIds = new Set(workers.map(w => w.id));
+      const attendance = isAll ? (AppData.attendance || []) : (AppData.attendance || []).filter(a => a.siteId === currentSupervisorSiteId || workerIds.has(a.workerId));
+      const inventory = isAll ? (AppData.inventory || []) : (AppData.inventory || []).filter(i => !i.siteId || i.siteId === currentSupervisorSiteId);
+      return { sites, workers, attendance, inventory };
+    }
+
     function openAiAssistantModal() {
-      console.log("Attempting to open AI Assistant modal");
+      if (!requireAuth('المساعد الذكي')) return;
       openModal('modalAiAssistant');
       if (aiChatHistory.length === 0) {
         initAiWelcomeMessage();
@@ -7880,11 +8166,12 @@
     }
 
     function initAiWelcomeMessage() {
-      const activeSites = (AppData.sites || []).filter(s => s.status !== "منتهي").length;
-      const totalWorkers = (AppData.workers || []).length;
-      const lowStock = (AppData.inventory || []).filter(i => (i.currentStock || 0) <= (i.minThreshold || 5)).length;
+      const { sites, workers, attendance, inventory } = getScopedOperationalData();
+      const activeSites = sites.filter(s => s.status !== "منتهي").length;
+      const totalWorkers = workers.length;
+      const lowStock = inventory.filter(i => (i.currentStock || 0) <= (i.minThreshold || 5)).length;
       const today = new Date().toISOString().split("T")[0];
-      const todayAtt = (AppData.attendance || []).filter(a => a.date === today);
+      const todayAtt = attendance.filter(a => a.date === today);
       const presentCount = todayAtt.filter(a => a.status === "حاضر").length;
 
       const welcomeText = `👋 **أهلاً بك! أنا مساعدك الذكي لإدارة مشاريع خدمات النظافة والعمليات التشغيلية.**\n\n📊 **ملخص تشغيلي سريع لليوم:**\n• مواقع العمل النشطة: ${activeSites} موقع\n• القوى العاملة الإجمالية: ${totalWorkers} كادر\n• الحاضرون اليوم (${today}): ${presentCount} عامل\n${lowStock > 0 ? `• ⚠️ هناك ${lowStock} أصناف مواد بحاجة لإعادة طلب بالمخزن!\n` : '• ✅ المخزون في حالة ممتازة.\n'}\nيمكنك النقر على أحد الأسئلة السريعة أعلاه أو سؤالي عن الحضور، الغياب، المخزون، أو نصائح ترشيد التكاليف!`;
@@ -7938,6 +8225,7 @@
 
     async function handleSendAiMessage(event) {
       if (event) event.preventDefault();
+      if (!requireAuth('المساعد الذكي')) return;
       const input = document.getElementById('aiUserInput');
       const text = input ? input.value.trim() : "";
       if (!text) return;
@@ -7983,11 +8271,12 @@
     }
 
     async function callWebGeminiOrFallback(userPrompt) {
-      const cfgKey = document.getElementById('cfgApiKey')?.value || "";
+      const { sites, workers, inventory } = getScopedOperationalData();
+      const cfgKey = currentUserIsAdmin ? (document.getElementById('cfgApiKey')?.value || "") : "";
       if (cfgKey && cfgKey.startsWith("AIzaSy")) {
         try {
-          const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.0-flash", "gemini-1.5-flash"];
-          const contextPrompt = `بيانات المشروع: مواقع النشطة=${(AppData.sites||[]).length}, عمال=${(AppData.workers||[]).length}, أصناف المخزون=${(AppData.inventory||[]).length}. أجب بإيجاز واحترافية باللغة العربية.\nسؤال: ${userPrompt}`;
+          const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+          const contextPrompt = `بيانات المشروع: مواقع النشطة=${sites.length}, عمال=${workers.length}, أصناف المخزون=${inventory.length}. أجب بإيجاز واحترافية باللغة العربية.\nسؤال: ${userPrompt}`;
 
           for (const m of models) {
             const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${cfgKey}`, {
@@ -8014,16 +8303,17 @@
     function generateWebSmartAiResponse(prompt) {
       const p = prompt.toLowerCase();
       const today = new Date().toISOString().split("T")[0];
+      const { sites, workers, attendance, inventory } = getScopedOperationalData();
 
       // 1. Attendance queries
       if (p.includes("حضور") || p.includes("غياب") || p.includes("متأخر") || p.includes("تأخير") || p.includes("من حضر")) {
-        const todayAtt = (AppData.attendance || []).filter(a => a.date === today);
+        const todayAtt = attendance.filter(a => a.date === today);
         const present = todayAtt.filter(a => a.status === "حاضر");
         const late = todayAtt.filter(a => a.status === "تأخير");
         const absent = todayAtt.filter(a => a.status === "غائب");
 
         let res = `📋 **تقرير الحضور والانصراف لتاريخ اليوم (${today}):**\n\n`;
-        res += `• إجمالي العمالة: ${(AppData.workers || []).length} عامل\n`;
+        res += `• إجمالي العمالة: ${workers.length} عامل\n`;
         res += `• ✅ الحاضرون: ${present.length} عامل\n`;
         res += `• ⏳ المتأخرون: ${late.length} عامل\n`;
         res += `• ❌ الغائبون: ${absent.length} عامل\n\n`;
@@ -8031,7 +8321,7 @@
         if (late.length > 0) {
           res += `⚠️ **المتأخرون:**\n`;
           late.forEach(l => {
-            const w = (AppData.workers || []).find(wk => wk.id === l.workerId);
+            const w = workers.find(wk => wk.id === l.workerId);
             res += `  - ${w ? w.name : 'عامل'} (${w ? w.role : '-'})\n`;
           });
           res += `\n`;
@@ -8040,7 +8330,7 @@
         if (absent.length > 0) {
           res += `🚨 **أبرز الغائبين:**\n`;
           absent.slice(0, 6).forEach(ab => {
-            const w = (AppData.workers || []).find(wk => wk.id === ab.workerId);
+            const w = workers.find(wk => wk.id === ab.workerId);
             res += `  - ${w ? w.name : 'عامل'}\n`;
           });
         }
@@ -8050,9 +8340,9 @@
 
       // 2. Inventory & stock
       if (p.includes("مخزون") || p.includes("مواد") || p.includes("منظف") || p.includes("نقص") || p.includes("نفاد") || p.includes("صرف")) {
-        const lowStock = (AppData.inventory || []).filter(i => (i.currentStock || 0) <= (i.minThreshold || 5));
+        const lowStock = inventory.filter(i => (i.currentStock || 0) <= (i.minThreshold || 5));
         let res = `📦 **تقرير مخزون المواد والمستلزمات:**\n\n`;
-        res += `• إجمالي الأصناف بالمستودع: ${(AppData.inventory || []).length} صنف\n`;
+        res += `• إجمالي الأصناف بالمستودع: ${inventory.length} صنف\n`;
         res += `• أصناف تحت الحد الأدنى: ${lowStock.length} صنف\n\n`;
 
         if (lowStock.length > 0) {
@@ -8069,14 +8359,17 @@
 
       // 3. Financial & Invoices & Profit
       if (p.includes("مالي") || p.includes("ربح") || p.includes("مصروف") || p.includes("فاتورة") || p.includes("فواتير") || p.includes("أرباح") || p.includes("دخل")) {
+        if (!currentUserIsAdmin) {
+          return "🔒 عذراً، التقارير المالية والأرباح مخصصة للإدارة العامة فقط.";
+        }
         const totalInvoiced = (AppData.invoices || []).reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0);
         const totalExpenses = (AppData.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
         const netProfit = totalInvoiced - totalExpenses;
 
         let res = `💰 **الملخص المالي والربحية للمشروع:**\n\n`;
-        res += `• إجمالي الفواتير الصادرة: ${totalInvoiced.toLocaleString('ar-SA')} ر.س\n`;
-        res += `• إجمالي المصروفات التشغيلية: ${totalExpenses.toLocaleString('ar-SA')} ر.س\n`;
-        res += `• 📈 صافي الأرباح التشغيلية: ${netProfit.toLocaleString('ar-SA')} ر.س\n\n`;
+        res += `• إجمالي الفواتير الصادرة: ${formatMoney(totalInvoiced)}\n`;
+        res += `• إجمالي المصروفات التشغيلية: ${formatMoney(totalExpenses)}\n`;
+        res += `• 📈 صافي الأرباح التشغيلية: ${formatMoney(netProfit)}\n\n`;
 
         const unpaid = (AppData.invoices || []).filter(i => i.status !== "مدفوعة بالكامل");
         if (unpaid.length > 0) {
@@ -8089,16 +8382,23 @@
 
       // 4. Sites & Contracts
       if (p.includes("موقع") || p.includes("مواقع") || p.includes("عقد") || p.includes("عقود")) {
-        const totalMonthly = (AppData.sites || []).reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
         let res = `🏢 **دليل مواقع العمل الميدانية:**\n\n`;
-        res += `• عدد مواقع العمل: ${(AppData.sites || []).length} موقع\n`;
-        res += `• إجمالي قيمة العقود الشهرية: ${totalMonthly.toLocaleString('ar-SA')} ر.س / شهرياً\n\n`;
-        (AppData.sites || []).slice(0, 5).forEach(site => {
+        res += `• عدد مواقع العمل: ${sites.length} موقع\n`;
+        if (currentUserIsAdmin) {
+          const totalMonthly = sites.reduce((sum, s) => sum + (Number(s.contractMonthlyValue) || 0), 0);
+          res += `• إجمالي قيمة العقود الشهرية: ${formatMoney(totalMonthly)} / شهرياً\n`;
+        }
+        res += `\n`;
+        sites.slice(0, 5).forEach(site => {
           res += `📍 **${site.name}** (العميل: ${site.clientName || 'غير محدد'})\n`;
-          res += `  - قيمة العقد: ${(Number(site.contractMonthlyValue) || 0).toLocaleString('ar-SA')} ر.س | الحالة: ${site.status || 'نشط'}\n`;
+          if (currentUserIsAdmin) {
+            res += `  - قيمة العقد: ${formatMoney(Number(site.contractMonthlyValue) || 0)} | الحالة: ${site.status || 'نشط'}\n`;
+          } else {
+            res += `  - الحالة: ${site.status || 'نشط'}\n`;
+          }
         });
-        if ((AppData.sites || []).length > 5) {
-          res += `  - وغيرها ${(AppData.sites || []).length - 5} مواقع...\n`;
+        if (sites.length > 5) {
+          res += `  - وغيرها ${sites.length - 5} مواقع...\n`;
         }
         return res;
       }
@@ -8109,8 +8409,8 @@
       }
 
       // Default smart overview
-      const activeSites = (AppData.sites || []).filter(s => s.status !== "منتهي").length;
-      return `📊 **معلومات عامة عن النظام والمشروع:**\n• مواقع العمل: ${activeSites} نشطة\n• الكوادر البشرية: ${(AppData.workers || []).length} عامل وموظف\n• أصناف المستودع: ${(AppData.inventory || []).length} صنف\n\n💡 يمكنك سؤالي بالتفصيل عن الحضور والغياب، المواد الناقصة بالمخزن، أو الأداء المالي والفواتير.`;
+      const activeSites = sites.filter(s => s.status !== "منتهي").length;
+      return `📊 **معلومات عامة عن النظام والمشروع:**\n• مواقع العمل: ${activeSites} نشطة\n• الكوادر البشرية: ${workers.length} عامل وموظف\n• أصناف المستودع: ${inventory.length} صنف\n\n💡 يمكنك سؤالي بالتفصيل عن الحضور والغياب، أو المواد الناقصة بالمخزن${currentUserIsAdmin ? '، أو الأداء المالي والفواتير' : ''}.`;
     }
 
     function installPwaDesktop() {
